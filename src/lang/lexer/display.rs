@@ -1,13 +1,12 @@
 use colored::Colorize;
 
-use super::{linter::LinterError, token::{Token, TokenLiteral, TokenSymbol}, tokenizer::TokenizerError, LexerResult};
+use super::{linter::LinterError, token::{Token, TokenLiteral, TokenSymbol}, tokenizer::TokenizerError, LexerError};
 
-impl std::fmt::Display for LexerResult {
+impl std::fmt::Display for LexerError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LexerResult::Ok => write!(f, "Ok"),
-            LexerResult::TokenizerError(error) => write!(f, "TokenizerError: {error}"),
-            LexerResult::LinterError(error) => write!(f, "LinterError: {error}"),
+            LexerError::TokenizerError(error) => write!(f, "TokenizerError >> {error}"),
+            LexerError::LinterError(error) => write!(f, "LinterError >> {error}"),
         }
     }
 }

@@ -9,13 +9,15 @@ use node::{expression::Expression, statement::{self, Statement}, AbstractSyntaxT
 
 use super::lexer::token::Token;
 
+/// Generates an abstract syntax tree (AST) from a vector of tokens.
 pub fn parse_tree(tokens: Vec<Token>) -> Result<AbstractSyntaxTree, ParserError> {
     let mut tree = Vec::new();
 
     let mut machine = ParsingMachine::new(tokens);
 
+    // For each new root-node: it will start parsing at its first token,
+    // and end the parsing at the first token of the next root-node.
     while let Some(t) = machine.peek() {
-        // STARTS AT: node[0] - ENDS AT: next_node[0]
         match t {
             Token::Keyword(keyword) => match keyword.as_str() {
                 "let" => tree.push(
@@ -27,6 +29,8 @@ pub fn parse_tree(tokens: Vec<Token>) -> Result<AbstractSyntaxTree, ParserError>
             },
             Token::EOL => { machine.next(); },
             Token::EOF => break,
+            // If the new root-node is not an statement, check for an expression (which will be printed when evaluating it).
+            // In case that the expression isn't valid neither, an error will be thrown.
             _ => match Expression::from_tokens(&mut machine) {
                 Ok(expression) => tree.push(TreeNode::Expression(expression)),
                 Err(error) => return Err(machine.except(ParsingMachineException::InvalidToken(

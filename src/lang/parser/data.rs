@@ -11,7 +11,6 @@ impl From<DataValue> for String {
         match value {
             DataValue::String(s) => s,
             DataValue::Number(n) => n.to_string(),
-            _ => String::from("<unknown>")
         }
     }
 }
@@ -35,7 +34,7 @@ impl Sub for &DataValue {
 
     fn sub(self, other: &DataValue) -> Self::Output {
         match (self, other) {
-            // If both are numbers, sum them
+            // If both are numbers, subtract them
             (DataValue::Number(lhs), DataValue::Number(rhs)) => DataValue::Number(lhs - rhs),
 
             // If at least one is not a number, convert all to string
@@ -49,7 +48,7 @@ impl Mul for &DataValue {
 
     fn mul(self, other: &DataValue) -> Self::Output {
         match (self, other) {
-            // If both are numbers, sum them
+            // If both are numbers, multiply them
             (DataValue::Number(lhs), DataValue::Number(rhs)) => DataValue::Number(lhs * rhs),
 
             // If at least one is not a number, convert all to string
@@ -63,7 +62,7 @@ impl Div for &DataValue {
 
     fn div(self, other: &DataValue) -> Self::Output {
         match (self, other) {
-            // If both are numbers, sum them
+            // If both are numbers, divide them
             (DataValue::Number(lhs), DataValue::Number(rhs)) => DataValue::Number(lhs / rhs),
 
             // If at least one is not a number, convert all to string

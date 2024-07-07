@@ -5,9 +5,13 @@ use scope::Scope;
 
 use crate::lang::parser::node::AbstractSyntaxTree;
 
+/// A virtual machine that executes a program in bytecode
 pub struct VM {
+    // The program to be executed in AST form
     program: AbstractSyntaxTree,
+    // The position of the cursor in the root-node vector (AST)
     ip: usize,
+    // The global scope (context) of the VM
     global: Scope<'static>
 }
 

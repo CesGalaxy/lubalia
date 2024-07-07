@@ -9,6 +9,7 @@ use crate::{lang::{lexer::token::Token, parser::{data::DataValue, exception::{Ex
 use super::{Node, NodeFactory};
 
 pub trait ExpressionNode: Node {
+    /// Evaluates the expression and returns its value.
     fn evaluate(&self, scope: &Scope) -> DataValue;
 }
 

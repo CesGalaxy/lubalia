@@ -1,4 +1,4 @@
-use super::{token::{Token, TokenLiteral, TokenSymbol}, LexerResult};
+use super::{token::{Token, TokenLiteral, TokenSymbol}, LexerError};
 
 /// Returns a vector of tokens from the given code.
 /// 
@@ -88,8 +88,8 @@ pub enum TokenizerError {
     ErrorParsingNumber(String),
 }
 
-impl From<TokenizerError> for LexerResult {
+impl From<TokenizerError> for LexerError {
     fn from(value: TokenizerError) -> Self {
-        LexerResult::TokenizerError(value)
+        LexerError::TokenizerError(value)
     }
 }

@@ -7,21 +7,27 @@ mod tokenizer;
 mod linter;
 mod display;
 
-pub fn lexer(code: String) -> Result<Vec<Token>, LexerResult> {
+/// Converts the code into a vector of tokens, then
+/// checks for errors or warning (linter) and returns
+/// the result or the first error found.
+/// 
+/// # Panics
+/// 
+/// Panics if there is an unexcepted error (not related with the code).
+pub fn lexer(code: String) -> Result<Vec<Token>, LexerError> {
     let tokens = tokenizer(code)?;
 
     let linter_error = linter(&tokens);
 
     if let Some(error) = linter_error {
-        Err(LexerResult::LinterError(error))
+        Err(LexerError::LinterError(error))
     } else {
         Ok(tokens)
     }
 }
 
 #[derive(Debug)]
-pub enum LexerResult {
-    Ok,
+pub enum LexerError {
     TokenizerError(TokenizerError),
     LinterError(LinterError)
 }

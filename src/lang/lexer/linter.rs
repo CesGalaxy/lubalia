@@ -1,8 +1,13 @@
 use super::token::Token;
 
 /// Examines the tokens searching for errors, bugs or other problems.
+/// The linter doesn't distuish from fatal errors and warnings.
 /// 
 /// Returns `None` if there are no errors. Otherwise, `Some(LinterError)`.
+/// 
+/// # Panics
+/// 
+/// Panics if there is an unexcepted error (not related with the code).
 pub fn linter(tokens: &Vec<Token>) -> Option<LinterError> {
     let mut pos = 0;
 

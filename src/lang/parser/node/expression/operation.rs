@@ -11,6 +11,7 @@ pub enum OperationExpressionNode {
 }
 
 impl ExpressionNode for OperationExpressionNode {
+    /// Operates the values
     fn evaluate(&self, _scope: &Scope) -> DataValue {
         match self {
             OperationExpressionNode::Add(a, b) => a + b,
@@ -23,9 +24,11 @@ impl ExpressionNode for OperationExpressionNode {
 
 impl NodeFactory for OperationExpressionNode {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParsingMachineError> {
+        // Get the first value
         let n1 = LiteralExpresionNode::from_tokens(m)?.into();
         
         match m.consume() {
+            // Check which operation to perform
             Some(Token::Symbol(symbol)) => match symbol {
                 TokenSymbol::Plus => Ok(Self::Add(n1, LiteralExpresionNode::from_tokens(m)?.0)),
                 TokenSymbol::Minus => Ok(Self::Sub(n1, LiteralExpresionNode::from_tokens(m)?.0)),

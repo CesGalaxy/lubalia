@@ -6,6 +6,7 @@ use super::ExpressionNode;
 pub struct LiteralExpresionNode(pub DataValue);
 
 impl ExpressionNode for LiteralExpresionNode {
+    /// Returns the literal value
     fn evaluate(&self, _scope: &Scope) -> DataValue {
         self.0.clone()
     }
