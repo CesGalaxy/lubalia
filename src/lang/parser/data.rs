@@ -26,10 +26,10 @@ impl std::fmt::Display for DataValue {
     }
 }
 
-impl Add for &DataValue {
+impl Add for DataValue {
     type Output = DataValue;
 
-    fn add(self, other: &DataValue) -> Self::Output {
+    fn add(self, other: DataValue) -> Self::Output {
         match (self, other) {
             // If both are numbers, sum them
             (DataValue::Number(lhs), DataValue::Number(rhs)) => DataValue::Number(lhs + rhs),
@@ -40,10 +40,10 @@ impl Add for &DataValue {
     }
 }
 
-impl Sub for &DataValue {
+impl Sub for DataValue {
     type Output = DataValue;
 
-    fn sub(self, other: &DataValue) -> Self::Output {
+    fn sub(self, other: DataValue) -> Self::Output {
         match (self, other) {
             // If both are numbers, subtract them
             (DataValue::Number(lhs), DataValue::Number(rhs)) => DataValue::Number(lhs - rhs),
@@ -54,10 +54,10 @@ impl Sub for &DataValue {
     }
 }
 
-impl Mul for &DataValue {
+impl Mul for DataValue {
     type Output = DataValue;
 
-    fn mul(self, other: &DataValue) -> Self::Output {
+    fn mul(self, other: DataValue) -> Self::Output {
         match (self, other) {
             // If both are numbers, multiply them
             (DataValue::Number(lhs), DataValue::Number(rhs)) => DataValue::Number(lhs * rhs),
@@ -68,10 +68,10 @@ impl Mul for &DataValue {
     }
 }
 
-impl Div for &DataValue {
+impl Div for DataValue {
     type Output = DataValue;
 
-    fn div(self, other: &DataValue) -> Self::Output {
+    fn div(self, other: DataValue) -> Self::Output {
         match (self, other) {
             // If both are numbers, divide them
             (DataValue::Number(lhs), DataValue::Number(rhs)) => DataValue::Number(lhs / rhs),

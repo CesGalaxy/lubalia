@@ -28,17 +28,25 @@ pub enum Expression {
     VariableReference(VariableReferenceNode)
 }
 
+impl Expression {
+    fn get_value(m: &mut ParsingMachine) -> Result<Expression, ParserError> {
+        match m.peek() {
+            Some(Token::Literal(_)) => Ok(Expression::Literal(LiteralExpresionNode::from_tokens(m)?)),
+            Some(Token::Keyword(_)) => Ok(Expression::VariableReference(VariableReferenceNode::from_tokens(m)?)),
+            _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("Number"))))
+        }
+    }
+}
+
 impl Node for Expression {}
 
 impl NodeFactory for Expression {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
         match m.peek() {
-            Some(Token::Literal(_)) => {
-                if let Some(Token::Symbol(_)) = m.peek_next() {
-                    Ok(Self::Operation(OperationExpressionNode::from_tokens(m)?))
-                } else {
-                    Ok(Self::Literal(LiteralExpresionNode::from_tokens(m)?))
-                }
+            Some(Token::Literal(_)) => if let Some(Token::Symbol(_)) = m.peek_next() {
+                Ok(Self::Operation(OperationExpressionNode::from_tokens(m)?))
+            } else {
+                Ok(Self::Literal(LiteralExpresionNode::from_tokens(m)?))
             },
             Some(Token::Keyword(_)) => {
                 Ok(Self::VariableReference(VariableReferenceNode::from_tokens(m)?))

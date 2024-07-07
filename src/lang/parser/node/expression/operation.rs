@@ -11,45 +11,73 @@ use crate::{
     vm::scope::Scope
 };
 
-use super::{literal::LiteralExpresionNode, ExpressionNode};
+use super::{Expression, ExpressionNode};
+
+pub type ArithmeticalExpression = (Vec<(Expression, ArithmeticalOperation)>, DataValue);
+
+#[derive(Debug)]
+pub enum ArithmeticalOperation {
+    Add,
+    Sub,
+    Mul,
+    Div
+}
+
+pub fn get_expression_segment(m: &mut ParsingMachine) -> Result<Option<(Expression, ArithmeticalOperation)>, ParserError> {
+    let n1 = Expression::get_value(m)?;
+
+    if let Some(Token::Symbol(symbol)) = m.consume() {
+        match symbol {
+            TokenSymbol::Plus => Ok(Some((n1, ArithmeticalOperation::Add))),
+            TokenSymbol::Minus => Ok(Some((n1, ArithmeticalOperation::Sub))),
+            TokenSymbol::Asterisk => Ok(Some((n1, ArithmeticalOperation::Mul))),
+            TokenSymbol::Slash => Ok(Some((n1, ArithmeticalOperation::Div))),
+            _ => return Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operand>")))),
+        }
+    } else {
+        Ok(None)
+    }
+}
 
 #[derive(Debug, Clone)]
 pub enum OperationExpressionNode {
-    Add(DataValue, DataValue),
-    Sub(DataValue, DataValue),
-    Mul(DataValue, DataValue),
-    Div(DataValue, DataValue)
+    Add(Box<Expression>, Box<Expression>),
+    Sub(Box<Expression>, Box<Expression>),
+    Mul(Box<Expression>, Box<Expression>),
+    Div(Box<Expression>, Box<Expression>)
 }
 
 impl Node for OperationExpressionNode {}
 
 impl NodeFactory for OperationExpressionNode {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
-        // Get the first value
-        let n1 = LiteralExpresionNode::from_tokens(m)?.into();
+        let segment = get_expression_segment(m)?.ok_or(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operation first segment>"))))?;
         
-        match m.consume() {
-            // Check which operation to perform
-            Some(Token::Symbol(symbol)) => match symbol {
-                TokenSymbol::Plus => Ok(Self::Add(n1, LiteralExpresionNode::from_tokens(m)?.0)),
-                TokenSymbol::Minus => Ok(Self::Sub(n1, LiteralExpresionNode::from_tokens(m)?.0)),
-                TokenSymbol::Asterisk => Ok(Self::Mul(n1, LiteralExpresionNode::from_tokens(m)?.0)),
-                TokenSymbol::Slash => Ok(Self::Div(n1, LiteralExpresionNode::from_tokens(m)?.0)),
-                _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operand>"))))
-            },
-            _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operand>"))))
-        }
+        // let mut segments = Vec::new();
+
+        // while let Some(segment) = get_expression_segment(m)? {
+        //     segments.push(segment);
+        // }
+
+        // let end = Expression::from_tokens(m)?;
+
+        Ok(match segment.1 {
+            ArithmeticalOperation::Add => Self::Add(Box::new(segment.0), Box::new(Expression::from_tokens(m)?)),
+            ArithmeticalOperation::Sub => Self::Sub(Box::new(segment.0), Box::new(Expression::from_tokens(m)?)),
+            ArithmeticalOperation::Mul => Self::Mul(Box::new(segment.0), Box::new(Expression::from_tokens(m)?)),
+            ArithmeticalOperation::Div => Self::Div(Box::new(segment.0), Box::new(Expression::from_tokens(m)?)),
+        })
     }
 }
 
 impl ExpressionNode for OperationExpressionNode {
     /// Operates the values
-    fn evaluate(&self, _scope: &Scope) -> DataValue {
+    fn evaluate(&self, scope: &Scope) -> DataValue {
         match self {
-            OperationExpressionNode::Add(a, b) => a + b,
-            OperationExpressionNode::Sub(a, b) => a - b,
-            OperationExpressionNode::Mul(a, b) => a * b,
-            OperationExpressionNode::Div(a, b) => a / b,
+            OperationExpressionNode::Add(a, b) => a.evaluate(scope) + b.evaluate(scope),
+            OperationExpressionNode::Sub(a, b) => a.evaluate(scope) - b.evaluate(scope),
+            OperationExpressionNode::Mul(a, b) => a.evaluate(scope) * b.evaluate(scope),
+            OperationExpressionNode::Div(a, b) => a.evaluate(scope) / b.evaluate(scope),
         }
     }
 }
