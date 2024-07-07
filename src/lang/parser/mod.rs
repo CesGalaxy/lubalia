@@ -3,7 +3,7 @@ mod machine;
 mod exception;
 pub mod data;
 
-use exception::ParsingMachineError;
+use exception::{ParsingMachineError, ParsingMachineException};
 use machine::ParsingMachine;
 use node::{expression::Expression, statement::{self, Statement}, AbstractSyntaxTree, NodeFactory, TreeNode};
 
@@ -29,7 +29,10 @@ pub fn parse_tree(tokens: Vec<Token>) -> Result<AbstractSyntaxTree, ParserError>
             Token::EOF => break,
             _ => match Expression::from_tokens(&mut machine) {
                 Ok(expression) => tree.push(TreeNode::Expression(expression)),
-                Err(error) => panic!("Invalid token {:?} - {:?}", machine.peek(), error),
+                Err(error) => return Err(machine.except(ParsingMachineException::InvalidToken(
+                    machine.peek().unwrap().clone(),
+                    Box::new(error)
+                )).into()),
             }
         }
     }

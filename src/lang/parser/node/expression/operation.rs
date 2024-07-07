@@ -1,4 +1,4 @@
-use crate::{lang::{lexer::token::Token, parser::{data::DataValue, exception::{ExcpectedToken, ParsingMachineError, ParsingMachineException}, machine::ParsingMachine, node::{Node, NodeFactory}}}, vm::scope::Scope};
+use crate::{lang::{lexer::token::{Token, TokenSymbol}, parser::{data::DataValue, exception::{ExcpectedToken, ParsingMachineError, ParsingMachineException}, machine::ParsingMachine, node::{Node, NodeFactory}}}, vm::scope::Scope};
 
 use super::{literal::LiteralExpresionNode, ExpressionNode};
 
@@ -13,32 +13,27 @@ pub enum OperationExpressionNode {
 impl ExpressionNode for OperationExpressionNode {
     fn evaluate(&self, _scope: &Scope) -> DataValue {
         match self {
-            OperationExpressionNode::Add(a, b) => {
-                if let DataValue::Number(n1) = a {
-                    if let DataValue::Number(n2) = b {
-                        DataValue::Number(n1 + n2)
-                    } else {
-                        DataValue::Number(0.0)
-                    }
-                } else {
-                    DataValue::Number(0.0)
-                }
-            }
-            _ => DataValue::Number(0.0)
+            OperationExpressionNode::Add(a, b) => a + b,
+            OperationExpressionNode::Sub(a, b) => a - b,
+            OperationExpressionNode::Mul(a, b) => a * b,
+            OperationExpressionNode::Div(a, b) => a / b,
         }
     }
 }
 
 impl NodeFactory for OperationExpressionNode {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParsingMachineError> {
-        let n1 = LiteralExpresionNode::from_tokens(m)?;
+        let n1 = LiteralExpresionNode::from_tokens(m)?.into();
         
         match m.consume() {
-            Some(Token::Symbol(_)) => {
-                let n2 = LiteralExpresionNode::from_tokens(m)?;
-                Ok(Self::Add(n1.0, n2.0))
+            Some(Token::Symbol(symbol)) => match symbol {
+                TokenSymbol::Plus => Ok(Self::Add(n1, LiteralExpresionNode::from_tokens(m)?.0)),
+                TokenSymbol::Minus => Ok(Self::Sub(n1, LiteralExpresionNode::from_tokens(m)?.0)),
+                TokenSymbol::Asterisk => Ok(Self::Mul(n1, LiteralExpresionNode::from_tokens(m)?.0)),
+                TokenSymbol::Slash => Ok(Self::Div(n1, LiteralExpresionNode::from_tokens(m)?.0)),
+                _ => Err(m.except(ParsingMachineException::TokenExpected(ExcpectedToken::Symbol("<operand>"))))
             },
-            _ => Err(m.except(ParsingMachineException::TokenExpected(ExcpectedToken::Symbol("+"))))
+            _ => Err(m.except(ParsingMachineException::TokenExpected(ExcpectedToken::Symbol("<operand>"))))
         }
     }
 }

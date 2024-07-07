@@ -1,3 +1,5 @@
+use crate::lang::lexer::token::Token;
+
 use super::{machine::ParsingMachine, ParserError};
 
 #[derive(Debug)]
@@ -12,7 +14,7 @@ pub enum ExcpectedToken {
 #[derive(Debug)]
 pub enum ParsingMachineException {
     TokenExpected(ExcpectedToken),
-
+    InvalidToken(Token, Box<ParsingMachineError>)
 }
 
 #[derive(Debug)]

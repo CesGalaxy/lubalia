@@ -22,3 +22,9 @@ impl NodeFactory for LiteralExpresionNode {
 }
 
 impl Node for LiteralExpresionNode {}
+
+impl From<LiteralExpresionNode> for DataValue {
+    fn from(node: LiteralExpresionNode) -> Self {
+        node.0
+    }
+}
