@@ -16,7 +16,7 @@ impl VM {
         let node = self.program.get(self.ip);
 
         if let Some(TreeNode::Expression(expr)) = node {
-            println!("#{} - {:?} - {:?}", self.ip, expr, expr.evaluate(&self.global));
+            println!("#{} - {expr} -> {}", self.ip, expr.evaluate(&self.global));
         }
 
         self.ip += 1;

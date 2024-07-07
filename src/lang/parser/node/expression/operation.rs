@@ -43,3 +43,13 @@ impl NodeFactory for OperationExpressionNode {
 
 impl Node for OperationExpressionNode {}
 
+impl std::fmt::Display for OperationExpressionNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            OperationExpressionNode::Add(a, b) => write!(f, "{} + {}", a, b),
+            OperationExpressionNode::Sub(a, b) => write!(f, "{} - {}", a, b),
+            OperationExpressionNode::Mul(a, b) => write!(f, "{} * {}", a, b),
+            OperationExpressionNode::Div(a, b) => write!(f, "{} / {}", a, b),
+        }
+    }
+}

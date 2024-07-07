@@ -16,21 +16,26 @@ fn test_file(file_name: &str) {
 
         if let Ok(tokens) = tokenizer_result {
             // Print the tokens lexed
-            for token in &tokens {
-                print!("{token} ");
-            }
+            // for token in &tokens {
+            //     print!("{token} ");
+            // }
 
-            println!("({})", tokens.len());
+            println!("{} tokens lexed!", tokens.len());
 
-            // Parse the tokens and print the AST
             let tree = parse_tree(tokens);
 
-            println!("TREE: {:?}", tree);
-
             if let Ok(program) = tree {
+                for node in &program {
+                    print!("{} ", node);
+                }
+
+                println!("({})", program.len());
+
                 // Create and run the VM
                 let mut vm = VM::new(program);
                 vm.run();
+            } else {
+                println!("TREE: {:?}", tree);
             }
         }
     }

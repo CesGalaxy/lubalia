@@ -43,3 +43,12 @@ impl NodeFactory for Expression {
         }
     }
 }
+
+impl std::fmt::Display for Expression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Expression::Literal(node) => write!(f, "{}", node),
+            Expression::Operation(node) => write!(f, "{}", node),
+        }
+    }
+}
