@@ -19,10 +19,8 @@ pub fn tokenizer(code: String) -> Result<Vec<Token>, TokenizerError> {
             pos += 1;
 
             while let Some(c) = code.chars().nth(pos) {
-                if c == ' ' {
+                if !c.is_ascii_alphanumeric() {
                     break;
-                } else if !c.is_ascii_alphanumeric() {
-                    return Err(TokenizerError::UnexcepedSymbolAtKeyword(keyword, c));
                 }
 
                 keyword.push(c);
@@ -30,6 +28,7 @@ pub fn tokenizer(code: String) -> Result<Vec<Token>, TokenizerError> {
             }
 
             tokens.push(Token::Keyword(keyword));
+            continue;
         } else if c.is_numeric() {
             let mut literal = String::new();
             literal.push(c);

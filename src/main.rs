@@ -17,6 +17,8 @@ fn test_file(file_name: &str) {
     if let Ok(code) = file {
         let tokenizer_result = lexer(code);
 
+        println!("{tokenizer_result:?}");
+
         if let Ok(tokens) = tokenizer_result {
             // Print the tokens lexed
             // for token in &tokens {

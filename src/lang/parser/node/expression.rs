@@ -1,8 +1,10 @@
 pub mod literal;
 pub mod operation;
+pub mod variable_reference;
 
 use literal::LiteralExpresionNode;
 use operation::OperationExpressionNode;
+use variable_reference::VariableReferenceNode;
 
 use crate::{
     lang::{
@@ -23,20 +25,25 @@ pub trait ExpressionNode: Node {
 pub enum Expression {
     Literal(LiteralExpresionNode),
     Operation(OperationExpressionNode),
+    VariableReference(VariableReferenceNode)
 }
 
 impl Node for Expression {}
 
 impl NodeFactory for Expression {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
-        if let Some(Token::Literal(_)) = m.peek() {
-            if let Some(Token::Symbol(_)) = m.peek_next() {
-                Ok(Self::Operation(OperationExpressionNode::from_tokens(m)?))
-            } else {
-                Ok(Self::Literal(LiteralExpresionNode::from_tokens(m)?))
-            }
-        } else {
-            Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("Number"))))
+        match m.peek() {
+            Some(Token::Literal(_)) => {
+                if let Some(Token::Symbol(_)) = m.peek_next() {
+                    Ok(Self::Operation(OperationExpressionNode::from_tokens(m)?))
+                } else {
+                    Ok(Self::Literal(LiteralExpresionNode::from_tokens(m)?))
+                }
+            },
+            Some(Token::Keyword(_)) => {
+                Ok(Self::VariableReference(VariableReferenceNode::from_tokens(m)?))
+            },
+            _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("Number"))))
         }
     }
 }
@@ -45,7 +52,8 @@ impl ExpressionNode for Expression {
     fn evaluate(&self, scope: &Scope) -> DataValue {
         match self {
             Expression::Literal(node) => node.evaluate(scope),
-            Expression::Operation(node) => node.evaluate(scope)
+            Expression::Operation(node) => node.evaluate(scope),
+            Expression::VariableReference(node) => node.evaluate(scope),
         }
     }
 }
@@ -55,6 +63,7 @@ impl std::fmt::Display for Expression {
         match self {
             Expression::Literal(node) => write!(f, "{}", node),
             Expression::Operation(node) => write!(f, "{}", node),
+            Expression::VariableReference(node) => write!(f, "{}", node),
         }
     }
 }
