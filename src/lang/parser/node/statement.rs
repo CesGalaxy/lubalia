@@ -15,16 +15,8 @@ pub enum Statement {
 
 impl Node for Statement {}
 
-impl std::fmt::Display for Statement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Statement::VariableDeclaration(node) => write!(f, "{}", node)
-        }
-    }
-}
-
 impl NodeFactory for Statement {
-    fn from_tokens(m: &mut crate::lang::parser::machine::ParsingMachine) -> Result<Self, crate::lang::parser::exception::ParsingMachineError> where Self: Sized {
+    fn from_tokens(m: &mut crate::lang::parser::machine::ParsingMachine) -> Result<Self, crate::lang::parser::exception::ParserError> where Self: Sized {
         match m.peek() {
             Some(Token::Keyword(keyword)) => match keyword.as_str() {
                 "let" => Ok(
@@ -34,7 +26,7 @@ impl NodeFactory for Statement {
                 ),
                 _ => panic!("Invalid keyword"),
             },
-            _ => Err(m.except(crate::lang::parser::exception::ParsingMachineException::TokenExpected(crate::lang::parser::exception::ExcpectedToken::Keyword("<var name>"))))
+            _ => Err(m.except(crate::lang::parser::exception::ParserException::TokenExpected(crate::lang::parser::exception::ExcpectedToken::Keyword("<var name>"))))
         }
     }
 }
@@ -43,6 +35,14 @@ impl StatementNode for Statement {
     fn run(&self, scope: &mut Scope) {
         match self {
             Statement::VariableDeclaration(node) => node.run(scope)
+        }
+    }
+}
+
+impl std::fmt::Display for Statement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Statement::VariableDeclaration(node) => write!(f, "{}", node)
         }
     }
 }

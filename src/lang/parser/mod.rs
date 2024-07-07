@@ -3,7 +3,7 @@ mod machine;
 mod exception;
 pub mod data;
 
-use exception::{ParsingMachineError, ParsingMachineException};
+use exception::{ParserError, ParserException};
 use machine::ParsingMachine;
 use node::{expression::Expression, statement::{self, Statement}, AbstractSyntaxTree, NodeFactory, TreeNode};
 
@@ -33,18 +33,13 @@ pub fn parse_tree(tokens: Vec<Token>) -> Result<AbstractSyntaxTree, ParserError>
             // In case that the expression isn't valid neither, an error will be thrown.
             _ => match Expression::from_tokens(&mut machine) {
                 Ok(expression) => tree.push(TreeNode::Expression(expression)),
-                Err(error) => return Err(machine.except(ParsingMachineException::InvalidToken(
+                Err(error) => return Err(machine.except(ParserException::InvalidToken(
                     machine.peek().unwrap().clone(),
                     Box::new(error)
-                )).into()),
+                ))),
             }
         }
     }
 
     Ok(tree)
-}
-
-#[derive(Debug)]
-pub enum ParserError {
-    ParsingMachineError(ParsingMachineError)
 }

@@ -1,6 +1,6 @@
 use crate::lang::lexer::token::Token;
 
-use super::{machine::ParsingMachine, ParserError};
+use super::machine::ParsingMachine;
 
 #[derive(Debug)]
 pub enum ExcpectedToken {
@@ -12,22 +12,16 @@ pub enum ExcpectedToken {
 }
 
 #[derive(Debug)]
-pub enum ParsingMachineException {
+pub enum ParserException {
     TokenExpected(ExcpectedToken),
-    InvalidToken(Token, Box<ParsingMachineError>)
+    InvalidToken(Token, Box<ParserError>)
 }
 
 #[derive(Debug)]
-pub struct ParsingMachineError(ParsingMachineException, usize);
-
-impl From<ParsingMachineError> for ParserError {
-    fn from(error: ParsingMachineError) -> Self {
-        ParserError::ParsingMachineError(error)
-    }
-}
+pub struct ParserError(ParserException, usize);
 
 impl ParsingMachine {
-    pub fn except(&self, exception: ParsingMachineException) -> ParsingMachineError {
-        ParsingMachineError(exception, self.pos)
+    pub fn except(&self, exception: ParserException) -> ParserError {
+        ParserError(exception, self.pos)
     }
 }
