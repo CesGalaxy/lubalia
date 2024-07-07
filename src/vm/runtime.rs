@@ -1,4 +1,4 @@
-use crate::lang::parser::node::{expression::ExpressionNode, TreeNode};
+use crate::lang::parser::node::{expression::ExpressionNode, statement::StatementNode, TreeNode};
 
 use super::VM;
 
@@ -15,8 +15,14 @@ impl VM {
     pub fn tick(&mut self) {
         let node = self.program.get(self.ip);
 
-        if let Some(TreeNode::Expression(expr)) = node {
-            println!("#{} - {expr} -> {}", self.ip, expr.evaluate(&self.global));
+        if let Some(node) = node {
+            let node = node.clone();
+
+            if let TreeNode::Expression(expr) = node {
+                println!("#{} - {expr} -> {}", self.ip, expr.evaluate(&self.global));
+            } else if let TreeNode::Statement(statement) = node {
+                statement.run(&mut self.global);
+            }
         }
 
         self.ip += 1;

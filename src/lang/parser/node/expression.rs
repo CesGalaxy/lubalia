@@ -13,7 +13,7 @@ pub trait ExpressionNode: Node {
     fn evaluate(&self, scope: &Scope) -> DataValue;
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expression {
     Literal(LiteralExpresionNode),
     Operation(OperationExpressionNode),

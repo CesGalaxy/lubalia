@@ -12,7 +12,7 @@ pub struct VM {
     // The position of the cursor in the root-node vector (AST)
     ip: usize,
     // The global scope (context) of the VM
-    global: Scope<'static>
+    pub global: Scope<'static>
 }
 
 impl VM {

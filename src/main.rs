@@ -34,6 +34,7 @@ fn test_file(file_name: &str) {
                 // Create and run the VM
                 let mut vm = VM::new(program);
                 vm.run();
+                println!("{:?}", vm.global);
             } else {
                 println!("TREE: {:?}", tree);
             }

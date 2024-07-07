@@ -2,7 +2,7 @@ use crate::{lang::{lexer::token::{Token, TokenLiteral}, parser::{data::DataValue
 
 use super::ExpressionNode;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct LiteralExpresionNode(pub DataValue);
 
 impl ExpressionNode for LiteralExpresionNode {

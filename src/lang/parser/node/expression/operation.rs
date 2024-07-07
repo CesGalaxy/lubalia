@@ -2,7 +2,7 @@ use crate::{lang::{lexer::token::{Token, TokenSymbol}, parser::{data::DataValue,
 
 use super::{literal::LiteralExpresionNode, ExpressionNode};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum OperationExpressionNode {
     Add(DataValue, DataValue),
     Sub(DataValue, DataValue),

@@ -2,6 +2,7 @@ use crate::lang::parser::data::DataValue;
 
 /// A context for running code, contains all variables.
 /// Extends all the data from its parent
+#[derive(Debug)]
 pub struct Scope<'a> {
     pub variables: Vec<(String, DataValue)>,
     pub parent: Option<&'a Scope<'a>>
