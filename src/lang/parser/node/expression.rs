@@ -4,7 +4,13 @@ pub mod operation;
 use literal::LiteralExpresionNode;
 use operation::OperationExpressionNode;
 
-use crate::{lang::{lexer::token::Token, parser::{data::DataValue, exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine}}, vm::scope::Scope};
+use crate::{
+    lang::{
+        lexer::token::Token,
+        parser::{data::DataValue, exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine}
+    },
+    vm::scope::Scope
+};
 
 use super::{Node, NodeFactory};
 

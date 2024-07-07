@@ -5,7 +5,7 @@ use crate::lang::parser::data::DataValue;
 #[derive(Debug)]
 pub struct Scope<'a> {
     pub variables: Vec<(String, DataValue)>,
-    pub parent: Option<&'a Scope<'a>>
+    pub parent: Option<&'a mut Scope<'a>>
 }
 
 impl Scope<'static> {
@@ -18,17 +18,34 @@ impl Scope<'static> {
 }
 
 impl<'a> Scope<'a> {
-    /// Add a variable to the scope
-    pub fn push(&mut self, name: String, value: DataValue) {
-        self.variables.push((name, value));
+    /// Add a variable to the scope (or overwrite it if it already exists)
+    pub fn set(&mut self, name: String, value: DataValue) {
+        if let Some(variable) = self.get_mut(name.clone()) {
+            *variable = value;
+        } else {
+            self.variables.push((name, value));
+        }
     }
 
-    /// Retrieve a variable from the scope (or parent)
+    /// Retrieve a mutable reference to a variable from the scope (or parent)
+    pub fn get_mut(&mut self, name: String) -> Option<&mut DataValue> {
+        if let Some(local) = self.variables.iter_mut().find(|v| v.0 == name) {
+            Some(&mut local.1)
+        } else {
+            if let Some(parent) = self.parent.as_mut().map(|scope| scope.get_mut(name)) {
+                parent
+            } else {
+                None
+            }
+        }
+    }
+
+    /// Retrieve a recefrence to a variable from the scope (or parent)
     pub fn get(&self, name: String) -> Option<&DataValue> {
         if let Some(local) = self.variables.iter().find(|v| v.0 == name).map(|v| &v.1) {
             Some(local)
         } else {
-            if let Some(parent) = self.parent.map(|scope| scope.get(name)) {
+            if let Some(parent) = self.parent.as_ref().map(|scope| scope.get(name)) {
                 parent
             } else {
                 None

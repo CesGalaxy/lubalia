@@ -1,4 +1,15 @@
-use crate::{lang::{lexer::token::{Token, TokenLiteral}, parser::{data::DataValue, exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine, node::{Node, NodeFactory}}}, vm::scope::Scope};
+use crate::{
+    lang::{
+        lexer::token::{Token, TokenLiteral},
+        parser::{
+            data::DataValue,
+            exception::{ExcpectedToken, ParserError, ParserException},
+            machine::ParsingMachine,
+            node::{Node, NodeFactory},
+        },
+    },
+    vm::scope::Scope,
+};
 
 use super::ExpressionNode;
 
@@ -12,7 +23,7 @@ impl NodeFactory for LiteralExpresionNode {
         match m.consume() {
             Some(Token::Literal(TokenLiteral::Number(n))) => Ok(Self(DataValue::Number(n))),
             Some(Token::Literal(TokenLiteral::String(s))) => Ok(Self(DataValue::String(s))),
-            _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("<any>"))))
+            _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("<any>")))),
         }
     }
 }

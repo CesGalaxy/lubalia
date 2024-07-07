@@ -1,4 +1,15 @@
-use crate::{lang::{lexer::token::{Token, TokenSymbol}, parser::{data::DataValue, exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine, node::{Node, NodeFactory}}}, vm::scope::Scope};
+use crate::{
+    lang::{
+        lexer::token::{Token, TokenSymbol},
+        parser::{
+            data::DataValue,
+            exception::{ExcpectedToken, ParserError, ParserException},
+            machine::ParsingMachine,
+            node::{Node, NodeFactory}
+        }
+    },
+    vm::scope::Scope
+};
 
 use super::{literal::LiteralExpresionNode, ExpressionNode};
 

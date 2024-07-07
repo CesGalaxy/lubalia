@@ -1,4 +1,7 @@
-use app::{lang::{lexer::lexer, parser::parse_tree}, vm::VM};
+use app::{
+    lang::{lexer::lexer, parser::parse_tree},
+    vm::VM,
+};
 
 fn main() {
     println!("Hello, world!");
@@ -10,7 +13,7 @@ fn main() {
 /// Get a file from storage, parse it and run it in the VM
 fn test_file(file_name: &str) {
     let file = std::fs::read_to_string(file_name);
-    
+
     if let Ok(code) = file {
         let tokenizer_result = lexer(code);
 

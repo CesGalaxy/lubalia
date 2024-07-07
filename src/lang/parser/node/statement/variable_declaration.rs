@@ -1,6 +1,13 @@
 use colored::Colorize;
 
-use crate::lang::{lexer::token::{Token, TokenSymbol}, parser::{exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine, node::{expression::{Expression, ExpressionNode}, Node, NodeFactory}}};
+use crate::lang::{
+    lexer::token::{Token, TokenSymbol},
+    parser::{
+        exception::{ExcpectedToken, ParserError, ParserException},
+        machine::ParsingMachine,
+        node::{expression::{Expression, ExpressionNode}, Node, NodeFactory}
+    }
+};
 
 use super::StatementNode;
 
@@ -35,7 +42,7 @@ impl NodeFactory for VariableDeclarationNode {
 
 impl StatementNode for VariableDeclarationNode {
     fn run(&self, scope: &mut crate::vm::scope::Scope) {
-        scope.push(self.0.clone(), self.1.evaluate(scope))
+        scope.set(self.0.clone(), self.1.evaluate(scope))
     }
 }
 

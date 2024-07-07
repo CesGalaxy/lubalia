@@ -1,11 +1,2 @@
-let x = "Hello world!";
-let y = 10;
-2 + 6
-8 - 1
-2 * 5
-8 / 2
-"hello" + "world"
-0 + "k"
-"root" - "node"
-"o" * "o"
-"Loaded 2" / "3"
+let x = "Hello" + "world!";
+let y = 2 + 3;
