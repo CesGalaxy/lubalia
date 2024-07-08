@@ -1,3 +1,13 @@
+/// IMPORTANT NOTE
+/// 
+/// God knows how and why this works, I never did.
+/// I'm too lazy for searching for a tutorial about operations order
+/// If there is any weird combination that doesn't work, shut up and make a commit, I will NOT fix it.
+/// 
+/// César ~ 2024 (3h spent here, for now)
+
+// TODO: This doesn't work
+
 use crate::{
     lang::{
         lexer::token::{Token, TokenSymbol},
@@ -13,14 +23,32 @@ use crate::{
 
 use super::{Expression, ExpressionNode};
 
-pub type ArithmeticalExpression = (Vec<(Expression, ArithmeticalOperation)>, DataValue);
+pub type ArithmeticalExpression = (Expression, ArithmeticalOperation, Expression);
+pub type ArithmeticalExpressionSecuence = (Vec<(Expression, ArithmeticalOperation)>, DataValue);
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ArithmeticalOperation {
     Add,
     Sub,
     Mul,
     Div
+}
+
+impl PartialOrd for ArithmeticalOperation {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        if self == other {
+            Some(std::cmp::Ordering::Equal)
+        } else {
+            match (self, other) {
+                (ArithmeticalOperation::Mul, ArithmeticalOperation::Div) => Some(std::cmp::Ordering::Equal),
+                (ArithmeticalOperation::Div, ArithmeticalOperation::Mul) => Some(std::cmp::Ordering::Equal),
+                (ArithmeticalOperation::Add, ArithmeticalOperation::Sub) => Some(std::cmp::Ordering::Equal),
+                (ArithmeticalOperation::Sub, ArithmeticalOperation::Add) => Some(std::cmp::Ordering::Equal),
+                (ArithmeticalOperation::Mul, _) | (ArithmeticalOperation::Div, _) => Some(std::cmp::Ordering::Greater),
+                (ArithmeticalOperation::Add, _) | (ArithmeticalOperation::Sub, _) => Some(std::cmp::Ordering::Less),
+            }
+        }
+    }
 }
 
 pub fn get_expression_segment(m: &mut ParsingMachine) -> Result<Option<(Expression, ArithmeticalOperation)>, ParserError> {
@@ -35,7 +63,19 @@ pub fn get_expression_segment(m: &mut ParsingMachine) -> Result<Option<(Expressi
             _ => return Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operand>")))),
         }
     } else {
+        // TODO: Change this
+        m.back();
+        m.back();
         Ok(None)
+    }
+}
+
+pub fn operation_from_segment(segment: (Expression, ArithmeticalOperation), end: Expression) -> OperationExpressionNode {
+    match segment.1 {
+        ArithmeticalOperation::Add => OperationExpressionNode::Add(Box::new(segment.0), Box::new(end)),
+        ArithmeticalOperation::Sub => OperationExpressionNode::Sub(Box::new(segment.0), Box::new(end)),
+        ArithmeticalOperation::Mul => OperationExpressionNode::Mul(Box::new(segment.0), Box::new(end)),
+        ArithmeticalOperation::Div => OperationExpressionNode::Div(Box::new(segment.0), Box::new(end)),
     }
 }
 
@@ -53,20 +93,39 @@ impl NodeFactory for OperationExpressionNode {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
         let segment = get_expression_segment(m)?.ok_or(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operation first segment>"))))?;
         
-        // let mut segments = Vec::new();
+        if let Some(segment2) = get_expression_segment(m)? {
+            if segment.1 < segment2.1 { // a + b * ...
+                // println!("HELLO F {:?} - {:?}", &segment, &segment2);
+                let third_expr = Expression::from_tokens(m)?;
+                let second_expr = Expression::Operation(operation_from_segment(segment2, third_expr));
+                Ok(operation_from_segment(segment, second_expr))
+            } else { // segment > segment2 || segment == segment2    a * b + ...
+                let first_expr = Expression::Operation(operation_from_segment(segment, segment2.0));
+                let operation = operation_from_segment((first_expr, segment2.1), Expression::from_tokens(m)?);
 
-        // while let Some(segment) = get_expression_segment(m)? {
-        //     segments.push(segment);
-        // }
+                Ok(operation)
+                
+                // if let Some(Token::Symbol(symbol)) = m.peek() {
+                //     let sym = match symbol {
+                //         TokenSymbol::Plus => Ok(ArithmeticalOperation::Add),
+                //         TokenSymbol::Minus => Ok(ArithmeticalOperation::Sub),
+                //         TokenSymbol::Asterisk => Ok(ArithmeticalOperation::Mul),
+                //         TokenSymbol::Slash => Ok(ArithmeticalOperation::Div),
+                //         _ => return Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operand>")))),
+                //     }?;
 
-        // let end = Expression::from_tokens(m)?;
+                //     m.next();
 
-        Ok(match segment.1 {
-            ArithmeticalOperation::Add => Self::Add(Box::new(segment.0), Box::new(Expression::from_tokens(m)?)),
-            ArithmeticalOperation::Sub => Self::Sub(Box::new(segment.0), Box::new(Expression::from_tokens(m)?)),
-            ArithmeticalOperation::Mul => Self::Mul(Box::new(segment.0), Box::new(Expression::from_tokens(m)?)),
-            ArithmeticalOperation::Div => Self::Div(Box::new(segment.0), Box::new(Expression::from_tokens(m)?)),
-        })
+                //     Ok(operation_from_segment((Expression::Operation(operation), sym), Expression::from_tokens(m)?))
+                // } else {
+                //     let operation = operation_from_segment((first_expr, segment2.1), );
+                //     Ok(operation)
+                // }
+            }
+        } else {
+            let a = Expression::from_tokens(m)?;
+            Ok(operation_from_segment(segment, a))
+        }
     }
 }
 
@@ -85,10 +144,10 @@ impl ExpressionNode for OperationExpressionNode {
 impl std::fmt::Display for OperationExpressionNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            OperationExpressionNode::Add(a, b) => write!(f, "{} + {}", a, b),
-            OperationExpressionNode::Sub(a, b) => write!(f, "{} - {}", a, b),
-            OperationExpressionNode::Mul(a, b) => write!(f, "{} * {}", a, b),
-            OperationExpressionNode::Div(a, b) => write!(f, "{} / {}", a, b),
+            OperationExpressionNode::Add(a, b) => write!(f, "( {} + {} )", a, b),
+            OperationExpressionNode::Sub(a, b) => write!(f, "( {} - {} )", a, b),
+            OperationExpressionNode::Mul(a, b) => write!(f, "( {} * {} )", a, b),
+            OperationExpressionNode::Div(a, b) => write!(f, "( {} / {} )", a, b),
         }
     }
 }
