@@ -22,14 +22,14 @@ impl NodeFactory for VariableDeclarationNode {
 
         if let Some(Token::Keyword(varname)) = m.consume() {
             if let Some(Token::Symbol(TokenSymbol::Equal)) = m.consume() {
-                if let Ok(value) = Expression::from_tokens(m) {
-                    if let Some(Token::Semicolon) = m.consume() {
-                        Ok(Self(varname, value))
-                    } else {
-                        Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol(";"))))
-                    }
+                let value = Expression::from_tokens(m)?;
+
+                println!("{value}");
+
+                if let Some(Token::Semicolon) = m.consume() {
+                    Ok(Self(varname, value))
                 } else {
-                    Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("<expr>"))))
+                    Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol(";"))))
                 }
             } else {
                 Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("="))))

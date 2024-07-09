@@ -2,6 +2,7 @@ pub mod node;
 mod machine;
 mod exception;
 pub mod data;
+mod arithmetic;
 
 use exception::{ParserError, ParserException};
 use machine::ParsingMachine;

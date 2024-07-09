@@ -8,14 +8,13 @@
 
 // TODO: This doesn't work
 
+use std::ops::{Add, Div, Mul, Sub};
+
 use crate::{
     lang::{
         lexer::token::{Token, TokenSymbol},
         parser::{
-            data::DataValue,
-            exception::{ExcpectedToken, ParserError, ParserException},
-            machine::ParsingMachine,
-            node::{Node, NodeFactory}
+            arithmetic::ArithmeticDataValue, data::DataValue, exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine, node::{Node, NodeFactory}
         }
     },
     vm::scope::Scope
@@ -91,7 +90,8 @@ impl Node for OperationExpressionNode {}
 
 impl NodeFactory for OperationExpressionNode {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
-        let segment = get_expression_segment(m)?.ok_or(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operation first segment>"))))?;
+        let segment = get_expression_segment(m)?
+            .ok_or(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operation first segment>"))))?;
         
         if let Some(segment2) = get_expression_segment(m)? {
             if segment.1 < segment2.1 { // a + b * ...
@@ -104,23 +104,6 @@ impl NodeFactory for OperationExpressionNode {
                 let operation = operation_from_segment((first_expr, segment2.1), Expression::from_tokens(m)?);
 
                 Ok(operation)
-                
-                // if let Some(Token::Symbol(symbol)) = m.peek() {
-                //     let sym = match symbol {
-                //         TokenSymbol::Plus => Ok(ArithmeticalOperation::Add),
-                //         TokenSymbol::Minus => Ok(ArithmeticalOperation::Sub),
-                //         TokenSymbol::Asterisk => Ok(ArithmeticalOperation::Mul),
-                //         TokenSymbol::Slash => Ok(ArithmeticalOperation::Div),
-                //         _ => return Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operand>")))),
-                //     }?;
-
-                //     m.next();
-
-                //     Ok(operation_from_segment((Expression::Operation(operation), sym), Expression::from_tokens(m)?))
-                // } else {
-                //     let operation = operation_from_segment((first_expr, segment2.1), );
-                //     Ok(operation)
-                // }
             }
         } else {
             let a = Expression::from_tokens(m)?;
@@ -133,11 +116,11 @@ impl ExpressionNode for OperationExpressionNode {
     /// Operates the values
     fn evaluate(&self, scope: &Scope) -> DataValue {
         match self {
-            OperationExpressionNode::Add(a, b) => a.evaluate(scope) + b.evaluate(scope),
-            OperationExpressionNode::Sub(a, b) => a.evaluate(scope) - b.evaluate(scope),
-            OperationExpressionNode::Mul(a, b) => a.evaluate(scope) * b.evaluate(scope),
-            OperationExpressionNode::Div(a, b) => a.evaluate(scope) / b.evaluate(scope),
-        }
+            OperationExpressionNode::Add(a, b) => ArithmeticDataValue::add(a.evaluate(scope).into(), b.evaluate(scope).into()),
+            OperationExpressionNode::Sub(a, b) => ArithmeticDataValue::sub(a.evaluate(scope).into(), b.evaluate(scope).into()),
+            OperationExpressionNode::Mul(a, b) => ArithmeticDataValue::mul(a.evaluate(scope).into(), b.evaluate(scope).into()),
+            OperationExpressionNode::Div(a, b) => ArithmeticDataValue::div(a.evaluate(scope).into(), b.evaluate(scope).into()),
+        }.into()
     }
 }
 
