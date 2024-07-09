@@ -1,6 +1,7 @@
 use crate::lang::lexer::token::Token;
 
 /// A tool for moving through a vector of tokens.
+#[derive(Clone)]
 pub struct ParsingMachine {
     /// The vector of tokens
     pub tokens: Vec<Token>,

@@ -23,6 +23,11 @@ impl NodeFactory for LiteralExpresionNode {
         match m.consume() {
             Some(Token::Literal(TokenLiteral::Number(n))) => Ok(Self(DataValue::Number(n))),
             Some(Token::Literal(TokenLiteral::String(s))) => Ok(Self(DataValue::String(s))),
+            Some(Token::Keyword(keyword)) => match keyword.as_str() {
+                "true" => Ok(Self(DataValue::Boolean(true))),
+                "false" => Ok(Self(DataValue::Boolean(false))),
+                _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Keyword("<literal@keyword>"))))
+            },
             _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("<literal>")))),
         }
     }

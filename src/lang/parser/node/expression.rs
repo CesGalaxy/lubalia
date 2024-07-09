@@ -32,7 +32,11 @@ impl Expression {
     fn get_value(m: &mut ParsingMachine) -> Result<Expression, ParserError> {
         match m.peek() {
             Some(Token::Literal(_)) => Ok(Expression::Literal(LiteralExpresionNode::from_tokens(m)?)),
-            Some(Token::Keyword(_)) => Ok(Expression::VariableReference(VariableReferenceNode::from_tokens(m)?)),
+            Some(Token::Keyword(_)) => if let Ok(_) = LiteralExpresionNode::from_tokens(&mut m.clone()) {
+                Ok(Expression::Literal(LiteralExpresionNode::from_tokens(m)?))
+            } else {
+                Ok(Expression::VariableReference(VariableReferenceNode::from_tokens(m)?))
+            },
             _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("Number"))))
         }
     }
@@ -48,8 +52,10 @@ impl NodeFactory for Expression {
             } else {
                 Ok(Self::Literal(LiteralExpresionNode::from_tokens(m)?))
             },
-            Some(Token::Keyword(_)) => {
-                Ok(Self::VariableReference(VariableReferenceNode::from_tokens(m)?))
+            Some(Token::Keyword(_)) => if let Ok(_) = LiteralExpresionNode::from_tokens(&mut m.clone()) {
+                Ok(Expression::Literal(LiteralExpresionNode::from_tokens(m)?))
+            } else {
+                Ok(Expression::VariableReference(VariableReferenceNode::from_tokens(m)?))
             },
             _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("Number"))))
         }
