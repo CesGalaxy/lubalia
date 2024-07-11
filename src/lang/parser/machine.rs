@@ -9,7 +9,6 @@ pub struct ParsingMachine {
     pub pos: usize,
 }
 
-#[allow(dead_code)]
 impl ParsingMachine {
     pub fn new(tokens: Vec<Token>) -> Self {
         Self {

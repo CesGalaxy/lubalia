@@ -6,7 +6,7 @@ use crate::lang::{
     }
 };
 
-use super::{ AbstractSyntaxTree, Node, NodeFactory, TreeNode};
+use super::{AbstractSyntaxTree, Node, NodeFactory, TreeNode};
 
 #[derive(Debug, Clone)]
 pub struct ScopeNode(pub AbstractSyntaxTree);
@@ -14,6 +14,7 @@ pub struct ScopeNode(pub AbstractSyntaxTree);
 impl Node for ScopeNode {}
 
 impl NodeFactory for ScopeNode {
+    /// Try to get an AST (vec of nodes) from a vec of tokens
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
         // Check if the scope is initialized with a '{'
         // Don't do the check if it's the strat of the code
@@ -23,18 +24,25 @@ impl NodeFactory for ScopeNode {
 
         let mut tree: AbstractSyntaxTree = Vec::new();
 
+        // For each new root-node: it will start parsing at its first token,
+        // and end the parsing at the first token of the next root-node.
         while let Some(t) = m.peek() {
             match t {
+                // The closed bracket '}' will end the scope
+                // TODO: Don't allow this in the global scope
                 Token::Symbol(TokenSymbol::BracketClose) => {
                     m.next();
                     return Ok(Self(tree));
                 },
+                // Handle end of line/file
                 Token::EOL => { m.next(); },
                 Token::EOF => return Ok(Self(tree)),
+                // Try to parse the current node
                 _ => tree.push(TreeNode::from_tokens(m)?),
             }
         }
 
+        // If the scope wasn't closed by a '}' or EOF, then it's missing a '}'
         return Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol("}"))));
     }
 }

@@ -13,6 +13,7 @@ use crate::{
 
 use super::ExpressionNode;
 
+/// A reference (through the name) to a variable of the scope
 #[derive(Debug, Clone)]
 pub struct VariableReferenceNode(String);
 

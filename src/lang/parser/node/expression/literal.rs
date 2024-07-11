@@ -13,6 +13,7 @@ use crate::{
 
 use super::ExpressionNode;
 
+/// A literal (constant and static) value, contains a DataValue that doesn't depend on anything else
 #[derive(Debug, Clone)]
 pub struct LiteralExpresionNode(pub DataValue);
 

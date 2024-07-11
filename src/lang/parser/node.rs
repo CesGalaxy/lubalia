@@ -31,9 +31,7 @@ impl NodeFactory for TreeNode {
                 ))),
                 _ => panic!("Invalid keyword"),
             },
-            // Token::EOL => Ok(None),
-            // Token::EOF => Ok(None),
-            // If the new root-node is not an statement, check for an expression (which will be printed when evaluating it).
+            // If the new node is not an statement, check for an expression (which will be printed when evaluating it).
             // In case that the expression isn't valid neither, an error will be thrown.
             _ => match expression::Expression::from_tokens(m) {
                 Ok(expression) => Ok(Self::Expression(expression)),

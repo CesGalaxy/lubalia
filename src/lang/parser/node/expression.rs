@@ -23,6 +23,7 @@ pub trait ExpressionNode: Node {
 
 #[derive(Debug, Clone)]
 pub enum Expression {
+    
     Literal(LiteralExpresionNode),
     Operation(OperationExpressionNode),
     VariableReference(VariableReferenceNode)
@@ -45,13 +46,17 @@ impl Expression {
 impl Node for Expression {}
 
 impl NodeFactory for Expression {
+    /// Try to get an expression from a vec of tokens
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
+        // TODO: This code is shit, fucking shit
         match m.peek() {
             Some(Token::Literal(_)) => match m.peek_next() {
+                // TODO: Handle all the symbols
                 Some(Token::Symbol(TokenSymbol::Plus)) => Ok(Self::Operation(OperationExpressionNode::from_tokens(m)?)),
                 // TODO: If it's None it means there is no EOL/EOF
                 _ => Ok(Self::Literal(LiteralExpresionNode::from_tokens(m)?))
             },
+            // TODO: Variables and booleans also want to be operated :(
             Some(Token::Keyword(_)) => if let Ok(_) = LiteralExpresionNode::from_tokens(&mut m.clone()) {
                 Ok(Expression::Literal(LiteralExpresionNode::from_tokens(m)?))
             } else {
@@ -63,6 +68,7 @@ impl NodeFactory for Expression {
 }
 
 impl ExpressionNode for Expression {
+    /// Evaluate an expression
     fn evaluate(&self, scope: &Context) -> DataValue {
         match self {
             Expression::Literal(node) => node.evaluate(scope),

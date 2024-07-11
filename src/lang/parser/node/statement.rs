@@ -1,6 +1,12 @@
 pub mod variable_declaration;
 
-use crate::{lang::{lexer::token::Token, parser::exception::{ExpectedToken, ParserError, ParserException}}, vm::context::Context};
+use crate::{
+    lang::{
+        lexer::token::Token,
+        parser::exception::{ExpectedToken, ParserError, ParserException}
+    },
+    vm::context::Context
+};
 
 use super::{Node, NodeFactory};
 
@@ -16,6 +22,7 @@ pub enum Statement {
 impl Node for Statement {}
 
 impl NodeFactory for Statement {
+    /// Try to get a statement given a vec of tokens
     fn from_tokens(m: &mut crate::lang::parser::machine::ParsingMachine) -> Result<Self, ParserError> where Self: Sized {
         match m.peek() {
             Some(Token::Keyword(keyword)) => match keyword.as_str() {
