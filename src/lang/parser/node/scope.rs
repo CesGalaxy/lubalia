@@ -15,7 +15,9 @@ impl Node for ScopeNode {}
 
 impl NodeFactory for ScopeNode {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
-        if m.consume() != Some(Token::Symbol(TokenSymbol::BracketOpen)) {
+        // Check if the scope is initialized with a '{'
+        // Don't do the check if it's the strat of the code
+        if m.pos != 0 && m.consume() != Some(Token::Symbol(TokenSymbol::BracketOpen)) {
             return Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol("<scope init>"))));
         }
 
