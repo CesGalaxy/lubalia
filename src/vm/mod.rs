@@ -1,7 +1,7 @@
 mod runtime;
-pub mod scope;
+pub mod context;
 
-use scope::Scope;
+use context::Context;
 
 use crate::lang::parser::node::AbstractSyntaxTree;
 
@@ -12,7 +12,7 @@ pub struct VM {
     // The position of the cursor in the root-node vector (AST)
     ip: usize,
     // The global scope (context) of the VM
-    pub global: Scope<'static>
+    pub global: Context<'static>
 }
 
 impl VM {
@@ -20,7 +20,7 @@ impl VM {
         VM {
             program,
             ip: 0,
-            global: Scope::new(),
+            global: Context::new(),
         }
     }
 }

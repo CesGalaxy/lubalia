@@ -8,7 +8,7 @@ use crate::{
             node::{Node, NodeFactory},
         },
     },
-    vm::scope::Scope,
+    vm::context::Context,
 };
 
 use super::ExpressionNode;
@@ -35,7 +35,7 @@ impl NodeFactory for LiteralExpresionNode {
 
 impl ExpressionNode for LiteralExpresionNode {
     /// Returns the literal value
-    fn evaluate(&self, _scope: &Scope) -> DataValue {
+    fn evaluate(&self, _scope: &Context) -> DataValue {
         self.0.clone()
     }
 }

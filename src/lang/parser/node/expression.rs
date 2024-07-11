@@ -11,14 +11,14 @@ use crate::{
         lexer::token::Token,
         parser::{data::DataValue, exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine}
     },
-    vm::scope::Scope
+    vm::context::Context
 };
 
 use super::{Node, NodeFactory};
 
 pub trait ExpressionNode: Node {
     /// Evaluates the expression and returns its value.
-    fn evaluate(&self, scope: &Scope) -> DataValue;
+    fn evaluate(&self, scope: &Context) -> DataValue;
 }
 
 #[derive(Debug, Clone)]
@@ -63,7 +63,7 @@ impl NodeFactory for Expression {
 }
 
 impl ExpressionNode for Expression {
-    fn evaluate(&self, scope: &Scope) -> DataValue {
+    fn evaluate(&self, scope: &Context) -> DataValue {
         match self {
             Expression::Literal(node) => node.evaluate(scope),
             Expression::Operation(node) => node.evaluate(scope),

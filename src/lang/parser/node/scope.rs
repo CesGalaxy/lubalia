@@ -1,3 +1,3 @@
 use super::AbstractSyntaxTree;
 
-pub struct Scope(AbstractSyntaxTree);
+pub struct ScopeNode(AbstractSyntaxTree);

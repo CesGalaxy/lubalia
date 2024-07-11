@@ -41,7 +41,7 @@ impl NodeFactory for VariableDeclarationNode {
 }
 
 impl StatementNode for VariableDeclarationNode {
-    fn run(&self, scope: &mut crate::vm::scope::Scope) {
+    fn run(&self, scope: &mut crate::vm::context::Context) {
         scope.set(self.0.clone(), self.1.evaluate(scope))
     }
 }

@@ -3,21 +3,21 @@ use crate::lang::parser::data::DataValue;
 /// A context for running code, contains all variables.
 /// Extends all the data from its parent
 #[derive(Debug)]
-pub struct Scope<'a> {
+pub struct Context<'a> {
     pub variables: Vec<(String, DataValue)>,
-    pub parent: Option<&'a mut Scope<'a>>
+    pub parent: Option<&'a mut Context<'a>>
 }
 
-impl Scope<'static> {
+impl Context<'static> {
     pub fn new() -> Self {
-        Scope {
+        Context {
             variables: Vec::new(),
             parent: None
         }
     }
 }
 
-impl<'a> Scope<'a> {
+impl<'a> Context<'a> {
     /// Add a variable to the scope (or overwrite it if it already exists)
     pub fn set(&mut self, name: String, value: DataValue) {
         if let Some(variable) = self.get_mut(name.clone()) {

@@ -17,7 +17,7 @@ use crate::{
             arithmetic::ArithmeticDataValue, data::DataValue, exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine, node::{Node, NodeFactory}
         }
     },
-    vm::scope::Scope
+    vm::context::Context
 };
 
 use super::{Expression, ExpressionNode};
@@ -114,7 +114,7 @@ impl NodeFactory for OperationExpressionNode {
 
 impl ExpressionNode for OperationExpressionNode {
     /// Operates the values
-    fn evaluate(&self, scope: &Scope) -> DataValue {
+    fn evaluate(&self, scope: &Context) -> DataValue {
         match self {
             OperationExpressionNode::Add(a, b) => ArithmeticDataValue::add(a.evaluate(scope).into(), b.evaluate(scope).into()),
             OperationExpressionNode::Sub(a, b) => ArithmeticDataValue::sub(a.evaluate(scope).into(), b.evaluate(scope).into()),

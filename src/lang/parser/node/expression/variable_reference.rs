@@ -8,7 +8,7 @@ use crate::{
             node::{Node, NodeFactory}
         }
     },
-    vm::scope::Scope
+    vm::context::Context
 };
 
 use super::ExpressionNode;
@@ -29,7 +29,7 @@ impl NodeFactory for VariableReferenceNode {
 
 impl ExpressionNode for VariableReferenceNode {
     /// Get the variable value from the scope, return 0.0 by default
-    fn evaluate(&self, scope: &Scope) -> DataValue {
+    fn evaluate(&self, scope: &Context) -> DataValue {
         scope.get(self.0.clone()).map(|value| value.clone()).unwrap_or(DataValue::Number(0.0))
     }
 }

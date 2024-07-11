@@ -1,11 +1,11 @@
 pub mod variable_declaration;
 
-use crate::{lang::{lexer::token::Token, parser::exception::{ExcpectedToken, ParserError, ParserException}}, vm::scope::Scope};
+use crate::{lang::{lexer::token::Token, parser::exception::{ExcpectedToken, ParserError, ParserException}}, vm::context::Context};
 
 use super::{Node, NodeFactory};
 
 pub trait StatementNode: Node + NodeFactory {
-    fn run(&self, scope: &mut Scope);
+    fn run(&self, scope: &mut Context);
 }
 
 #[derive(Debug, Clone)]
@@ -28,7 +28,7 @@ impl NodeFactory for Statement {
 }
 
 impl StatementNode for Statement {
-    fn run(&self, scope: &mut Scope) {
+    fn run(&self, scope: &mut Context) {
         match self {
             Statement::VariableDeclaration(node) => node.run(scope)
         }
