@@ -9,7 +9,7 @@ use variable_reference::VariableReferenceNode;
 use crate::{
     lang::{
         lexer::token::Token,
-        parser::{data::DataValue, exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine}
+        parser::{data::DataValue, exception::{ExpectedToken, ParserError, ParserException}, machine::ParsingMachine}
     },
     vm::context::Context
 };
@@ -37,7 +37,7 @@ impl Expression {
             } else {
                 Ok(Expression::VariableReference(VariableReferenceNode::from_tokens(m)?))
             },
-            _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("Number"))))
+            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Literal("Number"))))
         }
     }
 }
@@ -57,7 +57,7 @@ impl NodeFactory for Expression {
             } else {
                 Ok(Expression::VariableReference(VariableReferenceNode::from_tokens(m)?))
             },
-            _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("Number"))))
+            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Literal("Number"))))
         }
     }
 }

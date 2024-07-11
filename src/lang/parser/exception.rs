@@ -3,7 +3,7 @@ use crate::lang::lexer::token::Token;
 use super::machine::ParsingMachine;
 
 #[derive(Debug)]
-pub enum ExcpectedToken {
+pub enum ExpectedToken {
     Keyword(&'static str),
     Symbol(&'static str),
     Literal(&'static str),
@@ -13,7 +13,7 @@ pub enum ExcpectedToken {
 
 #[derive(Debug)]
 pub enum ParserException {
-    TokenExpected(ExcpectedToken),
+    TokenExpected(ExpectedToken),
     InvalidToken(Token, Box<ParserError>)
 }
 

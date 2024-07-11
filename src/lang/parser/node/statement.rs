@@ -1,6 +1,6 @@
 pub mod variable_declaration;
 
-use crate::{lang::{lexer::token::Token, parser::exception::{ExcpectedToken, ParserError, ParserException}}, vm::context::Context};
+use crate::{lang::{lexer::token::Token, parser::exception::{ExpectedToken, ParserError, ParserException}}, vm::context::Context};
 
 use super::{Node, NodeFactory};
 
@@ -22,7 +22,7 @@ impl NodeFactory for Statement {
                 "let" => Ok(Statement::VariableDeclaration(variable_declaration::VariableDeclarationNode::from_tokens(m)?)),
                 _ => panic!("Invalid keyword"),
             },
-            _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Keyword("<var name>"))))
+            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Keyword("<var name>"))))
         }
     }
 }

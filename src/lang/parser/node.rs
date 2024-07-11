@@ -2,7 +2,9 @@ pub mod expression;
 pub mod statement;
 pub mod scope;
 
-use super::{exception::ParserError, machine::ParsingMachine};
+use crate::lang::lexer::token::Token;
+
+use super::{exception::{ParserError, ParserException}, machine::ParsingMachine};
 
 pub trait Node: std::fmt::Debug + std::fmt::Display {}
 
@@ -14,14 +16,42 @@ pub trait NodeFactory: Node {
 #[derive(Debug, Clone)]
 pub enum TreeNode {
     Expression(expression::Expression),
-    Statement(statement::Statement)
+    Statement(statement::Statement),
+    Scope(scope::ScopeNode)
+}
+
+impl Node for TreeNode {}
+
+impl NodeFactory for TreeNode {
+    fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
+        match m.peek().expect("We want a TOKEN") {
+            Token::Keyword(keyword) => match keyword.as_str() {
+                "let" => Ok(Self::Statement(statement::Statement::VariableDeclaration(
+                    statement::variable_declaration::VariableDeclarationNode::from_tokens(m)?
+                ))),
+                _ => panic!("Invalid keyword"),
+            },
+            // Token::EOL => Ok(None),
+            // Token::EOF => Ok(None),
+            // If the new root-node is not an statement, check for an expression (which will be printed when evaluating it).
+            // In case that the expression isn't valid neither, an error will be thrown.
+            _ => match expression::Expression::from_tokens(m) {
+                Ok(expression) => Ok(Self::Expression(expression)),
+                Err(error) => Err(m.except(ParserException::InvalidToken(
+                    m.peek().unwrap().clone(),
+                    Box::new(error)
+                ))),
+            }
+        }
+    }
 }
 
 impl std::fmt::Display for TreeNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             TreeNode::Expression(expression) => write!(f, "[ {expression} ]"),
-            TreeNode::Statement(statement) => write!(f, "{{ {statement} }}")
+            TreeNode::Statement(statement) => write!(f, "( {statement} )"),
+            TreeNode::Scope(scope) => write!(f, "{{\n{scope}}}")
         }
     }
 }

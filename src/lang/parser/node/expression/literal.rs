@@ -3,7 +3,7 @@ use crate::{
         lexer::token::{Token, TokenLiteral},
         parser::{
             data::DataValue,
-            exception::{ExcpectedToken, ParserError, ParserException},
+            exception::{ExpectedToken, ParserError, ParserException},
             machine::ParsingMachine,
             node::{Node, NodeFactory},
         },
@@ -26,9 +26,9 @@ impl NodeFactory for LiteralExpresionNode {
             Some(Token::Keyword(keyword)) => match keyword.as_str() {
                 "true" => Ok(Self(DataValue::Boolean(true))),
                 "false" => Ok(Self(DataValue::Boolean(false))),
-                _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Keyword("<literal@keyword>"))))
+                _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Keyword("<literal@keyword>"))))
             },
-            _ => Err(m.except(ParserException::TokenExpected(ExcpectedToken::Literal("<literal>")))),
+            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Literal("<literal>")))),
         }
     }
 }

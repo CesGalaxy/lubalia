@@ -3,7 +3,7 @@ use colored::Colorize;
 use crate::lang::{
     lexer::token::{Token, TokenSymbol},
     parser::{
-        exception::{ExcpectedToken, ParserError, ParserException},
+        exception::{ExpectedToken, ParserError, ParserException},
         machine::ParsingMachine,
         node::{expression::{Expression, ExpressionNode}, Node, NodeFactory}
     }
@@ -29,13 +29,13 @@ impl NodeFactory for VariableDeclarationNode {
                 if let Some(Token::Semicolon) = m.consume() {
                     Ok(Self(varname, value))
                 } else {
-                    Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol(";"))))
+                    Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol(";"))))
                 }
             } else {
-                Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("="))))
+                Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol("="))))
             }
         } else {
-            Err(m.except(ParserException::TokenExpected(ExcpectedToken::Keyword("<var name>"))))
+            Err(m.except(ParserException::TokenExpected(ExpectedToken::Keyword("<var name>"))))
         }
     }
 }

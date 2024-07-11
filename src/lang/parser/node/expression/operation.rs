@@ -14,7 +14,7 @@ use crate::{
     lang::{
         lexer::token::{Token, TokenSymbol},
         parser::{
-            arithmetic::ArithmeticDataValue, data::DataValue, exception::{ExcpectedToken, ParserError, ParserException}, machine::ParsingMachine, node::{Node, NodeFactory}
+            arithmetic::ArithmeticDataValue, data::DataValue, exception::{ExpectedToken, ParserError, ParserException}, machine::ParsingMachine, node::{Node, NodeFactory}
         }
     },
     vm::context::Context
@@ -59,7 +59,7 @@ pub fn get_expression_segment(m: &mut ParsingMachine) -> Result<Option<(Expressi
             TokenSymbol::Minus => Ok(Some((n1, ArithmeticalOperation::Sub))),
             TokenSymbol::Asterisk => Ok(Some((n1, ArithmeticalOperation::Mul))),
             TokenSymbol::Slash => Ok(Some((n1, ArithmeticalOperation::Div))),
-            _ => return Err(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operand>")))),
+            _ => return Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol("<operand>")))),
         }
     } else {
         // TODO: Change this
@@ -91,7 +91,7 @@ impl Node for OperationExpressionNode {}
 impl NodeFactory for OperationExpressionNode {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
         let segment = get_expression_segment(m)?
-            .ok_or(m.except(ParserException::TokenExpected(ExcpectedToken::Symbol("<operation first segment>"))))?;
+            .ok_or(m.except(ParserException::TokenExpected(ExpectedToken::Symbol("<operation first segment>"))))?;
         
         if let Some(segment2) = get_expression_segment(m)? {
             if segment.1 < segment2.1 { // a + b * ...
