@@ -9,7 +9,7 @@ use crate::lang::{
 use super::{ AbstractSyntaxTree, Node, NodeFactory, TreeNode};
 
 #[derive(Debug, Clone)]
-pub struct ScopeNode(AbstractSyntaxTree);
+pub struct ScopeNode(pub AbstractSyntaxTree);
 
 impl Node for ScopeNode {}
 

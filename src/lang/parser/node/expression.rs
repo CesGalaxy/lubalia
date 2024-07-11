@@ -8,7 +8,7 @@ use variable_reference::VariableReferenceNode;
 
 use crate::{
     lang::{
-        lexer::token::Token,
+        lexer::token::{Token, TokenSymbol},
         parser::{data::DataValue, exception::{ExpectedToken, ParserError, ParserException}, machine::ParsingMachine}
     },
     vm::context::Context
@@ -47,17 +47,17 @@ impl Node for Expression {}
 impl NodeFactory for Expression {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
         match m.peek() {
-            Some(Token::Literal(_)) => if let Some(Token::Symbol(_)) = m.peek_next() {
-                Ok(Self::Operation(OperationExpressionNode::from_tokens(m)?))
-            } else {
-                Ok(Self::Literal(LiteralExpresionNode::from_tokens(m)?))
+            Some(Token::Literal(_)) => match m.peek_next() {
+                Some(Token::Symbol(TokenSymbol::Plus)) => Ok(Self::Operation(OperationExpressionNode::from_tokens(m)?)),
+                // TODO: If it's None it means there is no EOL/EOF
+                _ => Ok(Self::Literal(LiteralExpresionNode::from_tokens(m)?))
             },
             Some(Token::Keyword(_)) => if let Ok(_) = LiteralExpresionNode::from_tokens(&mut m.clone()) {
                 Ok(Expression::Literal(LiteralExpresionNode::from_tokens(m)?))
             } else {
                 Ok(Expression::VariableReference(VariableReferenceNode::from_tokens(m)?))
             },
-            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Literal("Number"))))
+            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Literal("<expr>"))))
         }
     }
 }
