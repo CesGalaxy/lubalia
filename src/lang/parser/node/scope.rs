@@ -55,3 +55,15 @@ impl std::fmt::Display for ScopeNode {
         Ok(())
     }
 }
+
+impl From<ScopeNode> for AbstractSyntaxTree {
+    fn from(node: ScopeNode) -> Self {
+        node.0
+    }
+}
+
+impl From<AbstractSyntaxTree> for ScopeNode {
+    fn from(tree: AbstractSyntaxTree) -> Self {
+        ScopeNode(tree)
+    }
+}

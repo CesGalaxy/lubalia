@@ -14,5 +14,5 @@ use super::lexer::token::Token;
 pub fn parse_tree(tokens: Vec<Token>) -> Result<AbstractSyntaxTree, ParserError> {
     let mut machine = ParsingMachine::new(tokens);
 
-    Ok(ScopeNode::from_tokens(&mut machine)?.0)
+    Ok(ScopeNode::from_tokens(&mut machine)?.into())
 }
