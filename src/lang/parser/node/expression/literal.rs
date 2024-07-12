@@ -27,9 +27,9 @@ impl NodeFactory for LiteralExpresionNode {
             Some(Token::Keyword(keyword)) => match keyword.as_str() {
                 "true" => Ok(Self(DataValue::Boolean(true))),
                 "false" => Ok(Self(DataValue::Boolean(false))),
-                _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Keyword("<literal@keyword>"))))
+                _ => Err(m.err(ParserException::TokenExpected(ExpectedToken::Keyword("<literal@keyword>"))))
             },
-            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Literal("<literal>")))),
+            _ => Err(m.err(ParserException::TokenExpected(ExpectedToken::Literal("<literal>")))),
         }
     }
 }

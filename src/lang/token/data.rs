@@ -1,5 +1,5 @@
 #[derive(Debug, Clone, PartialEq)]
-pub enum Token {
+pub enum TokenData {
     Keyword(String),
     Literal(TokenLiteral),
     Symbol(TokenSymbol),

@@ -37,7 +37,7 @@ impl Expression {
             } else {
                 Ok(Expression::VariableReference(VariableReferenceNode::from_tokens(m)?))
             },
-            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Literal("Number"))))
+            _ => Err(m.err(ParserException::TokenExpected(ExpectedToken::Literal("Number"))))
         }
     }
 }
@@ -61,7 +61,7 @@ impl NodeFactory for Expression {
             } else {
                 Ok(Expression::VariableReference(VariableReferenceNode::from_tokens(m)?))
             },
-            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Literal("<expr>"))))
+            _ => Err(m.err(ParserException::TokenExpected(ExpectedToken::Literal("<expr>"))))
         }
     }
 }

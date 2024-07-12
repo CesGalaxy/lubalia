@@ -30,6 +30,7 @@ impl NodeFactory for TreeNode {
                 "let" => Ok(Self::Statement(statement::Statement::VariableDeclaration(
                     statement::variable_declaration::VariableDeclarationNode::from_tokens(m)?
                 ))),
+                // TODO: Continue the match (keyword can be a variable)
                 _ => panic!("Invalid keyword"),
             },
             Token::Symbol(TokenSymbol::BracketOpen) => Ok(Self::Scope(scope::ScopeNode::from_tokens(m)?)),
@@ -37,7 +38,7 @@ impl NodeFactory for TreeNode {
             // In case that the expression isn't valid neither, an error will be thrown.
             _ => match expression::Expression::from_tokens(m) {
                 Ok(expression) => Ok(Self::Expression(expression)),
-                Err(error) => Err(m.except(ParserException::InvalidToken(
+                Err(error) => Err(m.err(ParserException::InvalidToken(
                     m.peek().unwrap().clone(),
                     Box::new(error)
                 ))),

@@ -30,13 +30,13 @@ impl NodeFactory for VariableDeclarationNode {
                 if let Some(Token::Semicolon) = m.consume() {
                     Ok(Self(varname, value))
                 } else {
-                    Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol(";"))))
+                    Err(m.err(ParserException::TokenExpected(ExpectedToken::Symbol(";"))))
                 }
             } else {
-                Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol("="))))
+                Err(m.err(ParserException::TokenExpected(ExpectedToken::Symbol("="))))
             }
         } else {
-            Err(m.except(ParserException::TokenExpected(ExpectedToken::Keyword("<var name>"))))
+            Err(m.err(ParserException::TokenExpected(ExpectedToken::Keyword("<var name>"))))
         }
     }
 }

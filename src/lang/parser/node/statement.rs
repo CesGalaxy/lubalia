@@ -29,7 +29,7 @@ impl NodeFactory for Statement {
                 "let" => Ok(Statement::VariableDeclaration(variable_declaration::VariableDeclarationNode::from_tokens(m)?)),
                 _ => panic!("Invalid keyword"),
             },
-            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Keyword("<var name>"))))
+            _ => Err(m.err(ParserException::TokenExpected(ExpectedToken::Keyword("<var name>"))))
         }
     }
 }

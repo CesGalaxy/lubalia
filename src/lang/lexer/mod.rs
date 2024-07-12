@@ -1,9 +1,4 @@
-use token::Token;
-use tokenizer::{tokenizer, TokenizerError};
 use linter::{linter, LinterError};
-
-pub mod token;
-mod tokenizer;
 mod linter;
 mod display;
 

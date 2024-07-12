@@ -23,7 +23,7 @@ impl NodeFactory for VariableReferenceNode {
     fn from_tokens(m: &mut ParsingMachine) -> Result<Self, ParserError> {
         match m.consume() {
             Some(Token::Keyword(varname)) => Ok(Self(varname)),
-            _ => Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol("<varname>"))))
+            _ => Err(m.err(ParserException::TokenExpected(ExpectedToken::Symbol("<varname>"))))
         }
     }
 }

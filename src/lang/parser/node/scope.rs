@@ -19,7 +19,7 @@ impl NodeFactory for ScopeNode {
         // Check if the scope is initialized with a '{'
         // Don't do the check if it's the strat of the code
         if m.pos != 0 && m.consume() != Some(Token::Symbol(TokenSymbol::BracketOpen)) {
-            return Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol("<scope init>"))));
+            return Err(m.err(ParserException::TokenExpected(ExpectedToken::Symbol("<scope init>"))));
         }
 
         let mut tree: AbstractSyntaxTree = Vec::new();
@@ -43,7 +43,7 @@ impl NodeFactory for ScopeNode {
         }
 
         // If the scope wasn't closed by a '}' or EOF, then it's missing a '}'
-        return Err(m.except(ParserException::TokenExpected(ExpectedToken::Symbol("}"))));
+        return Err(m.err(ParserException::TokenExpected(ExpectedToken::Symbol("}"))));
     }
 }
 
