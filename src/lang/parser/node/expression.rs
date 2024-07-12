@@ -23,7 +23,6 @@ pub trait ExpressionNode: Node {
 
 #[derive(Debug, Clone)]
 pub enum Expression {
-    
     Literal(LiteralExpresionNode),
     Operation(OperationExpressionNode),
     VariableReference(VariableReferenceNode)
