@@ -1,6 +1,6 @@
 use crate::{
     lang::{
-        lexer::token::{Token, TokenLiteral},
+        token::{Token, TokenLiteral},
         parser::{
             data::DataValue,
             exception::{ExpectedToken, ParserError, ParserException},

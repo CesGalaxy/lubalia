@@ -1,5 +1,5 @@
 use crate::lang::{
-    lexer::token::{Token, TokenSymbol},
+    token::{Token, TokenSymbol},
     parser::{
         exception::{ExpectedToken, ParserError, ParserException},
         machine::ParsingMachine

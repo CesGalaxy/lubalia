@@ -2,7 +2,7 @@ pub mod expression;
 pub mod statement;
 pub mod scope;
 
-use crate::lang::lexer::token::{Token, TokenSymbol};
+use crate::lang::token::{Token, TokenSymbol};
 
 use super::{exception::{ParserError, ParserException}, machine::ParsingMachine};
 

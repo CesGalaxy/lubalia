@@ -14,32 +14,33 @@ fn test_file(file_name: &str) {
     if let Ok(code) = file {
         let tokenizer_result = lexer(code);
 
-        println!("{tokenizer_result:?}");
-
-        if let Ok(tokens) = tokenizer_result {
-            // Print the tokens lexed
-            for token in &tokens {
-                print!("{token} ");
-            }
-
-            println!("{} tokens lexed!", tokens.len());
-
-            // let tree = parse_tree(tokens);
-
-            // if let Ok(program) = tree {
-            //     for node in &program {
-            //         print!("{} ", node);
-            //     }
-
-            //     println!("({})", program.len());
-
-            //     // Create and run the VM
-            //     let mut vm = VM::new(program);
-            //     vm.run();
-            //     println!("{:?}", vm.global);
-            // } else {
-            //     println!("TREE: {:?}", tree);
-            // }
+        match tokenizer_result {
+            Ok(tokens) => {
+                // Print the tokens lexed
+                for token in &tokens {
+                    print!("{token}");
+                }
+    
+                println!(" {} tokens lexed!", tokens.len());
+    
+                // let tree = parse_tree(tokens);
+    
+                // if let Ok(program) = tree {
+                //     for node in &program {
+                //         print!("{} ", node);
+                //     }
+    
+                //     println!("({})", program.len());
+    
+                //     // Create and run the VM
+                //     let mut vm = VM::new(program);
+                //     vm.run();
+                //     println!("{:?}", vm.global);
+                // } else {
+                //     println!("TREE: {:?}", tree);
+                // }
+            },
+            Err(error) => panic!("TokenixerError:\n{error}")
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::lang::lexer::token::Token;
+use crate::lang::token::Token;
 
 /// A tool for moving through a vector of tokens.
 #[derive(Clone)]

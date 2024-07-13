@@ -2,7 +2,7 @@ pub mod variable_declaration;
 
 use crate::{
     lang::{
-        lexer::token::Token,
+        token::Token,
         parser::exception::{ExpectedToken, ParserError, ParserException}
     },
     vm::context::Context

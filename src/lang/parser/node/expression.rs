@@ -8,7 +8,7 @@ use variable_reference::VariableReferenceNode;
 
 use crate::{
     lang::{
-        lexer::token::{Token, TokenSymbol},
+        token::{Token, TokenSymbol},
         parser::{data::DataValue, exception::{ExpectedToken, ParserError, ParserException}, machine::ParsingMachine}
     },
     vm::context::Context

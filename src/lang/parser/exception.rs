@@ -1,6 +1,6 @@
 use colored::Colorize;
 
-use crate::lang::lexer::token::Token;
+use crate::lang::token::Token;
 
 use super::machine::ParsingMachine;
 
@@ -16,22 +16,22 @@ pub enum ExpectedToken {
 #[derive(Debug)]
 pub enum ParserException {
     TokenExpected(ExpectedToken),
-    ExpressionExpected(&'static str),
+    // ExpressionExpected(&'static str),
     InvalidToken(Token, Box<ParserError>)
 }
 
 #[derive(Debug)]
 pub struct ParserError {
     exception: ParserException,
-    pos: Option<usize>,
+    _pos: Option<usize>,
 }
 
 impl std::fmt::Display for ExpectedToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ExpectedToken::Keyword(keyword) => write!(f, "keyword: {keyword}"),
-            ExpectedToken::Symbol(symbol) => write!(f, ""),
-            ExpectedToken::Literal(literal) => write!(f, ""),
+            ExpectedToken::Symbol(_) => write!(f, ""),
+            ExpectedToken::Literal(_) => write!(f, ""),
             _ => write!(f, "a")
         }
     }
@@ -58,7 +58,7 @@ impl ParsingMachine {
     pub fn err(&self, exception: ParserException) -> ParserError {
         ParserError {
             exception,
-            pos: Some(self.pos)
+            _pos: Some(self.pos)
         }
     }
 }
