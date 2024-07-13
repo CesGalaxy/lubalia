@@ -2,12 +2,22 @@ use colored::Colorize;
 
 use super::result::Transcription;
 
+/// An error during the transcription process
 #[derive(Debug)]
 pub struct TranscriberError<'a, SourceUnit: Clone, ResultUnit, Error: std::fmt::Display> {
+    /// The cursor position when the falied tick started
     pub tick_initial_position: usize,
+
+    /// The amount of source units the tick consumed before the error
     pub tick_buffer: Vec<SourceUnit>,
+
+    /// The cursor position at the time of the error
     pub cursor_position: usize,
-    pub buffer: Transcription<'a, SourceUnit, ResultUnit>,
+
+    /// The uncompleted transcription before the time of the error
+    pub transcription_buffer: Transcription<'a, SourceUnit, ResultUnit>,
+
+    /// The error that occured
     pub error: Error,
 }
 
