@@ -14,7 +14,7 @@ mod linter;
 /// Panics if there is an unexcepted error (not related with the code).
 pub fn lexer(code: String) -> Result<Vec<Token>, LexerError> {
     let tokenization = tokenizer(code)?;
-    let tokens = tokenization.units();
+    let tokens = tokenization.units().into_iter().cloned().collect();
 
     let linter_error = linter(&tokens);
 
@@ -31,7 +31,7 @@ pub fn lexer(code: String) -> Result<Vec<Token>, LexerError> {
 #[derive(Debug)]
 pub enum LexerError {
     /// An error during the tokenizer (transcribing) process.
-    TokenizerError(TranscriberError<'static, char, Token, TokenizerError>),
+    TokenizerError(TranscriberError<char, Token, TokenizerError>),
     
     /// A linter error, usually a missing semicolon.
     LinterError(LinterError)
@@ -46,7 +46,7 @@ impl std::fmt::Display for LexerError {
     }
 }
 
-impl From<TranscriberError<'_, char, Token, TokenizerError>> for LexerError {
+impl From<TranscriberError<char, Token, TokenizerError>> for LexerError {
     fn from(err: TranscriberError<char, Token, TokenizerError>) -> Self {
         Self::TokenizerError(err)
     }

@@ -27,11 +27,20 @@ impl<'a, Unit> TranscriberCursor<'a, Unit> {
         self.source.get(self.pos)
     }
 
+    // Get the unit at the next cursor position
+    pub fn peek_next(&self) -> Option<&Unit> {
+        self.source.get(self.pos + 1)
+    }
+
+    /// Get the unit at the previous cursor position
+    pub fn peek_prev(&self) -> Option<&Unit> {
+        self.source.get(self.pos - 1)
+    }
+
     /// Get the unit at the cursor position and move the cursor forward
     pub fn consume(&mut self) -> Option<&Unit> {
-        let unit = self.peek();
         self.next();
-        unit
+        self.peek_prev()
     }
 
     /// Check if the cursor is outside the source (cursor position >= source length)

@@ -11,7 +11,7 @@ pub mod error;
 /// # Panics
 /// 
 /// Panics if there is an unexcepted error (not related with the code).
-pub fn tokenizer(code: String) -> TranscriptionResult<'static, char, Token, TokenizerError> {
+pub fn tokenizer(code: String) -> TranscriptionResult<char, Token, TokenizerError> {
     let code_len = code.len();
 
     let mut transcription = transcriber(code.chars().collect(), tokenize_token)?;

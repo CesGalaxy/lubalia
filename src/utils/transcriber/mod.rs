@@ -11,23 +11,28 @@ use result::{Transcription, TranscriptionResult};
 pub fn transcriber<SourceUnit: Clone, ResultUnit: std::fmt::Debug, Error: std::fmt::Display>(
     source: Vec<SourceUnit>,
     tick: impl Fn(&mut TranscriberCursor<SourceUnit>, &SourceUnit) -> Result<Option<ResultUnit>, Error>,
-) -> TranscriptionResult<'static, SourceUnit, ResultUnit, Error> {
-    let mut transcription = Transcription::new(source);
-    let mut cursor = TranscriberCursor::new(&transcription.source);
+) -> TranscriptionResult<SourceUnit, ResultUnit, Error> {
+    let mut transcription = Transcription::new(source.clone());
+    let mut cursor = TranscriberCursor::new(&source);
 
-    while let Some(tick_initial_unit) = cursor.peek() {
+    while let Some(tick_initial_unit) = cursor.peek().map(|tiu| tiu.clone()) {
         let tick_initial_position = cursor.pos;
 
-        let tick_result = tick(&mut cursor, tick_initial_unit).map_err(|err| TranscriberError {
-            tick_initial_position,
-            tick_buffer: source[tick_initial_position..cursor.pos].to_vec(),
-            cursor_position: cursor.pos,
-            transcription_buffer: transcription,
-            error: err,
-        });
+        let tick_result = tick(&mut cursor, &tick_initial_unit);
 
-        if let Some(unit) = tick_result? {
-            transcription.push(unit, Some(tick_initial_position), Some(cursor.pos));
+        match tick_result {
+            Ok(Some(unit)) => {
+                let current_position = cursor.pos;
+                transcription.push(unit, Some(tick_initial_position), Some(current_position))
+            }
+            Err(error) => return Err(TranscriberError {
+                tick_initial_position,
+                tick_buffer: source[tick_initial_position..cursor.pos].to_vec(),
+                cursor_position: cursor.pos,
+                transcription_buffer: transcription,
+                error: error,
+            }),
+            _ => {}
         }
 
         if tick_initial_position == cursor.pos {

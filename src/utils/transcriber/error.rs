@@ -4,7 +4,7 @@ use super::result::Transcription;
 
 /// An error during the transcription process
 #[derive(Debug)]
-pub struct TranscriberError<'a, SourceUnit: Clone, ResultUnit, Error: std::fmt::Display> {
+pub struct TranscriberError<SourceUnit: Clone, ResultUnit, Error: std::fmt::Display> {
     /// The cursor position when the falied tick started
     pub tick_initial_position: usize,
 
@@ -15,13 +15,13 @@ pub struct TranscriberError<'a, SourceUnit: Clone, ResultUnit, Error: std::fmt::
     pub cursor_position: usize,
 
     /// The uncompleted transcription before the time of the error
-    pub transcription_buffer: Transcription<'a, SourceUnit, ResultUnit>,
+    pub transcription_buffer: Transcription<SourceUnit, ResultUnit>,
 
     /// The error that occured
     pub error: Error,
 }
 
-impl<S: std::fmt::Debug + Clone, R, E: std::fmt::Display> std::fmt::Display for TranscriberError<'_, S, R, E> {
+impl<S: std::fmt::Debug + Clone, R, E: std::fmt::Display> std::fmt::Display for TranscriberError<S, R, E> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} (at position {})\n", "Transcriber Error".red().bold(), self.cursor_position.to_string().yellow().bold())?;
         write!(f, "\t{}\n", self.error)?;
