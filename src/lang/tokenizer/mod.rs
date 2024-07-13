@@ -60,13 +60,13 @@ fn tokenize_token(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
         let mut literal = String::new();
         cursor.next();
 
-        while let Some(c) = cursor.peek() {
+        // Here you can use 'consume', as the odd one out will be the '"'.
+        while let Some(c) = cursor.consume() {
             if c == &'"' {
                 break;
             }
 
             literal.push(*c);
-            cursor.next();
         }
 
         Ok(Some(Token::Literal(TokenLiteral::String(literal))))
