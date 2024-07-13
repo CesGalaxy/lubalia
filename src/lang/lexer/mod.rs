@@ -27,7 +27,7 @@ pub fn lexer(code: String) -> Result<Vec<Token>, LexerError> {
 
 #[derive(Debug)]
 pub enum LexerError {
-    TokenizerError(TranscriberError<char, Token, TokenizerError>),
+    TokenizerError(TranscriberError<'static, char, Token, TokenizerError>),
     LinterError(LinterError)
 }
 
