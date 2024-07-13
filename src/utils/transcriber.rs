@@ -35,21 +35,25 @@
 //     fn tick(cursor: &mut TranscriberCursor<Self::SourceUnit>, initial_unit: &Self::SourceUnit) -> Result<Self::ResultUnit, Self::Error>;
 // }
 
+use colored::Colorize;
+
 /// Transcribe a vec of iUnits into a vec of oUnits.
 /// Create an iteration over the iUnits for transcribing them to oUnits
-pub fn transcriber<SourceUnit, ResultUnit, Error>(
+pub fn transcriber<SourceUnit: Clone, ResultUnit: std::fmt::Debug, Error: std::fmt::Display>(
     source: Vec<SourceUnit>,
     tick: impl Fn(&mut TranscriberCursor<SourceUnit>, &SourceUnit) -> Result<Option<ResultUnit>, Error>,
-) -> Result<Vec<ResultUnit>, TranscriberError<Error>> {
+) -> Result<Vec<ResultUnit>, TranscriberError<SourceUnit, ResultUnit, Error>> {
     let mut cursor = TranscriberCursor::new(&source);
     let mut result: Vec<ResultUnit> = vec![];
 
-    while let Some(initial_unit) = source.get(cursor.pos) {
+    while let Some(tick_initial_unit) = source.get(cursor.pos) {
         let tick_initial_position = cursor.pos;
 
-        let tick_result = tick(&mut cursor, initial_unit).map_err(|err| TranscriberError {
+        let tick_result = tick(&mut cursor, tick_initial_unit).map_err(|err| TranscriberError {
             tick_initial_position,
+            tick_buffer: source[tick_initial_position..cursor.pos].to_vec(),
             cursor_position: cursor.pos,
+            buffer: result,
             error: err,
         });
 
@@ -105,8 +109,19 @@ impl<'a, SourceUnit> TranscriberCursor<'a, SourceUnit> {
     }
 }
 
-pub struct TranscriberError<Error> {
+#[derive(Debug)]
+pub struct TranscriberError<SourceUnit: Clone, ResultUnit, Error: std::fmt::Display> {
     tick_initial_position: usize,
+    tick_buffer: Vec<SourceUnit>,
     cursor_position: usize,
+    buffer: Vec<ResultUnit>,
     error: Error,
+}
+
+impl<S: std::fmt::Debug + Clone, R, E: std::fmt::Display> std::fmt::Display for TranscriberError<S, R, E> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} (at position {})\n", "Transcriber Error".red().bold(), self.cursor_position.to_string().yellow().bold())?;
+        write!(f, "\t{}\n", self.error)?;
+        write!(f, "\tBuffer (starts at {}): {:?}", self.tick_initial_position.to_string().yellow().bold(), self.tick_buffer)
+    }
 }

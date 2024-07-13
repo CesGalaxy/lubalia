@@ -11,7 +11,7 @@ pub mod error;
 /// # Panics
 /// 
 /// Panics if there is an unexcepted error (not related with the code).
-pub fn tokenizer(code: String) -> Result<Vec<Token>, TranscriberError<TokenizerError>> {
+pub fn tokenizer(code: String) -> Result<Vec<Token>, TranscriberError<char, Token, TokenizerError>> {
     let mut tokens = transcriber(code.chars().collect(), tokenize_token)?;
 
     tokens.push(Token(TokenData::EOL));

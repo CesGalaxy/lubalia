@@ -1,6 +1,9 @@
 use linter::{linter, LinterError};
+
+use crate::utils::transcriber::TranscriberError;
+
+use super::{token::Token, tokenizer::{error::TokenizerError, tokenizer}};
 mod linter;
-mod display;
 
 /// Converts the code into a vector of tokens, then
 /// checks for errors or warning (linter) and returns
@@ -23,6 +26,21 @@ pub fn lexer(code: String) -> Result<Vec<Token>, LexerError> {
 
 #[derive(Debug)]
 pub enum LexerError {
-    TokenizerError(TokenizerError),
+    TokenizerError(TranscriberError<char, Token, TokenizerError>),
     LinterError(LinterError)
+}
+
+impl std::fmt::Display for LexerError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::TokenizerError(error) => write!(f, "TokenizerError >> {error}"),
+            Self::LinterError(error) => write!(f, "LinterError >> {error}"),
+        }
+    }
+}
+
+impl From<TranscriberError<char, Token, TokenizerError>> for LexerError {
+    fn from(err: TranscriberError<char, Token, TokenizerError>) -> Self {
+        Self::TokenizerError(err)
+    }
 }

@@ -1,4 +1,4 @@
-use super::token::Token;
+use crate::lang::token::{data::TokenData, Token};
 
 /// Examines the tokens searching for errors, bugs or other problems.
 /// The linter doesn't distuish from fatal errors and warnings.
@@ -12,8 +12,8 @@ pub fn linter(tokens: &Vec<Token>) -> Option<LinterError> {
     let mut pos = 0;
 
     while let Some(t) = tokens.get(pos) {
-        if *t == Token::Semicolon {
-            if tokens.get(pos + 1).cloned() != Some(Token::EOL) {
+        if t.0 == TokenData::Semicolon {
+            if tokens.get(pos + 1).cloned().map(|token| token.0) != Some(TokenData::EOL) {
                 return Some(LinterError::SemicolonNotAtEnd);
             }
         }
@@ -27,4 +27,12 @@ pub fn linter(tokens: &Vec<Token>) -> Option<LinterError> {
 #[derive(Debug)]
 pub enum LinterError {
     SemicolonNotAtEnd
+}
+
+impl std::fmt::Display for LinterError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::SemicolonNotAtEnd => write!(f, "Semicolon not at end"),
+        }
+    }
 }
