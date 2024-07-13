@@ -1,6 +1,6 @@
 use linter::{linter, LinterError};
 
-use crate::utils::transcriber::TranscriberError;
+use crate::utils::transcriber::error::TranscriberError;
 
 use super::{token::Token, tokenizer::{error::TokenizerError, tokenizer}};
 mod linter;
@@ -13,7 +13,8 @@ mod linter;
 /// 
 /// Panics if there is an unexcepted error (not related with the code).
 pub fn lexer(code: String) -> Result<Vec<Token>, LexerError> {
-    let tokens = tokenizer(code)?;
+    let tokenization = tokenizer(code)?;
+    let tokens = tokenization.units();
 
     let linter_error = linter(&tokens);
 
@@ -39,7 +40,7 @@ impl std::fmt::Display for LexerError {
     }
 }
 
-impl From<TranscriberError<char, Token, TokenizerError>> for LexerError {
+impl From<TranscriberError<'_, char, Token, TokenizerError>> for LexerError {
     fn from(err: TranscriberError<char, Token, TokenizerError>) -> Self {
         Self::TokenizerError(err)
     }

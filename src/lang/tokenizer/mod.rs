@@ -1,8 +1,8 @@
 use error::TokenizerError;
 
-use crate::utils::transcriber::{transcriber, TranscriberCursor, TranscriberError};
+use crate::utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber};
 
-use super::token::{data::{TokenData, TokenLiteral, TokenSymbol}, Token};
+use super::token::{Token, TokenLiteral, TokenSymbol};
 
 pub mod error;
 
@@ -11,13 +11,15 @@ pub mod error;
 /// # Panics
 /// 
 /// Panics if there is an unexcepted error (not related with the code).
-pub fn tokenizer(code: String) -> Result<Vec<Token>, TranscriberError<char, Token, TokenizerError>> {
-    let mut tokens = transcriber(code.chars().collect(), tokenize_token)?;
+pub fn tokenizer(code: String) -> TranscriptionResult<'static, char, Token, TokenizerError> {
+    let code_len = code.len();
 
-    tokens.push(Token(TokenData::EOL));
-    tokens.push(Token(TokenData::EOF));
+    let mut transcription = transcriber(code.chars().collect(), tokenize_token)?;
 
-    Ok(tokens)
+    transcription.push(Token::EOL, Some(code_len), None);
+    transcription.push(Token::EOF, Some(code_len), None);
+
+    Ok(transcription)
 }
 
 fn tokenize_token(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> Result<Option<Token>, TokenizerError> {
@@ -38,9 +40,7 @@ fn tokenize_token(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
             cursor.next();
         }
 
-        Ok(Some(Token(
-            TokenData::Keyword(keyword)
-        )))
+        Ok(Some(Token::Keyword(keyword)))
     } else if initial_unit.is_numeric() {
         let mut literal = String::new();
         literal.push(*initial_unit);
@@ -55,9 +55,7 @@ fn tokenize_token(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
             cursor.next();
         }
 
-        Ok(Some(Token(
-            TokenData::Literal(TokenLiteral::Number(literal.parse().or_else(|_| Err(TokenizerError::ErrorParsingNumber(literal)))?))
-        )))
+        Ok(Some(Token::Literal(TokenLiteral::Number(literal.parse().or_else(|_| Err(TokenizerError::ErrorParsingNumber(literal)))?))))
     } else if initial_unit == &'"' {
         let mut literal = String::new();
         cursor.next();
@@ -71,19 +69,15 @@ fn tokenize_token(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
             cursor.next();
         }
 
-        Ok(Some(Token(
-            TokenData::Literal(TokenLiteral::String(literal))
-        )))
+        Ok(Some(Token::Literal(TokenLiteral::String(literal))))
     } else {
         if let Some(symbol) = TokenSymbol::from_char(*initial_unit) {
-            Ok(Some(Token(
-                TokenData::Symbol(symbol)
-            )))
+            Ok(Some(Token::Symbol(symbol)))
         } else {
             match initial_unit {
-                ';' => Ok(Some(Token(TokenData::Semicolon))),
-                '\n' => Ok(Some(Token(TokenData::EOL))),
-                _ => Err(TokenizerError::UnknownCharacter(*initial_unit))
+                ';' => Ok(Some(Token::Semicolon)),
+                '\n' => Ok(Some(Token::EOL)),
+                _ => return Err(TokenizerError::UnknownCharacter(*initial_unit)),
             }
         }
     }

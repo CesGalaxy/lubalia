@@ -1,4 +1,4 @@
-use crate::lang::token::{data::TokenData, Token};
+use crate::lang::token::Token;
 
 /// Examines the tokens searching for errors, bugs or other problems.
 /// The linter doesn't distuish from fatal errors and warnings.
@@ -12,8 +12,8 @@ pub fn linter(tokens: &Vec<Token>) -> Option<LinterError> {
     let mut pos = 0;
 
     while let Some(t) = tokens.get(pos) {
-        if t.0 == TokenData::Semicolon {
-            if tokens.get(pos + 1).cloned().map(|token| token.0) != Some(TokenData::EOL) {
+        if t == &Token::Semicolon {
+            if tokens.get(pos + 1) != Some(&Token::EOL) {
                 return Some(LinterError::SemicolonNotAtEnd);
             }
         }
