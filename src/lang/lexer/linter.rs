@@ -24,8 +24,11 @@ pub fn linter(tokens: &Vec<Token>) -> Option<LinterError> {
     None
 }
 
+/// An error with the provided code, it should be a missing semicolon, otherwise, the end of the world.
 #[derive(Debug)]
 pub enum LinterError {
+    /// The semicolon is not at the end of the line.
+    /// THIS IS THE SOURCE OF ALL PROBLEMS!
     SemicolonNotAtEnd
 }
 
