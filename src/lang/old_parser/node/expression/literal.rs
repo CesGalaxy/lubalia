@@ -1,7 +1,7 @@
 use crate::{
     lang::{
         token::{Token, TokenLiteral},
-        parser::{
+        old_parser::{
             data::DataValue,
             exception::{ExpectedToken, ParserError, ParserException},
             machine::ParsingMachine,

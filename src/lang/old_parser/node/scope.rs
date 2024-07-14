@@ -1,6 +1,6 @@
 use crate::lang::{
     token::{Token, TokenSymbol},
-    parser::{
+    old_parser::{
         exception::{ExpectedToken, ParserError, ParserException},
         machine::ParsingMachine
     }

@@ -3,7 +3,7 @@ pub mod context;
 
 use context::Context;
 
-use crate::lang::parser::node::AbstractSyntaxTree;
+use crate::lang::old_parser::node::AbstractSyntaxTree;
 
 /// A virtual machine that executes a program in bytecode
 pub struct VM {

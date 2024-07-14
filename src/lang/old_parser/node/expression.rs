@@ -9,7 +9,7 @@ use variable_reference::VariableReferenceNode;
 use crate::{
     lang::{
         token::{Token, TokenSymbol},
-        parser::{data::DataValue, exception::{ExpectedToken, ParserError, ParserException}, machine::ParsingMachine}
+        old_parser::{data::DataValue, exception::{ExpectedToken, ParserError, ParserException}, machine::ParsingMachine}
     },
     vm::context::Context
 };

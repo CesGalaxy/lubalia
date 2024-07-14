@@ -3,7 +3,7 @@ pub mod variable_declaration;
 use crate::{
     lang::{
         token::Token,
-        parser::exception::{ExpectedToken, ParserError, ParserException}
+        old_parser::exception::{ExpectedToken, ParserError, ParserException}
     },
     vm::context::Context
 };
@@ -23,7 +23,7 @@ impl Node for Statement {}
 
 impl NodeFactory for Statement {
     /// Try to get a statement given a vec of tokens
-    fn from_tokens(m: &mut crate::lang::parser::machine::ParsingMachine) -> Result<Self, ParserError> where Self: Sized {
+    fn from_tokens(m: &mut crate::lang::old_parser::machine::ParsingMachine) -> Result<Self, ParserError> where Self: Sized {
         match m.peek() {
             Some(Token::Keyword(keyword)) => match keyword.as_str() {
                 "let" => Ok(Statement::VariableDeclaration(variable_declaration::VariableDeclarationNode::from_tokens(m)?)),

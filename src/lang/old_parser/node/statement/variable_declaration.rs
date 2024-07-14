@@ -2,7 +2,7 @@ use colored::Colorize;
 
 use crate::lang::{
     token::{Token, TokenSymbol},
-    parser::{
+    old_parser::{
         exception::{ExpectedToken, ParserError, ParserException},
         machine::ParsingMachine,
         node::{expression::{Expression, ExpressionNode}, Node, NodeFactory}

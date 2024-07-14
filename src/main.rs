@@ -1,4 +1,4 @@
-use app::lang::lexer::lexer;
+use app::lang::{lexer::lexer, parser::parser};
 
 fn main() {
     println!("Hello, world!");
@@ -23,22 +23,24 @@ fn test_file(file_name: &str) {
     
                 println!(" {} tokens lexed!", tokens.len());
     
-                // let tree = parse_tree(tokens);
+                let tree = parser(tokens);
     
-                // if let Ok(program) = tree {
-                //     for node in &program {
-                //         print!("{} ", node);
-                //     }
+                if let Ok(program) = tree {
+                    let program: Vec<_> = program.units().into_iter().cloned().collect();
+
+                    for astri in &program {
+                        print!("{:?} ", astri);
+                    }
     
-                //     println!("({})", program.len());
+                    println!("({})", program.len());
     
-                //     // Create and run the VM
-                //     let mut vm = VM::new(program);
-                //     vm.run();
-                //     println!("{:?}", vm.global);
-                // } else {
-                //     println!("TREE: {:?}", tree);
-                // }
+                    // Create and run the VM
+                    //let mut vm = VM::new(program);
+                    //vm.run();
+                    //println!("{:?}", vm.global);
+                } else {
+                    println!("TREE: {:?}", tree);
+                }
             },
             Err(error) => panic!("TokenixerError:\n{error}")
         }

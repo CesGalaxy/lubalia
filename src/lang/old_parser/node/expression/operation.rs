@@ -13,7 +13,7 @@ use std::ops::{Add, Div, Mul, Sub};
 use crate::{
     lang::{
         token::{Token, TokenSymbol},
-        parser::{
+        old_parser::{
             arithmetic::ArithmeticDataValue, data::DataValue, exception::{ExpectedToken, ParserError, ParserException}, machine::ParsingMachine, node::{Node, NodeFactory}
         }
     },

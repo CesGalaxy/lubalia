@@ -1,4 +1,4 @@
-use crate::lang::parser::node::{expression::ExpressionNode, statement::StatementNode, TreeNode};
+use crate::lang::old_parser::node::{expression::ExpressionNode, statement::StatementNode, TreeNode};
 
 use super::VM;
 

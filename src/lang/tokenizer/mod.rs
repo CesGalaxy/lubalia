@@ -14,7 +14,7 @@ pub mod error;
 pub fn tokenizer(code: String) -> TranscriptionResult<char, Token, TokenizerError> {
     let code_len = code.len();
 
-    let mut transcription = transcriber(code.chars().collect(), tokenize_token)?;
+    let mut transcription = transcriber(code.chars().collect(), tokenizer_tick)?;
 
     transcription.push(Token::EOL, Some(code_len), None);
     transcription.push(Token::EOF, Some(code_len), None);
@@ -22,7 +22,7 @@ pub fn tokenizer(code: String) -> TranscriptionResult<char, Token, TokenizerErro
     Ok(transcription)
 }
 
-fn tokenize_token(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> Result<Option<Token>, TokenizerError> {
+fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> Result<Option<Token>, TokenizerError> {
     if initial_unit == &' ' || initial_unit == &'\t' {
         cursor.next();
         Ok(None)
