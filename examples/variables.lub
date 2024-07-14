@@ -1,4 +1,1 @@
-let name = "César";
-let greet = "Hello, " + name + "!";
-let positive = true;
-let negative = false;
+"César"

@@ -1,9 +1,10 @@
 pub mod error;
 pub mod root;
 pub mod node;
+pub mod data;
 
 use error::ParserError;
-use node::ASTNode;
+use node::{ASTNode, Node};
 use root::ASTRootItem;
 
 use crate::utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber};
@@ -20,6 +21,7 @@ pub fn parser(tokens: Vec<Token>) -> TranscriptionResult<Token, ASTRootItem, Par
 }
 
 pub fn parser_tick(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<ASTRootItem>, ParserError> {
+    // TODO: This task should be for ASTRootItem
     match initial_token {
         Token::Literal(literal) => {
             println!("{literal}");
@@ -27,6 +29,6 @@ pub fn parser_tick(cursor: &mut TranscriberCursor<Token>, initial_token: &Token)
             Ok(None)
         },
         Token::EOF => Ok(None),
-        _ => ASTNode::transcribe(cursor, initial_token).map(|a| a.map(ASTRootItem::Node))
+        _ => ASTNode::transcribe(cursor, initial_token).map(|astn| astn.map(ASTRootItem::Node))
     }
 }
