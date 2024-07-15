@@ -1,13 +1,11 @@
 # Lubalia
 A small programming language I made for embedding in my projects, but you can use it too (mentioning me somewhere).
 
-> I'm working on making it compatible with JS throught WASM
-
 ## Basic syntax
 ```
 let name = "César";
 
-@print("Hello, $x!");
+@print("Hello, $name!");
 ```
 
 ## How does it work
