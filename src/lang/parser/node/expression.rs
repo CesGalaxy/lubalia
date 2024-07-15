@@ -6,11 +6,11 @@ use super::Node;
 
 #[derive(Debug, Clone)]
 pub enum ASTExpression {
-    Terminal,
+    Terminal(terminal::TerminalExpression),
 }
 
 impl Node for ASTExpression {
     fn transcribe(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<ASTExpression>, ParserError> {
-        todo!()
+        terminal::TerminalExpression::transcribe(cursor, initial_token).map(|texpr| texpr.map(ASTExpression::Terminal))
     }
 }

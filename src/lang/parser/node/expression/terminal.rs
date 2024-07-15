@@ -1,5 +1,6 @@
 use crate::{lang::{parser::{data::DataValue, error::ParserError, node::Node}, token::Token}, utils::transcriber::cursor::TranscriberCursor};
 
+#[derive(Debug, Clone)]
 pub enum TerminalExpression {
     Literal(DataValue),
     VarRef(String)

@@ -23,11 +23,6 @@ pub fn parser(tokens: Vec<Token>) -> TranscriptionResult<Token, ASTRootItem, Par
 pub fn parser_tick(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<ASTRootItem>, ParserError> {
     // TODO: This task should be for ASTRootItem
     match initial_token {
-        Token::Literal(literal) => {
-            println!("{literal}");
-            // NOT REQUIRED, TRANSCRIBER WILL TAKE CARE OF IT: cursor.next();
-            Ok(None)
-        },
         Token::EOF => Ok(None),
         _ => ASTNode::transcribe(cursor, initial_token).map(|astn| astn.map(ASTRootItem::Node))
     }

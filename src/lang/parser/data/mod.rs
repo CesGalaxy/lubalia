@@ -1,5 +1,6 @@
 use crate::lang::token::TokenLiteral;
 
+#[derive(Debug, Clone)]
 pub enum DataValue {
     Number(f64),
     String(String),
