@@ -7,10 +7,10 @@ pub enum TerminalExpression {
 }
 
 impl Node for TerminalExpression {
-    fn transcribe(_cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<TerminalExpression>, ParserError> {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, _initial_token: &Token) -> Result<Option<TerminalExpression>, ParserError> {
         match cursor.consume() {
-            Token::Literal(literal) => Ok(Some(TerminalExpression::Literal(literal.clone().into()))),
-            Token::Keyword(varname) => match varname.as_str() {
+            Some(Token::Literal(literal)) => Ok(Some(TerminalExpression::Literal(literal.clone().into()))),
+            Some(Token::Keyword(varname)) => match varname.as_str() {
                 "true" => Ok(Some(TerminalExpression::Literal(DataValue::Boolean(true)))),
                 "false" => Ok(Some(TerminalExpression::Literal(DataValue::Boolean(false)))),
                 "null" => Ok(Some(TerminalExpression::Literal(DataValue::Null))),
