@@ -24,6 +24,6 @@ pub fn parser_tick(cursor: &mut TranscriberCursor<Token>, initial_token: &Token)
     // TODO: This task should be for ASTRootItem
     match initial_token {
         Token::EOF => Ok(None),
-        _ => ASTNode::transcribe(cursor, initial_token).map(|astn| astn.map(ASTRootItem::Node))
+        _ => ASTNode::transcribe(cursor).map(|astn| astn.map(ASTRootItem::Node))
     }
 }

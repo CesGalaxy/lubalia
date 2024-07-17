@@ -12,7 +12,10 @@ pub enum ASTExpression {
 }
 
 impl Node for ASTExpression {
-    fn transcribe(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<ASTExpression>, ParserError> {
-        terminal::TerminalExpression::transcribe(cursor, initial_token).map(|texpr| texpr.map(ASTExpression::Terminal))
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTExpression>, ParserError> {
+        match cursor.peek_next() {
+            Some(Token::Symbol(_)) => binary::BinaryExpression::transcribe(cursor).map(|bexpr| bexpr.map(ASTExpression::Binary)),
+            _ => terminal::TerminalExpression::transcribe(cursor).map(|texpr| texpr.map(ASTExpression::Terminal))
+        }
     }
 }

@@ -13,15 +13,15 @@ pub enum ASTNode {
 }
 
 pub trait Node {
-    fn transcribe(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<Self>, ParserError> where Self: Sized;
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized;
 }
 
 impl Node for ASTNode {
-    fn transcribe(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<ASTNode>, ParserError> {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTNode>, ParserError> {
         // ALL NODES ARE DEFINED HERE
-        match initial_token {
+        match cursor.consume().expect("Expected token") {
             Token::EOL => Ok(None),
-            _ => ASTExpression::transcribe(cursor, initial_token).map(|aste| aste.map(ASTNode::Expression))
+            _ => ASTExpression::transcribe(cursor).map(|aste| aste.map(ASTNode::Expression))
         }
     }
 }
