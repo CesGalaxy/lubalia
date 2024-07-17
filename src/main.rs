@@ -3,6 +3,10 @@ use app::lang::{lexer::lexer, parser::parser};
 fn main() {
     println!("Hello, world!");
 
+    if cfg!(target_os = "windows") {
+        colored::control::set_virtual_terminal(true).unwrap();
+    }
+
     // Read test file
     test_file("examples/variables.lub");
 }
@@ -42,7 +46,7 @@ fn test_file(file_name: &str) {
                     println!("TREE: {:?}", tree);
                 }
             },
-            Err(error) => panic!("TokenixerError:\n{error}")
+            Err(error) => panic!("LexerError:\n{error}")
         }
     }
 }
