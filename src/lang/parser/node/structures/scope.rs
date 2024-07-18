@@ -10,8 +10,6 @@ impl Node for ScopeStruct {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ScopeStruct>, ParserError> {
         let mut buffer = vec![];
 
-        println!("{:?}", cursor.peek());
-
         if !cursor.consume().is_some_and(|t| t == &Token::Symbol(TokenSymbol::BraceOpen)) {
             return Err(ParserError::Expected("start@scope/sym '{'".to_string()));
         }

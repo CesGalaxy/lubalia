@@ -195,8 +195,6 @@ impl Node for BinaryExpression {
 
                                 let rhs = v4;
 
-                                println!("BINARY: {:?}", cursor.peek());
-
                                 Ok(Some(Self { lhs, operator, rhs }))
                             }
                         },
