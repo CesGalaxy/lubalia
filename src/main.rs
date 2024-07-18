@@ -33,10 +33,8 @@ fn test_file(file_name: &str) {
                     let program: Vec<_> = program.units().into_iter().cloned().collect();
 
                     for astri in &program {
-                        print!("{:?} ", astri);
+                        println!("\t{astri:?}");
                     }
-    
-                    println!("({})", program.len());
     
                     // Create and run the VM
                     //let mut vm = VM::new(program);
