@@ -3,8 +3,8 @@ use app::lang::{lexer::lexer, parser::parser};
 fn main() {
     println!("Hello, world!");
 
-    if cfg!(target_os = "windows") {
-        colored::control::set_virtual_terminal(true).unwrap();
+    if cfg!(windows) {
+        colored::control::set_override(true);
     }
 
     // Read test file
