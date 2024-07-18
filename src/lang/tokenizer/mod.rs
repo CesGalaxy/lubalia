@@ -77,6 +77,8 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
             match initial_unit {
                 ';' => Ok(Some(Token::Semicolon)),
                 '\n' => Ok(Some(Token::EOL)),
+                // For Windows, the CRLF consists of: '\n' for the EOL and '\r' will be ignored.
+                '\r' => Ok(None),
                 _ => return Err(TokenizerError::UnknownCharacter(*initial_unit)),
             }
         }
