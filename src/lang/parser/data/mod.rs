@@ -1,3 +1,5 @@
+pub mod arithmetic;
+
 use crate::lang::token::TokenLiteral;
 
 #[derive(Debug, Clone)]
