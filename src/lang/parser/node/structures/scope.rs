@@ -1,6 +1,5 @@
 use crate::{lang::{parser::{error::ParserError, node::{ASTNode, Node}}, token::{Token, TokenSymbol}}, utils::transcriber::cursor::TranscriberCursor};
 
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct ScopeStruct {
     code: Vec<ASTNode>
@@ -10,8 +9,9 @@ impl Node for ScopeStruct {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ScopeStruct>, ParserError> {
         let mut buffer = vec![];
 
+        // TODO: Integrate this in the cursor
         if !cursor.consume().is_some_and(|t| t == &Token::Symbol(TokenSymbol::BraceOpen)) {
-            return Err(ParserError::Expected("start@scope/sym '{'".to_string()));
+            return Err(ParserError::Expected("start@scope/sym <sym:brace:open> '{'".to_string()));
         }
 
         while Some(&Token::Symbol(TokenSymbol::BraceClose)) != cursor.peek() {
@@ -28,7 +28,7 @@ impl Node for ScopeStruct {
         }
 
         if !cursor.consume().is_some_and(|t| t == &Token::Symbol(TokenSymbol::BraceClose)) {
-            return Err(ParserError::Expected("end@scope/sym '}'".to_string()));
+            return Err(ParserError::Expected("end@scope/sym <sym:brace:close> '}'".to_string()));
         }
 
         Ok(Some(ScopeStruct {
