@@ -1,7 +1,10 @@
 pub mod terminal;
 pub mod binary;
 
-use crate::{lang::{parser::error::ParserError, token::Token}, utils::transcriber::cursor::TranscriberCursor};
+use crate::{
+    lang::{parser::error::ParserError, token::Token},
+    utils::transcriber::cursor::TranscriberCursor
+};
 
 use super::Node;
 
@@ -15,7 +18,11 @@ impl Node for ASTExpression {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTExpression>, ParserError> {
         match cursor.peek_next() {
             Some(Token::Symbol(_)) => binary::BinaryExpression::transcribe(cursor).map(|bexpr| bexpr.map(ASTExpression::Binary)),
-            _ => terminal::TerminalExpression::transcribe(cursor).map(|texpr| texpr.map(ASTExpression::Terminal))
+            _ => Ok(
+                terminal::TerminalExpression::transcribe(cursor)
+                    .unwrap_or(None)
+                    .map(ASTExpression::Terminal)
+            )
         }
     }
 }
