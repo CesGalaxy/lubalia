@@ -1,4 +1,4 @@
-use app::lang::{lexer::lexer, parser::parser};
+use app::{lang::{lexer::lexer, parser::parser}, vm::VM};
 
 fn main() {
     println!("Hello, world!");
@@ -37,9 +37,9 @@ fn test_file(file_name: &str) {
                     }
     
                     // Create and run the VM
-                    //let mut vm = VM::new(program);
-                    //vm.run();
-                    //println!("{:?}", vm.global);
+                    let mut vm = VM::new(program);
+                    vm.run();
+                    println!("{:?}", vm.global);
                 } else {
                     println!("TREE: {:?}", tree);
                 }

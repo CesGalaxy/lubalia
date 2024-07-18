@@ -3,12 +3,12 @@ pub mod context;
 
 use context::Context;
 
-use crate::lang::old_parser::node::AbstractSyntaxTree;
+use crate::lang::parser::root::ASTRootItem;
 
 /// A virtual machine that executes a program in bytecode
 pub struct VM {
     // The program to be executed in AST form
-    program: AbstractSyntaxTree,
+    program: Vec<ASTRootItem>,
     // The position of the cursor in the root-node vector (AST)
     ip: usize,
     // The global scope (context) of the VM
@@ -16,7 +16,7 @@ pub struct VM {
 }
 
 impl VM {
-    pub fn new(program: AbstractSyntaxTree) -> Self {
+    pub fn new(program: Vec<ASTRootItem>) -> Self {
         VM {
             program,
             ip: 0,

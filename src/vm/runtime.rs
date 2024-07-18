@@ -1,4 +1,4 @@
-use crate::lang::old_parser::node::{expression::ExpressionNode, statement::StatementNode, TreeNode};
+use crate::lang::parser::root::ASTRootItem;
 
 use super::VM;
 
@@ -13,16 +13,8 @@ impl VM {
 
     /// Each tick corresponds to the execution of a single instruction (represented by a root-node)
     pub fn tick(&mut self) {
-        let node = self.program.get(self.ip);
-
-        if let Some(node) = node {
-            let node = node.clone();
-
-            if let TreeNode::Expression(expr) = node {
-                println!("#{} - {expr} -> {}", self.ip, expr.evaluate(&self.global));
-            } else if let TreeNode::Statement(statement) = node {
-                statement.run(&mut self.global);
-            }
+        if let Some(ASTRootItem::Node(node)) = self.program.get(self.ip) {
+            println!("{:?}", node.execute());
         }
 
         self.ip += 1;

@@ -1,4 +1,4 @@
-use crate::lang::old_parser::data::DataValue;
+use crate::lang::parser::data::DataValue;
 
 /// A context for running code, contains all variables.
 /// Extends all the data from its parent

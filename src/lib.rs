@@ -2,7 +2,7 @@
 pub mod lang;
 
 /// A virtual machine for running Lubalia Bytecode
-// pub mod vm;
+pub mod vm;
 
 /// A collection of utilities
 pub mod utils;
