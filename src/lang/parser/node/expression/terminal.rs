@@ -6,6 +6,8 @@ use crate::{
     utils::transcriber::cursor::TranscriberCursor
 };
 
+use super::ExpressionNode;
+
 #[derive(Debug, Clone)]
 pub enum TerminalExpression {
     Literal(DataValue),
@@ -28,6 +30,16 @@ impl Node for TerminalExpression {
                 ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope))
             },
             _ => Err(ParserError::Expected("<expr:terminal>".to_string()))
+        }
+    }
+}
+
+impl ExpressionNode for TerminalExpression {
+    fn evaluate(&self) -> Result<DataValue, &'static str> {
+        match self {
+            Self::Literal(literal) => Ok(literal.clone()),
+            Self::VarRef(_) => Err("Variable references are not yet supported"),
+            Self::Scope(_) => Err("Scopes are not yet supported")
         }
     }
 }

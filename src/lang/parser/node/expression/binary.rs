@@ -1,8 +1,9 @@
+use crate::lang::parser::data::DataValue;
 use crate::lang::parser::{error::ParserError, node::Node};
 use crate::lang::token::{Token, TokenSymbol};
 use crate::utils::transcriber::cursor::TranscriberCursor;
 use super::terminal::TerminalExpression;
-use super::ASTExpression;
+use super::{ASTExpression, ExpressionNode};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Operator {
@@ -233,6 +234,20 @@ impl Node for BinaryExpression {
                 operator: o1,
                 rhs: v2
             }))
+        }
+    }
+}
+
+impl ExpressionNode for BinaryExpression {
+    fn evaluate(&self) -> Result<DataValue, &'static str> {
+        let lhs = self.lhs.evaluate()?;
+        let rhs = self.rhs.evaluate()?;
+
+        match self.operator {
+            Operator::Add => Ok(lhs + rhs),
+            Operator::Sub => Ok(lhs - rhs),
+            Operator::Mul => Ok(lhs * rhs),
+            Operator::Div => Ok(lhs / rhs)
         }
     }
 }

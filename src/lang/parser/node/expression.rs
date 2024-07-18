@@ -2,7 +2,7 @@ pub mod terminal;
 pub mod binary;
 
 use crate::{
-    lang::{parser::error::ParserError, token::Token},
+    lang::{parser::{data::DataValue, error::ParserError}, token::Token},
     utils::transcriber::cursor::TranscriberCursor
 };
 
@@ -14,6 +14,10 @@ pub enum ASTExpression {
     Binary(binary::BinaryExpression)
 }
 
+pub trait ExpressionNode: Node {
+    fn evaluate(&self) -> Result<DataValue, &'static str>;
+}
+
 impl Node for ASTExpression {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTExpression>, ParserError> {
         match cursor.peek_next() {
@@ -23,6 +27,15 @@ impl Node for ASTExpression {
                     .unwrap_or(None)
                     .map(ASTExpression::Terminal)
             )
+        }
+    }
+}
+
+impl ExpressionNode for ASTExpression {
+    fn evaluate(&self) -> Result<DataValue, &'static str> {
+        match self {
+            ASTExpression::Terminal(expr) => expr.evaluate(),
+            ASTExpression::Binary(expr) => expr.evaluate()
         }
     }
 }
