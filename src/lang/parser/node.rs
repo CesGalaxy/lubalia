@@ -1,4 +1,5 @@
 pub mod expression;
+pub mod structures;
 
 use expression::ASTExpression;
 
@@ -19,6 +20,7 @@ pub trait Node {
 impl Node for ASTNode {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTNode>, ParserError> {
         // ALL NODES ARE DEFINED HERE
+        println!("AST NODE ========================= {:?}", cursor.peek());
         match cursor.peek().expect("Expected token") {
             Token::EOL => Ok(None),
             _ => ASTExpression::transcribe(cursor).map(|aste| aste.map(ASTNode::Expression))

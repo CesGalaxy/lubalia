@@ -45,11 +45,11 @@ impl From<&Token> for Option<Operator> {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Clone, Debug)]
 pub struct BinaryExpression {
     lhs: Box<ASTExpression>,
     operator: Operator,
-    /// Use box for recursive types
     rhs: Box<ASTExpression>
 }
 
@@ -194,6 +194,8 @@ impl Node for BinaryExpression {
                                 let operator = o3;
 
                                 let rhs = v4;
+
+                                println!("BINARY: {:?}", cursor.peek());
 
                                 Ok(Some(Self { lhs, operator, rhs }))
                             }
