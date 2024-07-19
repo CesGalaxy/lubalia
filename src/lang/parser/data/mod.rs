@@ -1,4 +1,5 @@
 pub mod arithmetic;
+pub mod logic;
 
 use crate::lang::token::TokenLiteral;
 

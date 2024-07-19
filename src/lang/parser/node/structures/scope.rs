@@ -2,6 +2,7 @@ use crate::{lang::{parser::{error::ParserError, node::{ASTNode, Node}}, token::{
 
 #[derive(Debug, Clone)]
 pub struct ScopeStruct {
+    #[allow(dead_code)]
     code: Vec<ASTNode>
 }
 

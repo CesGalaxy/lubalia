@@ -1,3 +1,5 @@
+use std::ops::Not;
+
 use crate::lang::parser::data::arithmetic::ArithmeticValue;
 use crate::lang::parser::data::DataValue;
 use crate::lang::parser::{error::ParserError, node::Node};
@@ -8,41 +10,54 @@ use super::terminal::TerminalExpression;
 use super::{ASTExpression, ExpressionNode};
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum Operator {
+pub enum BinaryOperator {
     Add,
     Sub,
     Mul,
-    Div
+    Div,
+    // Equal,
+    // NoEqual,
+    // Greater,
+    // GreaterOrEqual,
+    // Less,
+    // LessOrEqual,
+    AND,
+    OR,
+    NAND,
+    NOR,
+    XOR,
+    XNOR
 }
 
-impl From<&Operator> for u8 {
-    fn from(value: &Operator) -> Self {
+impl From<&BinaryOperator> for u8 {
+    fn from(value: &BinaryOperator) -> Self {
         match value {
-            Operator::Add | Operator::Sub => 0,
-            Operator::Mul | Operator::Div => 1
+            BinaryOperator::AND | BinaryOperator::OR | BinaryOperator::NAND | BinaryOperator::NOR | BinaryOperator::XOR | BinaryOperator::XNOR => 3,
+            // BinaryOperator::Equal | BinaryOperator::NoEqual | BinaryOperator::Greater | BinaryOperator::GreaterOrEqual | BinaryOperator::Less | BinaryOperator::LessOrEqual => 2,
+            BinaryOperator::Mul | BinaryOperator::Div => 1,
+            BinaryOperator::Add | BinaryOperator::Sub => 0,
         }
     }
 }
 
-// impl PartialOrd for Operator {
-//     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-//         match (self, other) {
-//             (Self::Mul, Self::Div) | (Self::Div, Self::Mul) => Some(std::cmp::Ordering::Equal),
-//             (Self::Add, Self::Sub) | (Self::Sub, Self::Add) => Some(std::cmp::Ordering::Equal),
-//             (Self::Mul, _) | (Self::Div, _) => Some(std::cmp::Ordering::Greater),
-//             (Self::Add, _) | (Self::Sub, _) => Some(std::cmp::Ordering::Less),
-//             _ => Some(std::cmp::Ordering::Equal)
-//         }
-//     }
-// }
-
-impl From<&Token> for Option<Operator> {
+impl From<&Token> for Option<BinaryOperator> {
     fn from(value: &Token) -> Self {
         match value {
-            Token::Symbol(TokenSymbol::Plus) => Some(Operator::Add),
-            Token::Symbol(TokenSymbol::Minus) => Some(Operator::Sub),
-            Token::Symbol(TokenSymbol::Asterisk) => Some(Operator::Mul),
-            Token::Symbol(TokenSymbol::Slash) => Some(Operator::Div),
+            Token::Symbol(TokenSymbol::Plus) => Some(BinaryOperator::Add),
+            Token::Symbol(TokenSymbol::Minus) => Some(BinaryOperator::Sub),
+            Token::Symbol(TokenSymbol::Asterisk) => Some(BinaryOperator::Mul),
+            Token::Symbol(TokenSymbol::Slash) => Some(BinaryOperator::Div),
+            Token::Symbol(TokenSymbol::Ampersand) => Some(BinaryOperator::AND),
+            Token::Symbol(TokenSymbol::Pipe) => Some(BinaryOperator::OR),
+            Token::Keyword(keyword) => match keyword.to_ascii_lowercase().as_str() {
+                "and" => Some(BinaryOperator::AND),
+                "or" => Some(BinaryOperator::OR),
+                "nand" => Some(BinaryOperator::NAND),
+                "nor" => Some(BinaryOperator::NOR),
+                "xor" => Some(BinaryOperator::XOR),
+                "xnor" => Some(BinaryOperator::XNOR),
+                _ => None
+            },
             _ => None
         }
     }
@@ -52,74 +67,9 @@ impl From<&Token> for Option<Operator> {
 #[derive(Clone, Debug)]
 pub struct BinaryExpression {
     lhs: Box<ASTExpression>,
-    operator: Operator,
+    operator: BinaryOperator,
     rhs: Box<ASTExpression>
 }
-
-// pub fn transcribe_next_segment(
-//     cursor: &mut TranscriberCursor<Token>,
-//     stack: Vec<(Box<ASTExpression>, Operator)>,
-// ) -> Result<Option<BinaryExpression>, ParserError> {
-//     expr:terminal + sym/operator + ...
-//     let v = Box::new(ASTExpression::Terminal(
-//         TerminalExpression::transcribe(cursor)?.ok_or(ParserError::Expected("<expr:segment|expr:terminal>".to_string()))?
-//     ));
-// 
-//     let o: Option<Operator> = cursor.consume().and_then(|token| token.into());
-// 
-//     // let mut stack = stack.iter().rev();
-//    
-//     if let Some(o) = o {
-//         let nv = Box::new(ASTExpression::Terminal(
-//             TerminalExpression::transcribe(cursor)?.ok_or(ParserError::Expected("<expr:segment|expr:terminal>".to_string()))?
-//         ));
-// 
-//         let mut buff = None;
-// 
-//         if let Some((pv, po)) = stack.next() {
-//             if u8::from(po) < u8::from(&o) {
-//                 buff = Some(BinaryExpression {
-//                     lhs: pv.clone(),
-//                     operator: o.clone(),
-//                     rhs: Box::new(ASTExpression::Binary(BinaryExpression {
-//                         lhs: v.clone(),
-//                         operator: o.clone(),
-//                         rhs: nv.clone(),
-//                     })),
-//                 });
-//             } else {
-//                 // (( pv po v ) o nv)
-//                 buff = Some(BinaryExpression {
-//                     lhs: Box::new(ASTExpression::Binary(BinaryExpression {
-//                         lhs: pv.clone(),
-//                         operator: po.clone(),
-//                         rhs: v.clone(),
-//                     })),
-//                     operator: o.clone(),
-//                     rhs: v
-//                 });
-//             }
-//         }
-// 
-//         let new_stack = vec![];
-// 
-//         while let Some(segment) = stack.next
-// 
-//         Ok(buff)
-//     } else {
-//         let mut buff: Option<BinaryExpression> = None;
-// 
-//         while let Some((pv, po)) = stack.next() {
-//             buff = Some(BinaryExpression {
-//                 lhs: pv.clone(),
-//                 operator: po.clone(),
-//                 rhs: if let Some(b) = buff { Box::new(ASTExpression::Binary(b)) } else { v.clone() },
-//             });
-//         }
-// 
-//         Ok(buff)
-//     }
-// }
 
 impl Node for BinaryExpression {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<BinaryExpression>, ParserError> {
@@ -127,13 +77,13 @@ impl Node for BinaryExpression {
             TerminalExpression::transcribe(cursor)?.ok_or(ParserError::Expected("<expr:terminal>".to_string()))?
         ));
 
-        let o1: Operator = cursor.consume().and_then(|token| token.into()).ok_or(ParserError::Expected("<sym/operator>".to_string()))?;
+        let o1: BinaryOperator = cursor.consume().and_then(|token| token.into()).ok_or(ParserError::Expected("<sym/operator>".to_string()))?;
 
         let v2 = Box::new(ASTExpression::Terminal(
             TerminalExpression::transcribe(cursor)?.ok_or(ParserError::Expected("<expr:terminal + sym/operator + ...|expr:terminal>".to_string()))?
         ));
 
-        let o2: Option<Operator> = cursor.peek().and_then(|token| token.into());
+        let o2: Option<BinaryOperator> = cursor.peek().and_then(|token| token.into());
 
         match o2 {
             Some(o2) => {
@@ -144,7 +94,7 @@ impl Node for BinaryExpression {
                         TerminalExpression::transcribe(cursor)?.ok_or(ParserError::Expected("<expr:terminal + sym/operator + ...|expr:terminal>".to_string()))?
                     ));
 
-                    let o3: Option<Operator> = cursor.peek().and_then(|token| token.into());
+                    let o3: Option<BinaryOperator> = cursor.peek().and_then(|token| token.into());
 
                     match o3 {
                         Some(o3) => {
@@ -246,10 +196,16 @@ impl ExpressionNode for BinaryExpression {
         let rhs = self.rhs.evaluate(context);
 
         match self.operator {
-            Operator::Add => (<ArithmeticValue>::from(lhs) + <ArithmeticValue>::from(rhs)).into(),
-            Operator::Sub => (<ArithmeticValue>::from(lhs) - <ArithmeticValue>::from(rhs)).into(),
-            Operator::Mul => (<ArithmeticValue>::from(lhs) * <ArithmeticValue>::from(rhs)).into(),
-            Operator::Div => (<ArithmeticValue>::from(lhs) / <ArithmeticValue>::from(rhs)).into()
+            BinaryOperator::Add => (ArithmeticValue::from(lhs) + ArithmeticValue::from(rhs)).into(),
+            BinaryOperator::Sub => (ArithmeticValue::from(lhs) - ArithmeticValue::from(rhs)).into(),
+            BinaryOperator::Mul => (ArithmeticValue::from(lhs) * ArithmeticValue::from(rhs)).into(),
+            BinaryOperator::Div => (ArithmeticValue::from(lhs) / ArithmeticValue::from(rhs)).into(),
+            BinaryOperator::AND => (bool::from(lhs) && bool::from(rhs)).into(),
+            BinaryOperator::OR => (bool::from(lhs) || bool::from(rhs)).into(),
+            BinaryOperator::NAND => (!bool::from(lhs) || !bool::from(rhs)).into(),
+            BinaryOperator::NOR => (!bool::from(lhs) && !bool::from(rhs)).into(),
+            BinaryOperator::XOR => (bool::from(lhs) ^ bool::from(rhs)).into(),
+            BinaryOperator::XNOR => (bool::from(lhs) ^ bool::from(rhs)).not().into()
         }
     }
 }

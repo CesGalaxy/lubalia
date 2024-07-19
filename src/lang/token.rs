@@ -33,7 +33,10 @@ pub enum TokenSymbol {
     BracketClose,
     Comma,
     Dot,
-    At
+    At,
+    Ampersand,
+    Pipe,
+    Exclamation,
 }
 
 impl From<&TokenSymbol> for &str {
@@ -55,6 +58,9 @@ impl From<&TokenSymbol> for &str {
             TokenSymbol::Comma => ",",
             TokenSymbol::Dot => ".",
             TokenSymbol::At => "@",
+            TokenSymbol::Ampersand => "&",
+            TokenSymbol::Pipe => "|",
+            TokenSymbol::Exclamation => "!",
         }
     }
 }
@@ -78,6 +84,9 @@ impl TokenSymbol {
             ',' => Some(TokenSymbol::Comma),
             '.' => Some(TokenSymbol::Dot),
             '@' => Some(TokenSymbol::At),
+            '&' => Some(TokenSymbol::Ampersand),
+            '|' => Some(TokenSymbol::Pipe),
+            '!' => Some(TokenSymbol::Exclamation),
             _ => None,
         }
     }

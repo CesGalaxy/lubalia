@@ -1,4 +1,5 @@
-let x = "Hello " + "world!";
-let y = x;
-let value2 = true + 1;
-let mixed = "Hell" + 0;
+let t1 = true & 1;
+let t2 = "hello" & 5;
+
+let f1 = true & 0;
+let f2 = "" | 0;
