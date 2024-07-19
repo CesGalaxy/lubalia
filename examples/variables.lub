@@ -1,5 +1,2 @@
-let t1 = true & 1;
-let t2 = "hello" & 5;
-
-let f1 = true & 0;
-let f2 = "" | 0;
+let t = 10 > 1;
+let f = 2 > 7;

@@ -15,11 +15,12 @@ pub enum BinaryOperator {
     Sub,
     Mul,
     Div,
-    // Equal,
+    Equal,
+    // TODO: I'm too lazy for implementing operators with 2 symbols
     // NoEqual,
-    // Greater,
+    Greater,
     // GreaterOrEqual,
-    // Less,
+    Less,
     // LessOrEqual,
     AND,
     OR,
@@ -33,7 +34,7 @@ impl From<&BinaryOperator> for u8 {
     fn from(value: &BinaryOperator) -> Self {
         match value {
             BinaryOperator::AND | BinaryOperator::OR | BinaryOperator::NAND | BinaryOperator::NOR | BinaryOperator::XOR | BinaryOperator::XNOR => 3,
-            // BinaryOperator::Equal | BinaryOperator::NoEqual | BinaryOperator::Greater | BinaryOperator::GreaterOrEqual | BinaryOperator::Less | BinaryOperator::LessOrEqual => 2,
+            BinaryOperator::Equal | BinaryOperator::Greater | BinaryOperator::Less => 2,
             BinaryOperator::Mul | BinaryOperator::Div => 1,
             BinaryOperator::Add | BinaryOperator::Sub => 0,
         }
@@ -47,6 +48,9 @@ impl From<&Token> for Option<BinaryOperator> {
             Token::Symbol(TokenSymbol::Minus) => Some(BinaryOperator::Sub),
             Token::Symbol(TokenSymbol::Asterisk) => Some(BinaryOperator::Mul),
             Token::Symbol(TokenSymbol::Slash) => Some(BinaryOperator::Div),
+            Token::Symbol(TokenSymbol::Equal) => Some(BinaryOperator::Equal),
+            Token::Symbol(TokenSymbol::GreaterThan) => Some(BinaryOperator::Greater),
+            Token::Symbol(TokenSymbol::LessThan) => Some(BinaryOperator::Less),
             Token::Symbol(TokenSymbol::Ampersand) => Some(BinaryOperator::AND),
             Token::Symbol(TokenSymbol::Pipe) => Some(BinaryOperator::OR),
             Token::Keyword(keyword) => match keyword.to_ascii_lowercase().as_str() {
@@ -200,6 +204,9 @@ impl ExpressionNode for BinaryExpression {
             BinaryOperator::Sub => (ArithmeticValue::from(lhs) - ArithmeticValue::from(rhs)).into(),
             BinaryOperator::Mul => (ArithmeticValue::from(lhs) * ArithmeticValue::from(rhs)).into(),
             BinaryOperator::Div => (ArithmeticValue::from(lhs) / ArithmeticValue::from(rhs)).into(),
+            BinaryOperator::Equal => (lhs == rhs).into(),
+            BinaryOperator::Greater => (lhs > rhs).into(),
+            BinaryOperator::Less => (lhs < rhs).into(),
             BinaryOperator::AND => (bool::from(lhs) && bool::from(rhs)).into(),
             BinaryOperator::OR => (bool::from(lhs) || bool::from(rhs)).into(),
             BinaryOperator::NAND => (!bool::from(lhs) || !bool::from(rhs)).into(),
