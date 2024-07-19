@@ -13,8 +13,12 @@ impl VM {
 
     /// Each tick corresponds to the execution of a single instruction (represented by a root-node)
     pub fn tick(&mut self) {
-        if let Some(ASTRootItem::Node(node)) = self.program.get(self.ip) {
-            println!("{:?}", node.execute(&mut self.global));
+        if let Some(ASTRootItem::Node(node)) = self.program.get(self.ip).cloned() {
+            let mut context = self.global.clone();
+
+            println!("{:?}", node.execute(&mut context, self));
+            
+            self.global = context;
         }
 
         self.ip += 1;

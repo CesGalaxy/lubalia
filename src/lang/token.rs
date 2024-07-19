@@ -37,6 +37,7 @@ pub enum TokenSymbol {
     Ampersand,
     Pipe,
     Exclamation,
+    Underscore,
 }
 
 impl From<&TokenSymbol> for &str {
@@ -61,6 +62,7 @@ impl From<&TokenSymbol> for &str {
             TokenSymbol::Ampersand => "&",
             TokenSymbol::Pipe => "|",
             TokenSymbol::Exclamation => "!",
+            TokenSymbol::Underscore => "_",
         }
     }
 }
@@ -87,6 +89,7 @@ impl TokenSymbol {
             '&' => Some(TokenSymbol::Ampersand),
             '|' => Some(TokenSymbol::Pipe),
             '!' => Some(TokenSymbol::Exclamation),
+            '_' => Some(TokenSymbol::Underscore),
             _ => None,
         }
     }

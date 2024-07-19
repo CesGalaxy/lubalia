@@ -3,7 +3,7 @@ use crate::{
         parser::{data::DataValue, error::ParserError, node::{structures::scope::ScopeStruct, Node}},
         token::{Token, TokenSymbol}
     },
-    utils::transcriber::cursor::TranscriberCursor, vm::context::Context
+    utils::transcriber::cursor::TranscriberCursor, vm::{context::Context, VM}
 };
 
 use super::ExpressionNode;
@@ -12,7 +12,8 @@ use super::ExpressionNode;
 pub enum TerminalExpression {
     Literal(DataValue),
     VarRef(String),
-    Scope(ScopeStruct)
+    Scope(ScopeStruct),
+    LastValue
 }
 
 impl Node for TerminalExpression {
@@ -29,17 +30,19 @@ impl Node for TerminalExpression {
                 cursor.back();
                 ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope))
             },
+            Some(Token::Symbol(TokenSymbol::Underscore)) => Ok(Some(Self::LastValue)),
             _ => Err(ParserError::Expected("<expr:terminal>".to_string()))
         }
     }
 }
 
 impl ExpressionNode for TerminalExpression {
-    fn evaluate(&self, context: &mut Context) -> DataValue {
+    fn evaluate(&self, context: &mut Context, vm: &mut VM) -> DataValue {
         match self {
             Self::Literal(literal) => literal.clone(),
             Self::VarRef(varname) => context.get(varname.clone()).cloned().unwrap_or_default(),
-            Self::Scope(_) => DataValue::Null
+            Self::Scope(_) => DataValue::Null,
+            Self::LastValue => vm.last_value.clone()
         }
     }
 }

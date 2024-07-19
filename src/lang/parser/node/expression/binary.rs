@@ -6,6 +6,7 @@ use crate::lang::parser::{error::ParserError, node::Node};
 use crate::lang::token::{Token, TokenSymbol};
 use crate::utils::transcriber::cursor::TranscriberCursor;
 use crate::vm::context::Context;
+use crate::vm::VM;
 use super::terminal::TerminalExpression;
 use super::{ASTExpression, ExpressionNode};
 
@@ -195,9 +196,9 @@ impl Node for BinaryExpression {
 }
 
 impl ExpressionNode for BinaryExpression {
-    fn evaluate(&self, context: &mut Context) -> DataValue {
-        let lhs = self.lhs.evaluate(context);
-        let rhs = self.rhs.evaluate(context);
+    fn evaluate(&self, context: &mut Context, vm: &mut VM) -> DataValue {
+        let lhs = self.lhs.evaluate(context, vm);
+        let rhs = self.rhs.evaluate(context, vm);
 
         match self.operator {
             BinaryOperator::Add => (ArithmeticValue::from(lhs) + ArithmeticValue::from(rhs)).into(),
