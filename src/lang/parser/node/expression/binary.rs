@@ -239,15 +239,15 @@ impl Node for BinaryExpression {
 }
 
 impl ExpressionNode for BinaryExpression {
-    fn evaluate(&self) -> Result<DataValue, &'static str> {
-        let lhs = self.lhs.evaluate()?;
-        let rhs = self.rhs.evaluate()?;
+    fn evaluate(&self) -> DataValue {
+        let lhs = self.lhs.evaluate();
+        let rhs = self.rhs.evaluate();
 
         match self.operator {
-            Operator::Add => Ok(lhs + rhs),
-            Operator::Sub => Ok(lhs - rhs),
-            Operator::Mul => Ok(lhs * rhs),
-            Operator::Div => Ok(lhs / rhs)
+            Operator::Add => lhs + rhs,
+            Operator::Sub => lhs - rhs,
+            Operator::Mul => lhs * rhs,
+            Operator::Div => lhs / rhs
         }
     }
 }

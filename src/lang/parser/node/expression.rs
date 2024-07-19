@@ -15,7 +15,7 @@ pub enum ASTExpression {
 }
 
 pub trait ExpressionNode: Node {
-    fn evaluate(&self) -> Result<DataValue, &'static str>;
+    fn evaluate(&self) -> DataValue;
 }
 
 impl Node for ASTExpression {
@@ -32,7 +32,7 @@ impl Node for ASTExpression {
 }
 
 impl ExpressionNode for ASTExpression {
-    fn evaluate(&self) -> Result<DataValue, &'static str> {
+    fn evaluate(&self) -> DataValue {
         match self {
             ASTExpression::Terminal(expr) => expr.evaluate(),
             ASTExpression::Binary(expr) => expr.evaluate()

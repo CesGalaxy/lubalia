@@ -35,11 +35,11 @@ impl Node for TerminalExpression {
 }
 
 impl ExpressionNode for TerminalExpression {
-    fn evaluate(&self) -> Result<DataValue, &'static str> {
+    fn evaluate(&self) -> DataValue {
         match self {
-            Self::Literal(literal) => Ok(literal.clone()),
-            Self::VarRef(_) => Err("Variable references are not yet supported"),
-            Self::Scope(_) => Err("Scopes are not yet supported")
+            Self::Literal(literal) => literal.clone(),
+            Self::VarRef(_) => DataValue::Null,
+            Self::Scope(_) => DataValue::Null
         }
     }
 }

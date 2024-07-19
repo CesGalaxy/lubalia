@@ -3,9 +3,9 @@ pub mod structures;
 pub mod statement;
 
 use expression::{ASTExpression, ExpressionNode};
-use statement::ASTStatement;
+use statement::{ASTStatement, StatementNode};
 
-use crate::{lang::token::Token, utils::transcriber::cursor::TranscriberCursor};
+use crate::{lang::token::Token, utils::transcriber::cursor::TranscriberCursor, vm::context::Context};
 
 use super::{data::DataValue, error::ParserError};
 
@@ -20,10 +20,13 @@ pub trait Node {
 }
 
 impl ASTNode {
-    pub fn execute(&self) -> Result<DataValue, &'static str> {
+    pub fn execute(&self, context: &mut Context) -> Option<DataValue> {
         match self {
-            Self::Expression(expr) => expr.evaluate(),
-            Self::Statement(_) => Ok(DataValue::Null)
+            Self::Expression(expr) => Some(expr.evaluate()),
+            Self::Statement(statement) => {
+                statement.execute(context).ok();
+                None
+            }
         }
     }
 }
