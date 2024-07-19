@@ -35,10 +35,10 @@ impl Node for TerminalExpression {
 }
 
 impl ExpressionNode for TerminalExpression {
-    fn evaluate(&self, _context: &mut Context) -> DataValue {
+    fn evaluate(&self, context: &mut Context) -> DataValue {
         match self {
             Self::Literal(literal) => literal.clone(),
-            Self::VarRef(_) => DataValue::Null,
+            Self::VarRef(varname) => context.get(varname.clone()).cloned().unwrap_or_default(),
             Self::Scope(_) => DataValue::Null
         }
     }
