@@ -1,3 +1,4 @@
+use crate::lang::parser::data::arithmetic::ArithmeticValue;
 use crate::lang::parser::data::DataValue;
 use crate::lang::parser::{error::ParserError, node::Node};
 use crate::lang::token::{Token, TokenSymbol};
@@ -245,10 +246,10 @@ impl ExpressionNode for BinaryExpression {
         let rhs = self.rhs.evaluate(context);
 
         match self.operator {
-            Operator::Add => lhs + rhs,
-            Operator::Sub => lhs - rhs,
-            Operator::Mul => lhs * rhs,
-            Operator::Div => lhs / rhs
+            Operator::Add => (<ArithmeticValue>::from(lhs) + <ArithmeticValue>::from(rhs)).into(),
+            Operator::Sub => (<ArithmeticValue>::from(lhs) - <ArithmeticValue>::from(rhs)).into(),
+            Operator::Mul => (<ArithmeticValue>::from(lhs) * <ArithmeticValue>::from(rhs)).into(),
+            Operator::Div => (<ArithmeticValue>::from(lhs) / <ArithmeticValue>::from(rhs)).into()
         }
     }
 }

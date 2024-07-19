@@ -1,2 +1,4 @@
 let x = "Hello " + "world!";
 let y = x;
+let value2 = true + 1;
+let mixed = "Hell" + 0;

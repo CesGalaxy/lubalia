@@ -13,6 +13,7 @@ pub enum VariableType {
 
 #[derive(Debug, Clone)]
 pub struct VariableDeclaration {
+    #[allow(dead_code)]
     vartype: VariableType,
     varname: String,
     value: Option<ASTExpression>
