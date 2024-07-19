@@ -22,7 +22,7 @@ pub trait Node {
 impl ASTNode {
     pub fn execute(&self, context: &mut Context) -> Option<DataValue> {
         match self {
-            Self::Expression(expr) => Some(expr.evaluate()),
+            Self::Expression(expr) => Some(expr.evaluate(context)),
             Self::Statement(statement) => {
                 statement.execute(context).ok();
                 None

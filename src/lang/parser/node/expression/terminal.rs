@@ -3,7 +3,7 @@ use crate::{
         parser::{data::DataValue, error::ParserError, node::{structures::scope::ScopeStruct, Node}},
         token::{Token, TokenSymbol}
     },
-    utils::transcriber::cursor::TranscriberCursor
+    utils::transcriber::cursor::TranscriberCursor, vm::context::Context
 };
 
 use super::ExpressionNode;
@@ -35,7 +35,7 @@ impl Node for TerminalExpression {
 }
 
 impl ExpressionNode for TerminalExpression {
-    fn evaluate(&self) -> DataValue {
+    fn evaluate(&self, _context: &mut Context) -> DataValue {
         match self {
             Self::Literal(literal) => literal.clone(),
             Self::VarRef(_) => DataValue::Null,

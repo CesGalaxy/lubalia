@@ -3,7 +3,7 @@ pub mod binary;
 
 use crate::{
     lang::{parser::{data::DataValue, error::ParserError}, token::Token},
-    utils::transcriber::cursor::TranscriberCursor
+    utils::transcriber::cursor::TranscriberCursor, vm::context::Context
 };
 
 use super::Node;
@@ -15,7 +15,7 @@ pub enum ASTExpression {
 }
 
 pub trait ExpressionNode: Node {
-    fn evaluate(&self) -> DataValue;
+    fn evaluate(&self, context: &mut Context) -> DataValue;
 }
 
 impl Node for ASTExpression {
@@ -32,10 +32,10 @@ impl Node for ASTExpression {
 }
 
 impl ExpressionNode for ASTExpression {
-    fn evaluate(&self) -> DataValue {
+    fn evaluate(&self, context: &mut Context) -> DataValue {
         match self {
-            ASTExpression::Terminal(expr) => expr.evaluate(),
-            ASTExpression::Binary(expr) => expr.evaluate()
+            ASTExpression::Terminal(expr) => expr.evaluate(context),
+            ASTExpression::Binary(expr) => expr.evaluate(context)
         }
     }
 }
