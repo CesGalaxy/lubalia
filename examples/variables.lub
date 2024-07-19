@@ -1,2 +1,2 @@
-2 + 2
 let x = "Hello " + "world!";
+let y = x;
