@@ -18,3 +18,9 @@ impl From<TokenLiteral> for DataValue {
         }
     }
 }
+
+impl Default for DataValue {
+    fn default() -> Self {
+        DataValue::Null
+    }
+}
