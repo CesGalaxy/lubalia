@@ -49,7 +49,7 @@ impl StatementNode for VariableDeclaration {
     fn execute(&self, context: &mut Context, vm: &mut VM) -> Result<(), &'static str> {
         let value = self.value.clone().map(|v| v.evaluate(context, vm)).unwrap_or(DataValue::Null);
 
-        context.set(self.varname.clone(), value);
+        context.create(self.varname.clone(), value);
 
         Ok(())
     }

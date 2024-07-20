@@ -12,19 +12,26 @@ pub fn transcriber<SourceUnit: Clone, ResultUnit: std::fmt::Debug, Error: std::f
     source: Vec<SourceUnit>,
     tick: impl Fn(&mut TranscriberCursor<SourceUnit>, &SourceUnit) -> Result<Option<ResultUnit>, Error>,
 ) -> TranscriptionResult<SourceUnit, ResultUnit, Error> {
+    // Create an empty transcription result and a cursor for navigation through the source
     let mut transcription = Transcription::new(source.clone());
     let mut cursor = TranscriberCursor::new(&source);
 
+    // Iterate over the source units
     while let Some(tick_initial_unit) = cursor.peek().map(|tiu| tiu.clone()) {
+        // The position of the cursor when the tick started
         let tick_initial_position = cursor.pos;
 
+        // Execute the tick function
         let tick_result = tick(&mut cursor, &tick_initial_unit);
 
         match tick_result {
+            // If the tick is successful, and it transcribed something,
+            // the result is added to the transcription with additional information
             Ok(Some(unit)) => {
                 let current_position = cursor.pos;
                 transcription.push(unit, Some(tick_initial_position), Some(current_position))
-            }
+            },
+            // If the tick fails, the transcription can't continue and the error is returned with additional information
             Err(error) => return Err(TranscriberError {
                 tick_initial_position,
                 tick_buffer: source[tick_initial_position..cursor.pos].to_vec(),
@@ -32,52 +39,19 @@ pub fn transcriber<SourceUnit: Clone, ResultUnit: std::fmt::Debug, Error: std::f
                 transcription_buffer: transcription,
                 error: error,
             }),
+            // The tick can return None if there's nothing to transcribe
             _ => {}
         }
 
+        // If the cursor didn't move, move it forward one unit
+        // This can be useful for ticks that are ignored (like comments, spaces, end of line, etc.)
         if tick_initial_position == cursor.pos {
             cursor.next();
         }
     }
 
+    // Mark the transcription as completed
     transcription.completed = true;
 
     Ok(transcription)
 }
-
-// pub trait Transcriber {
-//     /// Input Unit (iUnit)
-//     type SourceUnit;
-//     /// Output Unit (oUnit)
-//     type ResultUnit;
-//     /// Error
-//     type Error;
-//
-//     /// Transcribe a vec of iUnits into a vec of oUnits.
-//     /// Create an iteration over the iUnits for transcribing them to oUnits
-//     fn transcribe(source: Vec<Self::SourceUnit>) -> Result<Vec<Self::ResultUnit>, TranscriberError<Self::Error>> {
-//         let mut cursor = TranscriberCursor::new(&source);
-//         let mut result: Vec<Self::ResultUnit> = vec![];
-//
-//         while let Some(initial_unit) = source.get(cursor.pos) {
-//             let tick_initial_position = cursor.pos;
-//
-//             let tick_result = Self::tick(&mut cursor, initial_unit).map_err(|err| TranscriberError {
-//                 tick_initial_position,
-//                 cursor_position: cursor.pos,
-//                 error: err
-//             });
-//
-//             result.push(tick_result?);
-//
-//             if tick_initial_position == cursor.pos {
-//                 cursor.next();
-//             }
-//         }
-//
-//         Ok(result)
-//     }
-//
-//     /// Each tick, starts at the initial iUnit of the current oUnit, and must end with the initial iUnit of the next oUnit.
-//     fn tick(cursor: &mut TranscriberCursor<Self::SourceUnit>, initial_unit: &Self::SourceUnit) -> Result<Self::ResultUnit, Self::Error>;
-// }

@@ -2,6 +2,7 @@ use std::ops::{Add, Div, Mul, Sub};
 
 use super::DataValue;
 
+/// Arithmetic values are thoose which can be used in arithmetic operations.
 pub enum ArithmeticValue {
     Number(f64),
     String(String),

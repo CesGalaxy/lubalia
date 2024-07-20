@@ -27,7 +27,6 @@ impl<SourceUnit, ResultUnit> Transcription<SourceUnit, ResultUnit> {
     pub fn push(&mut self, unit: ResultUnit, initial_position: Option<usize>, current_position: Option<usize>) {
         self.result.push(IdentifiedTranscriptionUnit {
             value: unit,
-            // transcription: &self,
             source_position: initial_position,
             source_length: current_position.map(|c| initial_position.map(|i| c - i).unwrap_or(0)),
         });
@@ -42,17 +41,14 @@ impl<SourceUnit, ResultUnit> Transcription<SourceUnit, ResultUnit> {
 /// A unit with extra data for localizing it's source in the transcription source. (aka ITU)
 #[derive(Debug, PartialEq)]
 pub struct IdentifiedTranscriptionUnit<Unit> {
-    /// THe transcribed unit
+    /// The transcribed unit
     pub value: Unit,
-
-    /// A reference to the transcription which source this unit comes from.
-    // pub transcription: &'a Transcription<'a, SourceUnit, ResultUnit>,
 
     /// The position of the source unit in the transcription source.
     /// If `None`, the unit is not localized.
     pub source_position: Option<usize>,
 
-    /// The amount of source units in the transcription source that this unit tooks.
+    /// The amount of source units in the transcription source that this unit took.
     /// If `None`, the unit is not localized.
     pub source_length: Option<usize>,
 }

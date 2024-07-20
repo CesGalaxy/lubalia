@@ -11,6 +11,7 @@ use crate::utils::transcriber::{cursor::TranscriberCursor, result::Transcription
 
 use super::token::Token;
 
+/// Transcribe a list of tokens into an AST (Abstract Syntax Tree).
 pub fn parser(tokens: Vec<Token>) -> TranscriptionResult<Token, ASTRootItem, ParserError> {
     // Source --> Token
     // Result --> Node (Expr/Stmnt)
@@ -20,7 +21,8 @@ pub fn parser(tokens: Vec<Token>) -> TranscriptionResult<Token, ASTRootItem, Par
     Ok(transcription)
 }
 
-pub fn parser_tick(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<ASTRootItem>, ParserError> {
+/// Each tick of the parser transcriber
+fn parser_tick(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<ASTRootItem>, ParserError> {
     // TODO: This task should be for ASTRootItem
     match initial_token {
         Token::EOF => Ok(None),

@@ -1,8 +1,11 @@
+/// This module contains the arithmetic operations for the language, with their corresponding data values.
 pub mod arithmetic;
+/// This module contains the logic operations for the language, with their corresponding data values.
 pub mod logic;
 
 use crate::lang::token::TokenLiteral;
 
+/// Represents a posible data value which the language can work with.
 #[derive(Debug, Clone)]
 pub enum DataValue {
     Number(f64),

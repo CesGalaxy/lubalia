@@ -19,6 +19,7 @@ pub struct VM {
 }
 
 impl VM {
+    /// Create a new VM with a program
     pub fn new(program: Vec<ASTRootItem>) -> Self {
         VM {
             program,

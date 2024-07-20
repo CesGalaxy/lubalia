@@ -9,14 +9,17 @@ pub struct Context {
 }
 
 impl Context {
+    /// Create a new empty context
     pub fn new() -> Self {
         Context { variables: Vec::new(), parent: None }
     }
 }
 
 impl Context {
-    /// Add a variable to the scope (or overwrite it if it already exists)
-    pub fn set(&mut self, name: String, value: DataValue) {
+    /// Add a new variable to the current scope (or overwrite it if it already exists).
+    /// If there is one with the same name in the parent scope, it won't be overwritten,
+    /// but inaccessable from the current scope, as it will shadow the parent's variable.
+    pub fn create(&mut self, name: String, value: DataValue) {
         if let Some(variable) = self.get_mut(name.clone()) {
             *variable = value;
         } else {
@@ -37,11 +40,16 @@ impl Context {
         }
     }
 
-    /// Retrieve a recefrence to a variable from the scope (or parent)
+    /// Retrieve a recefrence to a variable from the scope,
+    /// if there is no variable with the given name, it will look in the parent scope.
+    /// If the variable is not found neither, it will return None.
     pub fn get(&self, name: String) -> Option<&DataValue> {
+        // Check if the variable is in the local scope,
+        // otherwise, check the parent scope.
         if let Some(local) = self.variables.iter().find(|v| v.0 == name).map(|v| &v.1) {
             Some(local)
         } else {
+            // If the variable is not in the parent scope neither, return None (will end up with DataValue::default())
             if let Some(parent) = &self.parent.as_ref().map(|scope| scope.get(name)) {
                 *parent
             } else {
