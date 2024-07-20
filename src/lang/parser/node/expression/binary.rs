@@ -1,14 +1,8 @@
 use std::ops::Not;
 
-use crate::lang::parser::data::arithmetic::ArithmeticValue;
-use crate::lang::parser::data::DataValue;
-use crate::lang::parser::{error::ParserError, node::Node};
-use crate::lang::token::{Token, TokenSymbol};
-use crate::utils::transcriber::cursor::TranscriberCursor;
-use crate::vm::context::Context;
-use crate::vm::VM;
-use super::terminal::TerminalExpression;
-use super::{ASTExpression, ExpressionNode};
+use crate::{lang::{parser::{data::{arithmetic::ArithmeticValue, DataValue}, error::ParserError, node::Node}, token::{Token, TokenSymbol}}, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
+
+use super::{terminal::TerminalExpression, ASTExpression, ExpressionNode};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum BinaryOperator {
@@ -196,9 +190,9 @@ impl Node for BinaryExpression {
 }
 
 impl ExpressionNode for BinaryExpression {
-    fn evaluate(&self, context: &mut Context, vm: &mut VM) -> DataValue {
-        let lhs = self.lhs.evaluate(context, vm);
-        let rhs = self.rhs.evaluate(context, vm);
+    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+        let lhs = self.lhs.evaluate(tick);
+        let rhs = self.rhs.evaluate(tick);
 
         match self.operator {
             BinaryOperator::Add => (ArithmeticValue::from(lhs) + ArithmeticValue::from(rhs)).into(),

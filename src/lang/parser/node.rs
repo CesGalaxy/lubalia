@@ -5,7 +5,7 @@ pub mod statement;
 use expression::{ASTExpression, ExpressionNode};
 use statement::{ASTStatement, StatementNode};
 
-use crate::{lang::token::Token, utils::transcriber::cursor::TranscriberCursor, vm::{context::Context, VM}};
+use crate::{lang::token::Token, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
 
 use super::{data::DataValue, error::ParserError};
 
@@ -20,11 +20,11 @@ pub trait Node {
 }
 
 impl ASTNode {
-    pub fn execute(&self, context: &mut Context, vm: &mut VM) -> Option<DataValue> {
+    pub fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
-            Self::Expression(expr) => Some(expr.evaluate(context, vm)),
+            Self::Expression(expr) => Some(expr.evaluate(tick)),
             Self::Statement(statement) => {
-                statement.execute(context, vm).ok();
+                statement.execute(tick).ok();
                 None
             }
         }

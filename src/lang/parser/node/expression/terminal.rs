@@ -3,7 +3,7 @@ use crate::{
         parser::{data::DataValue, error::ParserError, node::{structures::scope::ScopeStruct, Node}},
         token::{Token, TokenSymbol}
     },
-    utils::transcriber::cursor::TranscriberCursor, vm::{context::Context, VM}
+    utils::transcriber::cursor::TranscriberCursor, vm::VMTick
 };
 
 use super::ExpressionNode;
@@ -37,12 +37,12 @@ impl Node for TerminalExpression {
 }
 
 impl ExpressionNode for TerminalExpression {
-    fn evaluate(&self, context: &mut Context, vm: &mut VM) -> DataValue {
+    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
         match self {
             Self::Literal(literal) => literal.clone(),
-            Self::VarRef(varname) => context.get(varname.clone()).cloned().unwrap_or_default(),
+            Self::VarRef(varname) => tick.get_context().get(varname.clone()).cloned().unwrap_or_default(),
             Self::Scope(_) => DataValue::Null,
-            Self::LastValue => vm.last_value.clone()
+            Self::LastValue => tick.vm.last_value.clone()
         }
     }
 }

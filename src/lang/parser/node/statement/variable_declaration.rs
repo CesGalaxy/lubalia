@@ -1,6 +1,6 @@
 use crate::{
     lang::{self, parser::{self, data::DataValue, error::ParserError, node::{expression::{ASTExpression, ExpressionNode}, Node}}, token::Token},
-    utils::transcriber::cursor::TranscriberCursor, vm::{context::Context, VM}
+    utils::transcriber::cursor::TranscriberCursor, vm::VMTick
 };
 
 use super::StatementNode;
@@ -46,10 +46,10 @@ impl Node for VariableDeclaration {
 }
 
 impl StatementNode for VariableDeclaration {
-    fn execute(&self, context: &mut Context, vm: &mut VM) -> Result<(), &'static str> {
-        let value = self.value.clone().map(|v| v.evaluate(context, vm)).unwrap_or(DataValue::Null);
+    fn execute(&self, tick: &mut VMTick) -> Result<(), &'static str> {
+        let value = self.value.clone().map(|v| v.evaluate(tick)).unwrap_or(DataValue::Null);
 
-        context.create(self.varname.clone(), value);
+        tick.get_context().create(self.varname.clone(), value);
 
         Ok(())
     }

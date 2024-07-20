@@ -2,7 +2,7 @@ pub mod variable_declaration;
 
 use crate::{
     lang::{parser::error::ParserError, token::Token},
-    utils::transcriber::cursor::TranscriberCursor, vm::{context::Context, VM}
+    utils::transcriber::cursor::TranscriberCursor, vm::VMTick
 };
 
 use super::Node;
@@ -13,7 +13,7 @@ pub enum ASTStatement {
 }
 
 pub trait StatementNode: Node {
-    fn execute(&self, context: &mut Context, vm: &mut VM) -> Result<(), &'static str>;
+    fn execute(&self, tick: &mut VMTick) -> Result<(), &'static str>;
 }
 
 impl Node for ASTStatement {
@@ -31,9 +31,9 @@ impl Node for ASTStatement {
 }
 
 impl StatementNode for ASTStatement {
-    fn execute(&self, context: &mut Context, vm: &mut VM) -> Result<(), &'static str> {
+    fn execute(&self, tick: &mut VMTick) -> Result<(), &'static str> {
         match self {
-            ASTStatement::VariableDeclaration(vd) => vd.execute(context, vm),
+            ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
         }
     }
 }

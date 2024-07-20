@@ -2,7 +2,7 @@ use crate::lang::parser::data::DataValue;
 
 /// A context for running code, contains all variables.
 /// Extends all the data from its parent
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Context {
     pub variables: Vec<(String, DataValue)>,
     pub parent: Option<Box<Context>>
@@ -13,9 +13,15 @@ impl Context {
     pub fn new() -> Self {
         Context { variables: Vec::new(), parent: None }
     }
-}
 
-impl Context {
+    /// Create a new context with a parent
+    pub fn with_parent(parent: Context) -> Self {
+        Context {
+            variables: Vec::new(),
+            parent: Some(Box::new(parent))
+        }
+    }
+
     /// Add a new variable to the current scope (or overwrite it if it already exists).
     /// If there is one with the same name in the parent scope, it won't be overwritten,
     /// but inaccessable from the current scope, as it will shadow the parent's variable.
