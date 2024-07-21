@@ -30,7 +30,7 @@ impl Node for ASTExpression {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTExpression>, ParserError> {
         // TODO: Expression shouldn't return an Err if nothing could be transcribed
         match cursor.peek_next() {
-            // Some(Token::Symbol(_)) => binary::BinaryExpression::transcribe(cursor).map(|bexpr| bexpr.map(ASTExpression::Binary)),
+            Some(Token::Symbol(symbol)) if symbol.is_operator() => binary::BinaryExpression::transcribe(cursor).map(|bexpr| bexpr.map(ASTExpression::Binary)),
             _ => Ok(
                 terminal::TerminalExpression::transcribe(cursor)
                     .unwrap_or(None)
