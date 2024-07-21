@@ -46,3 +46,13 @@ impl StatementNode for ASTStatement {
         }
     }
 }
+
+impl std::fmt::Display for ASTStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ASTStatement::VariableDeclaration(vd) => write!(f, "{}", vd),
+            ASTStatement::Scope(scope) => write!(f, "{}", scope),
+            ASTStatement::Conditional(cond) => write!(f, "{}", cond)
+        }
+    }
+}

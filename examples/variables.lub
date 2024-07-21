@@ -1,7 +1,7 @@
-let x = 0;
+let x = 1
 
-if true {
-    x = 1;
+let one = if true {
+    x
 } else {
-    x = 2;
+    2
 }

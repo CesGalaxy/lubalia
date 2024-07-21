@@ -66,3 +66,9 @@ impl StatementNode for VariableDeclaration {
         Some(value)
     }
 }
+
+impl std::fmt::Display for VariableDeclaration {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "let {} = {}", self.varname, self.value)
+    }
+}

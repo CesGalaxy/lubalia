@@ -44,3 +44,13 @@ impl StatementNode for ConditionalStatement {
         }
     }
 }
+
+impl std::fmt::Display for ConditionalStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "if {} {}", self.condition, self.then_branch)?;
+        if let Some(else_branch) = &self.else_branch {
+            write!(f, " else {}", else_branch)?;
+        }
+        Ok(())
+    }
+}

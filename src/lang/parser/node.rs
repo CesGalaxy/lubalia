@@ -18,7 +18,7 @@ pub enum ASTNode {
     Statement(ASTStatement)
 }
 
-pub trait Node {
+pub trait Node: std::fmt::Display {
     /// Transcribe a node from the source code (tokens)
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized;
 }
@@ -28,10 +28,7 @@ impl ASTNode {
     pub fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             Self::Expression(expr) => Some(expr.evaluate(tick)),
-            Self::Statement(statement) => {
-                statement.execute(tick);
-                None
-            }
+            Self::Statement(statement) => statement.execute(tick)
         }
     }
 }
@@ -39,6 +36,7 @@ impl ASTNode {
 impl Node for ASTNode {
     /// Get a node from the source code (tokens)
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTNode>, ParserError> {
+        println!("Transcribing ASTNode {:?}", cursor.peek());
         match cursor.peek() {
             Some(token) => match token {
                 Token::EOL => Ok(None),
@@ -51,6 +49,15 @@ impl Node for ASTNode {
                 )
             },
             None => Ok(None)
+        }
+    }
+}
+
+impl std::fmt::Display for ASTNode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Expression(expr) => write!(f, "{}{expr}{}", "<", ">"),
+            Self::Statement(stmt) => write!(f, "{}{stmt}{}", "[", "]")
         }
     }
 }

@@ -211,3 +211,9 @@ impl ExpressionNode for BinaryExpression {
         }
     }
 }
+
+impl std::fmt::Display for BinaryExpression {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "( {} {:?} {} )", self.lhs, self.operator, self.rhs)
+    }
+}

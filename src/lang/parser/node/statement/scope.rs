@@ -59,14 +59,26 @@ impl StatementNode for ScopeStruct {
             }
         }
 
-        tick.context = if !using_global_context {
-            if let Some(child) = std::mem::take(&mut tick.context) {
-                if let Some(parent) = child.parent {
-                    Some(parent)
-                } else { None }
-            } else { None }
-        } else { None };
+        if let Some(child) = std::mem::take(&mut tick.context) {
+            if let Some(parent) = child.parent {
+                if using_global_context {
+                    tick.vm.global = *parent;
+                } else {
+                    tick.context = Some(parent)
+                }
+            }
+        }
 
         result
+    }
+}
+
+impl std::fmt::Display for ScopeStruct {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{{\n")?;
+        for node in &self.nodes {
+            write!(f, "\t{}\n", node)?;
+        }
+        write!(f, "}}")
     }
 }
