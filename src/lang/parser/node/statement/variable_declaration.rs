@@ -31,14 +31,14 @@ pub struct VariableDeclaration {
 impl Node for VariableDeclaration {
     /// Transcribes the declaration of ONE variable
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized {
-        if !cursor.consume().is_some_and(|t| t == &Token::Keyword("let".to_string())) {
+        if cursor.consume() != Some(&Token::Keyword("let".to_string())) {
             return Err(ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string()));
         }
 
         if let Some(Token::Keyword(varname)) = cursor.consume() {
             let varname = varname.clone();
 
-            if !cursor.consume().is_some_and(|t| t == &Token::Symbol(TokenSymbol::Equal)) {
+            if cursor.consume() != Some(&Token::Symbol(TokenSymbol::Equal)) {
                 return Err(ParserError::Expected("equal@var_declaration <sym:equal> '='".to_string()));
             }
 
@@ -57,6 +57,7 @@ impl Node for VariableDeclaration {
 
 impl StatementNode for VariableDeclaration {
     /// Creates a new variable for the current context and assigns a value to it.
+    /// Returns the value of the variable.
     fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         let value = self.value.evaluate(tick);
 

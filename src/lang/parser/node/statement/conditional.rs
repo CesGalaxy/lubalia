@@ -17,10 +17,10 @@ impl Node for ConditionalStatement {
 
         let condition = ASTExpression::transcribe(cursor)?.ok_or(ParserError::Expected("condition@conditional <expr>".to_string()))?;
 
-        let then_branch = ASTNode::transcribe(cursor)?.ok_or(ParserError::Expected("then@conditional <node>".to_string()))?;
+        let then_branch = ASTNode::transcribe(cursor)?.ok_or(ParserError::Expected("then_branch@conditional <node>".to_string()))?;
 
         let else_branch = if cursor.consume() == Some(&Token::Keyword("else".to_string())) {
-            ASTNode::transcribe(cursor)?
+            Some(ASTNode::transcribe(cursor)?.ok_or(ParserError::Expected("else_branch@conditional <node>".to_string()))?)
         } else {
             None
         };

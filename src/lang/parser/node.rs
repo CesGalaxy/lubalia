@@ -42,8 +42,13 @@ impl Node for ASTNode {
         match cursor.peek() {
             Some(token) => match token {
                 Token::EOL => Ok(None),
-                Token::Keyword(_) => ASTStatement::transcribe(cursor).map(|stmt| stmt.map(ASTNode::Statement)),
-                _ => ASTExpression::transcribe(cursor).map(|aste| aste.map(ASTNode::Expression))
+                _ => Ok(
+                    // Try to transcribe a statement (error handled with ControlFlow),
+                    ASTStatement::transcribe(cursor)?.map(ASTNode::Statement)
+                        // if no statement was found, try to transcribe an expression (which won't be a statament-result).
+                        // The error is also handled with ControlFlow
+                        .or(ASTExpression::transcribe(cursor)?.map(ASTNode::Expression))
+                )
             },
             None => Ok(None)
         }
