@@ -1,9 +1,3 @@
-let x = 10;
-{
-    let ten = x;
-    let x = 5;
-    let five = x;
-    7
-}
-let eleven = x + 1;
-let notfound = five;
+let ten = {
+    5 + 5
+};

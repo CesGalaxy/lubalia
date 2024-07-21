@@ -41,7 +41,7 @@ fn test_file(file_name: &str) {
 
                     vm.evaluate(program);
 
-                    println!("{:?}", vm.global);
+                    println!("{}", vm.global);
                 } else {
                     println!("TREE: {:?}", tree);
                 }

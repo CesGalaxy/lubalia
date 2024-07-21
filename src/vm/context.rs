@@ -69,3 +69,19 @@ impl Default for Context {
         Context::new()
     }
 }
+
+impl std::fmt::Display for Context {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Context ================================\n")?;
+
+        for (name, value) in &self.variables {
+            write!(f, "\t{name:16} = {value}\n")?;
+        }
+
+        if let Some(parent) = &self.parent {
+            write!(f, "Parent:\n{parent}")
+        } else {
+            write!(f, "")
+        }
+    }
+}
