@@ -44,16 +44,18 @@ impl VM {
             context: None
         };
 
-        println!("{:?}", node.execute(&mut tick));
+        if let Some(value) = node.execute(&mut tick) {
+            println!("=> {:?}", value);
+        }
     }
 }
 
 pub struct VMTick<'a> {
     pub vm: &'a mut VM,
-    pub context: Option<&'a mut Context>,
+    pub context: Option<Box<Context>>,
 }
 
-impl<'a> VMTick<'a> {
+impl VMTick<'_> {
     pub fn get_context(&mut self) -> &mut Context {
         if let Some(context) = &mut self.context {
             context
@@ -61,4 +63,11 @@ impl<'a> VMTick<'a> {
             &mut self.vm.global
         }
     }
+
+    // pub fn tmp_context(&'a mut self) -> VMTick<'a> {
+    //     VMTick {
+    //         vm: self.vm,
+    //         context: Some(Context::with_parent(self.context.clone()))
+    //     }
+    // }
 }

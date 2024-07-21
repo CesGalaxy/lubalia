@@ -1,12 +1,12 @@
 use crate::{
     lang::{
-        parser::{data::DataValue, error::ParserError, node::{structures::scope::ScopeStruct, Node}},
+        parser::{data::DataValue, error::ParserError, node::Node},
         token::{Token, TokenSymbol}
     },
     utils::transcriber::cursor::TranscriberCursor, vm::VMTick
 };
 
-use super::ExpressionNode;
+use super::{scope::ScopeStruct, ExpressionNode};
 
 #[derive(Debug, Clone)]
 pub enum TerminalExpression {
@@ -41,7 +41,7 @@ impl ExpressionNode for TerminalExpression {
         match self {
             Self::Literal(literal) => literal.clone(),
             Self::VarRef(varname) => tick.get_context().get(varname.clone()).cloned().unwrap_or_default(),
-            Self::Scope(_) => DataValue::Null,
+            Self::Scope(scope) => scope.evaluate(tick),
             Self::LastValue => tick.vm.last_value.clone()
         }
     }

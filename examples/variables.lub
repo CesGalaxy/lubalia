@@ -1,3 +1,9 @@
-let t = 10 > 1;
-let f = 2 > 7;
-let last = _;
+let x = 10;
+{
+    let ten = x;
+    let x = 5;
+    let five = x;
+    7
+}
+let eleven = x + 1;
+let notfound = five;

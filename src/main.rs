@@ -26,19 +26,19 @@ fn test_file(file_name: &str) {
                 }
     
                 println!(" {} tokens lexed!", tokens.len());
-    
+                
                 let tree = parser(tokens);
     
                 if let Ok(program) = tree {
                     let program: Vec<_> = program.units().into_iter().cloned().collect();
 
-                    for astri in &program {
-                        println!("\t{astri:?}");
+                    for _astri in &program {
+                        // println!("\t{astri:?}");
                     }
     
                     // Create and run the VM
                     let mut vm = VM::new();
-                    
+
                     vm.evaluate(program);
 
                     println!("{:?}", vm.global);

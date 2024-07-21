@@ -1,5 +1,4 @@
 pub mod expression;
-pub mod structures;
 pub mod statement;
 
 use expression::{ASTExpression, ExpressionNode};
