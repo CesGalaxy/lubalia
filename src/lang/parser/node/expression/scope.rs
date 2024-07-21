@@ -8,15 +8,14 @@ use super::ExpressionNode;
 
 #[derive(Debug, Clone)]
 pub struct ScopeStruct {
-    code: Vec<ASTNode>
+    nodes: Vec<ASTNode>
 }
 
 impl Node for ScopeStruct {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ScopeStruct>, ParserError> {
-        let mut buffer = vec![];
+        let mut nodes = vec![];
 
-        // TODO: Integrate this in the cursor
-        if !cursor.consume().is_some_and(|t| t == &Token::Symbol(TokenSymbol::BraceOpen)) {
+        if cursor.consume() != Some(&Token::Symbol(TokenSymbol::BraceOpen)) {
             return Err(ParserError::Expected("start@scope/sym <sym:brace:open> '{'".to_string()));
         }
 
@@ -24,7 +23,7 @@ impl Node for ScopeStruct {
             let initial_position = cursor.pos;
 
             if let Some(node) = ASTNode::transcribe(cursor)? {
-                buffer.push(node);
+                nodes.push(node);
             }
 
             // FIXME: This is a bad idea
@@ -33,13 +32,11 @@ impl Node for ScopeStruct {
             }
         }
 
-        if !cursor.consume().is_some_and(|t| t == &Token::Symbol(TokenSymbol::BraceClose)) {
+        if cursor.consume() != Some(&Token::Symbol(TokenSymbol::BraceClose)) {
             return Err(ParserError::Expected("end@scope/sym <sym:brace:close> '}'".to_string()));
         }
 
-        Ok(Some(ScopeStruct {
-            code: buffer,
-        }))
+        Ok(Some(ScopeStruct { nodes }))
     }
 }
 
@@ -54,7 +51,7 @@ impl ExpressionNode for ScopeStruct {
 
         tick.context = Some(Box::new(Context::with_parent(std::mem::take(tick.get_context()))));
 
-        for node in &self.code {
+        for node in &self.nodes {
             if let Some(value) = node.execute(tick) {
                 result = Some(value);
                 break;
