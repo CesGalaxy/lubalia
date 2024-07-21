@@ -52,33 +52,22 @@ impl ExpressionNode for ScopeStruct {
 
         let using_global_context = tick.context.is_none();
 
-        let tick_ctx = tick.get_context();
-
-        let parent_ctx = std::mem::take(tick_ctx);
-
-        let child_ctx = Context::with_parent(Some(parent_ctx));
-
-        tick.context = Some(Box::new(child_ctx));
+        tick.context = Some(Box::new(Context::with_parent(std::mem::take(tick.get_context()))));
 
         for node in &self.code {
-            result = node.execute(tick);
+            if let Some(value) = node.execute(tick) {
+                result = Some(value);
+                break;
+            }
         }
 
-        let final_child_ctx = std::mem::take(&mut tick.context);
-
-        tick.context = if using_global_context {
-            None
-        } else {
-            if let Some(child) = final_child_ctx {
+        tick.context = if !using_global_context {
+            if let Some(child) = std::mem::take(&mut tick.context) {
                 if let Some(parent) = child.parent {
                     Some(parent)
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        };
+                } else { None }
+            } else { None }
+        } else { None };
 
         result.unwrap_or_default()
     }

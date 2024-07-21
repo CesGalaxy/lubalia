@@ -14,10 +14,10 @@ impl Context {
         Context { variables: Vec::new(), parent: None }
     }
     /// Create a new context with a parent
-    pub fn with_parent(parent: Option<Context>) -> Self {
+    pub fn with_parent(parent: Context) -> Self {
         Context {
             variables: Vec::new(),
-            parent: parent.map(Box::new)
+            parent: Some(Box::new(parent))
         }
     }
 
