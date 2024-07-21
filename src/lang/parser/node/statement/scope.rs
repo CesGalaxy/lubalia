@@ -14,11 +14,11 @@ pub struct ScopeStruct {
 
 impl Node for ScopeStruct {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ScopeStruct>, ParserError> {
-        let mut nodes = vec![];
-
         if cursor.consume() != Some(&Token::Symbol(TokenSymbol::BraceOpen)) {
             return Err(ParserError::Expected("start@scope/sym <sym:brace:open> '{'".to_string()));
         }
+
+        let mut nodes = vec![];
 
         while Some(&Token::Symbol(TokenSymbol::BraceClose)) != cursor.peek() {
             let initial_position = cursor.pos;
