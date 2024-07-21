@@ -4,7 +4,7 @@ use crate::{
     vm::{context::Context, VMTick}
 };
 
-use super::ExpressionNode;
+use super::StatementNode;
 
 #[derive(Debug, Clone)]
 pub struct ScopeStruct {
@@ -41,11 +41,11 @@ impl Node for ScopeStruct {
     }
 }
 
-impl ExpressionNode for ScopeStruct {
+impl StatementNode for ScopeStruct {
     // TODO: This code is shit. But works!
     /// Run the scope (with it's own generated child context),
     /// it will return a value (NULL if not provided).
-    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+    fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         let mut result = None;
 
         let using_global_context = tick.context.is_none();
@@ -67,6 +67,6 @@ impl ExpressionNode for ScopeStruct {
             } else { None }
         } else { None };
 
-        result.unwrap_or_default()
+        result
     }
 }

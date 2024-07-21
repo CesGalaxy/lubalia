@@ -1,5 +1,5 @@
 use crate::{
-    lang::{parser::{error::ParserError, node::{expression::{ASTExpression, ExpressionNode}, Node}}, token::{Token, TokenSymbol}},
+    lang::{parser::{data::DataValue, error::ParserError, node::{expression::{ASTExpression, ExpressionNode}, Node}}, token::{Token, TokenSymbol}},
     utils::transcriber::cursor::TranscriberCursor, vm::VMTick
 };
 
@@ -57,11 +57,11 @@ impl Node for VariableDeclaration {
 
 impl StatementNode for VariableDeclaration {
     /// Creates a new variable for the current context and assigns a value to it.
-    fn execute(&self, tick: &mut VMTick) -> Result<(), &'static str> {
+    fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         let value = self.value.evaluate(tick);
 
-        tick.get_context().create(self.varname.clone(), value);
+        tick.get_context().create(self.varname.clone(), value.clone());
 
-        Ok(())
+        Some(value)
     }
 }

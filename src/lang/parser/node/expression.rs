@@ -1,6 +1,5 @@
 pub mod terminal;
 pub mod binary;
-pub mod scope;
 
 use crate::{
     lang::{parser::{data::DataValue, error::ParserError}, token::Token},

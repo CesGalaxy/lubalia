@@ -1,7 +1,8 @@
 pub mod variable_declaration;
+pub mod scope;
 
 use crate::{
-    lang::{parser::error::ParserError, token::Token},
+    lang::{parser::{data::DataValue, error::ParserError}, token::{Token, TokenSymbol}},
     utils::transcriber::cursor::TranscriberCursor, vm::VMTick
 };
 
@@ -11,10 +12,11 @@ use super::Node;
 #[derive(Debug, Clone)]
 pub enum ASTStatement {
     VariableDeclaration(variable_declaration::VariableDeclaration),
+    Scope(scope::ScopeStruct)
 }
 
 pub trait StatementNode: Node {
-    fn execute(&self, tick: &mut VMTick) -> Result<(), &'static str>;
+    fn execute(&self, tick: &mut VMTick) -> Option<DataValue>;
 }
 
 impl Node for ASTStatement {
@@ -26,15 +28,17 @@ impl Node for ASTStatement {
                     _ => Ok(None)
                 }
             },
+            Some(Token::Symbol(TokenSymbol::BraceOpen)) => scope::ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope)),
             _ => Ok(None)
         }
     }
 }
 
 impl StatementNode for ASTStatement {
-    fn execute(&self, tick: &mut VMTick) -> Result<(), &'static str> {
+    fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
+            ASTStatement::Scope(scope) => scope.execute(tick)
         }
     }
 }

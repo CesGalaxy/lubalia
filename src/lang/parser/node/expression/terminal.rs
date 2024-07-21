@@ -1,9 +1,9 @@
 use crate::{
-    lang::{parser::{data::DataValue, error::ParserError, node::Node}, token::{Token, TokenSymbol}},
+    lang::{parser::{data::DataValue, error::ParserError, node::{statement::{ASTStatement, StatementNode}, Node}}, token::{Token, TokenSymbol}},
     utils::transcriber::cursor::TranscriberCursor, vm::VMTick
 };
 
-use super::{scope::ScopeStruct, ExpressionNode};
+use super::ExpressionNode;
 
 /// An expression which evaluated result doesn't need manipulation
 #[derive(Debug, Clone)]
@@ -15,7 +15,7 @@ pub enum TerminalExpression {
     VarRef(String),
 
     /// A scope (a block of code)
-    Scope(ScopeStruct),
+    StatementResult(Box<ASTStatement>),
 
     /// A reference to the last evaluated expression value
     LastValue
@@ -32,12 +32,11 @@ impl Node for TerminalExpression {
                 "null" => Ok(Some(Self::Literal(DataValue::Null))),
                 _ => Ok(Some(Self::VarRef(varname.clone())))
             },
-            Some(Token::Symbol(TokenSymbol::BraceOpen)) => {
-                cursor.back();
-                ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope))
-            },
             Some(Token::Symbol(TokenSymbol::Underscore)) => Ok(Some(Self::LastValue)),
-            _ => Err(ParserError::Expected("<expr:terminal>".to_string()))
+            _ => {
+                cursor.back();
+                ASTStatement::transcribe(cursor).map(|o| o.map(|stmt| Self::StatementResult(Box::new(stmt))))
+            }
         }
     }
 }
@@ -48,7 +47,7 @@ impl ExpressionNode for TerminalExpression {
         match self {
             Self::Literal(literal) => literal.clone(),
             Self::VarRef(varname) => tick.get_context().get(varname.clone()).cloned().unwrap_or_default(),
-            Self::Scope(scope) => scope.evaluate(tick),
+            Self::StatementResult(statement) => statement.execute(tick).unwrap_or_default(),
             Self::LastValue => tick.vm.last_value.clone()
         }
     }

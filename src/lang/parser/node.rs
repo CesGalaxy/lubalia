@@ -29,7 +29,7 @@ impl ASTNode {
         match self {
             Self::Expression(expr) => Some(expr.evaluate(tick)),
             Self::Statement(statement) => {
-                statement.execute(tick).ok();
+                statement.execute(tick);
                 None
             }
         }
