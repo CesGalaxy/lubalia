@@ -7,6 +7,7 @@ use crate::{
 
 use super::Node;
 
+/// An instruction the VM executes without returning a value
 #[derive(Debug, Clone)]
 pub enum ASTStatement {
     VariableDeclaration(variable_declaration::VariableDeclaration),

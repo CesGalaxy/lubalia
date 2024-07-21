@@ -8,6 +8,7 @@ use super::ExpressionNode;
 
 #[derive(Debug, Clone)]
 pub struct ScopeStruct {
+    /// The nodes to execute inside the scope
     nodes: Vec<ASTNode>
 }
 

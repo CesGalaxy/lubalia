@@ -13,9 +13,6 @@ use super::token::Token;
 
 /// Transcribe a list of tokens into an AST (Abstract Syntax Tree).
 pub fn parser(tokens: Vec<Token>) -> TranscriptionResult<Token, ASTRootItem, ParserError> {
-    // Source --> Token
-    // Result --> Node (Expr/Stmnt)
-
     let transcription = transcriber(tokens, parser_tick)?;
 
     Ok(transcription)

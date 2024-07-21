@@ -1,26 +1,36 @@
 use crate::{
-    lang::{self, parser::{self, data::DataValue, error::ParserError, node::{expression::{ASTExpression, ExpressionNode}, Node}}, token::Token},
+    lang::{parser::{error::ParserError, node::{expression::{ASTExpression, ExpressionNode}, Node}}, token::{Token, TokenSymbol}},
     utils::transcriber::cursor::TranscriberCursor, vm::VMTick
 };
 
 use super::StatementNode;
 
+/// Defined the method variables are stored
 #[derive(Debug, Clone)]
 pub enum VariableType {
+    /// A variable that can be change
     Variable,
+
+    /// A variable that can't be changed
     Constant
 }
 
 #[derive(Debug, Clone)]
 pub struct VariableDeclaration {
+    /// The type of the variable
     #[allow(dead_code)]
     vartype: VariableType,
+
+    /// The name of the variable
     varname: String,
-    value: Option<ASTExpression>
+
+    /// The value of the variable
+    value: ASTExpression
 }
 
 impl Node for VariableDeclaration {
-    fn transcribe(cursor: &mut TranscriberCursor<lang::token::Token>) -> Result<Option<Self>, parser::error::ParserError> where Self: Sized {
+    /// Transcribes the declaration of ONE variable
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized {
         if !cursor.consume().is_some_and(|t| t == &Token::Keyword("let".to_string())) {
             return Err(ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string()));
         }
@@ -28,11 +38,11 @@ impl Node for VariableDeclaration {
         if let Some(Token::Keyword(varname)) = cursor.consume() {
             let varname = varname.clone();
 
-            if !cursor.consume().is_some_and(|t| t == &Token::Symbol(lang::token::TokenSymbol::Equal)) {
+            if !cursor.consume().is_some_and(|t| t == &Token::Symbol(TokenSymbol::Equal)) {
                 return Err(ParserError::Expected("equal@var_declaration <sym:equal> '='".to_string()));
             }
 
-            let value = ASTExpression::transcribe(cursor)?;
+            let value = ASTExpression::transcribe(cursor)?.ok_or(ParserError::Expected("value@var_declaration <expr>".to_string()))?;
 
             Ok(Some(VariableDeclaration {
                 vartype: VariableType::Variable,
@@ -46,8 +56,9 @@ impl Node for VariableDeclaration {
 }
 
 impl StatementNode for VariableDeclaration {
+    /// Creates a new variable for the current context and assigns a value to it.
     fn execute(&self, tick: &mut VMTick) -> Result<(), &'static str> {
-        let value = self.value.clone().map(|v| v.evaluate(tick)).unwrap_or(DataValue::Null);
+        let value = self.value.evaluate(tick);
 
         tick.get_context().create(self.varname.clone(), value);
 
