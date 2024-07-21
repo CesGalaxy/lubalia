@@ -32,9 +32,9 @@ fn test_file(file_name: &str) {
                 if let Ok(program) = tree {
                     let program: Vec<_> = program.units().into_iter().cloned().collect();
 
-                    // for astri in &program {
-                        // println!("\t{astri:?}");
-                    //}
+                    for astri in &program {
+                        println!("\t{astri:?}");
+                    }
     
                     // Create and run the VM
                     let mut vm = VM::new();

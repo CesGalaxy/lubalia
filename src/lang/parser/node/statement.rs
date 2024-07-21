@@ -1,5 +1,6 @@
 pub mod variable_declaration;
 pub mod scope;
+pub mod conditional;
 
 use crate::{
     lang::{parser::{data::DataValue, error::ParserError}, token::{Token, TokenSymbol}},
@@ -12,7 +13,8 @@ use super::Node;
 #[derive(Debug, Clone)]
 pub enum ASTStatement {
     VariableDeclaration(variable_declaration::VariableDeclaration),
-    Scope(scope::ScopeStruct)
+    Scope(scope::ScopeStruct),
+    Conditional(conditional::ConditionalStatement)
 }
 
 pub trait StatementNode: Node {
@@ -25,6 +27,7 @@ impl Node for ASTStatement {
             Some(Token::Keyword(keyword)) => {
                 match keyword.as_str() {
                     "let" => variable_declaration::VariableDeclaration::transcribe(cursor).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
+                    "if" => conditional::ConditionalStatement::transcribe(cursor).map(|cond| cond.map(ASTStatement::Conditional)),
                     _ => Ok(None)
                 }
             },
@@ -38,7 +41,8 @@ impl StatementNode for ASTStatement {
     fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
-            ASTStatement::Scope(scope) => scope.execute(tick)
+            ASTStatement::Scope(scope) => scope.execute(tick),
+            ASTStatement::Conditional(cond) => cond.execute(tick)
         }
     }
 }
