@@ -1,7 +1,7 @@
 pub mod expression;
 pub mod statement;
 
-use expression::{ASTExpression, ExpressionNode};
+use expression::{terminal::TerminalExpression, ASTExpression, ExpressionNode};
 use statement::{ASTStatement, StatementNode};
 
 use crate::{lang::token::Token, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
@@ -28,7 +28,10 @@ impl ASTNode {
     pub fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             Self::Expression(expr) => Some(expr.evaluate(tick)),
-            Self::Statement(statement) => statement.execute(tick)
+            Self::Statement(statement) => {
+                statement.execute(tick);
+                None
+            }
         }
     }
 }
@@ -41,7 +44,14 @@ impl Node for ASTNode {
                 Token::EOL => Ok(None),
                 _ => Ok(
                     // Try to transcribe a statement (error handled with ControlFlow),
-                    ASTStatement::transcribe(cursor)?.map(ASTNode::Statement)
+                    ASTStatement::transcribe(cursor)?.map(|stmnt| {
+                        if cursor.peek() == Some(&Token::Semicolon) {
+                            cursor.next();
+                            Self::Statement(stmnt)
+                        } else {
+                            Self::Expression(ASTExpression::Terminal(TerminalExpression::StatementResult(Box::new(stmnt))))
+                        }
+                    })
                         // if no statement was found, try to transcribe an expression (which won't be a statament-result).
                         // The error is also handled with ControlFlow
                         .or(ASTExpression::transcribe(cursor)?.map(ASTNode::Expression))

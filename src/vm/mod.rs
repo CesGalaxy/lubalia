@@ -44,8 +44,11 @@ impl VM {
             context: None
         };
 
+        println!("TICK =======================================");
+
         if let Some(value) = node.execute(&mut tick) {
-            println!("=> {:?}", value);
+            println!("NODE: {node}");
+            println!("{} => {value}", if let ASTNode::Statement(_) = node { "S" } else { "E" });
         }
     }
 }

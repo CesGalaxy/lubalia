@@ -21,6 +21,7 @@ pub enum ASTExpression {
 }
 
 pub trait ExpressionNode: Node {
+    // TODO: Return an Option (for optional returns in statements)
     /// Evaluate the expression and return the result value
     fn evaluate(&self, tick: &mut VMTick) -> DataValue;
 }

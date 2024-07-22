@@ -1,8 +1,8 @@
-let x = 1
-let n
+let x = 0;
+let n;
 
 let one = if true {
-    x
+    1
 } else {
     2
-}
+};
