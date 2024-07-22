@@ -1,4 +1,5 @@
 /// A set of tools for moving through a vector of units with a cursor.
+#[derive(Debug, Clone)]
 pub struct TranscriberCursor<'a, Unit> {
     /// The position of the cursor, specifies the position of the current unit (starting at 0)
     pub pos: usize,

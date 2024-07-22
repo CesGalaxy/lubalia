@@ -36,7 +36,6 @@ impl ASTNode {
 impl Node for ASTNode {
     /// Get a node from the source code (tokens)
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTNode>, ParserError> {
-        println!("Transcribing ASTNode {:?}", cursor.peek());
         match cursor.peek() {
             Some(token) => match token {
                 Token::EOL => Ok(None),

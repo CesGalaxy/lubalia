@@ -1,4 +1,5 @@
 let x = 1
+let n
 
 let one = if true {
     x

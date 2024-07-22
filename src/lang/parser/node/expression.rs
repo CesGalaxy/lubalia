@@ -28,12 +28,13 @@ pub trait ExpressionNode: Node {
 impl Node for ASTExpression {
     /// Transcribe any kind of expression (if possible)
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTExpression>, ParserError> {
-        // TODO: Expression shouldn't return an Err if nothing could be transcribed
-        match cursor.peek_next() {
-            Some(Token::Symbol(symbol)) if symbol.is_operator() => binary::BinaryExpression::transcribe(cursor).map(|bexpr| bexpr.map(ASTExpression::Binary)),
-            _ => Ok(
-                terminal::TerminalExpression::transcribe(cursor)
-                    .unwrap_or(None)
+        //* Expressions shouldn't return an Err if nothing could be transcribed, should them?
+        if cursor.peek_next().is_some_and(Token::is_operator) {
+            binary::BinaryExpression::transcribe(cursor).map(|bexpr| bexpr.map(ASTExpression::Binary))
+        } else {
+            Ok(
+                terminal::TerminalExpression::transcribe(cursor)?
+                    //.unwrap_or(None)
                     .map(ASTExpression::Terminal)
             )
         }

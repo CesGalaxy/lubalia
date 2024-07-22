@@ -25,7 +25,7 @@ pub struct VariableDeclaration {
     varname: String,
 
     /// The value of the variable
-    value: ASTExpression
+    value: Option<ASTExpression>
 }
 
 impl Node for VariableDeclaration {
@@ -38,11 +38,12 @@ impl Node for VariableDeclaration {
         if let Some(Token::Keyword(varname)) = cursor.consume() {
             let varname = varname.clone();
 
-            if cursor.consume() != Some(&Token::Symbol(TokenSymbol::Equal)) {
-                return Err(ParserError::Expected("equal@var_declaration <sym:equal> '='".to_string()));
-            }
-
-            let value = ASTExpression::transcribe(cursor)?.ok_or(ParserError::Expected("value@var_declaration <expr>".to_string()))?;
+            let value = if let Some(&Token::Symbol(TokenSymbol::Equal)) = cursor.peek() {
+                cursor.next();
+                ASTExpression::transcribe(cursor)?
+            } else {
+                None
+            };
 
             Ok(Some(VariableDeclaration {
                 vartype: VariableType::Variable,
@@ -59,7 +60,7 @@ impl StatementNode for VariableDeclaration {
     /// Creates a new variable for the current context and assigns a value to it.
     /// Returns the value of the variable.
     fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
-        let value = self.value.evaluate(tick);
+        let value = self.value.clone().map(|expr| expr.evaluate(tick)).unwrap_or_default();
 
         tick.get_context().create(self.varname.clone(), value.clone());
 
@@ -69,6 +70,11 @@ impl StatementNode for VariableDeclaration {
 
 impl std::fmt::Display for VariableDeclaration {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "let {} = {}", self.varname, self.value)
+        write!(f, "let {}", self.varname)?;
+        if let Some(value) = &self.value {
+            write!(f, " = {}", value)
+        } else {
+            Ok(())
+        }
     }
 }

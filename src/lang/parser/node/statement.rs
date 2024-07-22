@@ -23,6 +23,8 @@ pub trait StatementNode: Node {
 
 impl Node for ASTStatement {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTStatement>, ParserError> {
+        //? Should this return Err if no statement is found? So node transcription ignores all errors and tries an expr (which will the one that can fail)
+        //* This must make sure that the transcribed node is the correct one. In case of error, it will fail.
         match cursor.peek() {
             Some(Token::Keyword(keyword)) => {
                 match keyword.as_str() {
