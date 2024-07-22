@@ -4,9 +4,9 @@ pub mod statement;
 use expression::{terminal::TerminalExpression, ASTExpression, ExpressionNode};
 use statement::{ASTStatement, StatementNode};
 
-use crate::{lang::token::Token, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
+use crate::{lang::{parser::error::ParserError, token::Token}, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
 
-use super::{data::DataValue, error::ParserError};
+use super::data::DataValue;
 
 /// An instruction for the VM
 #[derive(Debug, Clone)]

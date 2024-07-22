@@ -1,4 +1,9 @@
-use crate::{lang::{parser::{data::DataValue, error::ParserError, node::{expression::{ASTExpression, ExpressionNode}, ASTNode, Node}}, token::Token}, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
+use crate::{
+    engine::{data::DataValue, node::{expression::{ASTExpression, ExpressionNode}, Node}},
+    lang::{parser::error::ParserError, token::Token},
+    utils::transcriber::cursor::TranscriberCursor,
+    vm::VMTick
+};
 
 use super::{scope::ScopeStruct, StatementNode};
 

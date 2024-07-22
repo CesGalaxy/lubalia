@@ -1,13 +1,11 @@
 pub mod error;
-pub mod root;
-pub mod node;
-pub mod data;
 
 use error::ParserError;
-use node::{ASTNode, Node};
-use root::ASTRootItem;
 
-use crate::utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber};
+use crate::{
+    engine::{node::{ASTNode, Node}, root::ASTRootItem},
+    utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber}
+};
 
 use super::token::Token;
 

@@ -3,8 +3,9 @@ pub mod scope;
 pub mod conditional;
 
 use crate::{
-    lang::{parser::{data::DataValue, error::ParserError}, token::{Token, TokenSymbol}},
-    utils::transcriber::cursor::TranscriberCursor, vm::VMTick
+    engine::data::DataValue, lang::{parser::error::ParserError, token::{Token, TokenSymbol}},
+    utils::transcriber::cursor::TranscriberCursor,
+    vm::VMTick
 };
 
 use super::Node;

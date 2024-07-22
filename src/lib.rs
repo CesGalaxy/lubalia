@@ -6,3 +6,4 @@ pub mod vm;
 
 /// A collection of utilities
 pub mod utils;
+pub mod engine;

@@ -2,7 +2,8 @@ pub mod terminal;
 pub mod binary;
 
 use crate::{
-    lang::{parser::{data::DataValue, error::ParserError}, token::Token},
+    engine::data::DataValue,
+    lang::{parser::error::ParserError, token::Token},
     utils::transcriber::cursor::TranscriberCursor,
     vm::VMTick
 };

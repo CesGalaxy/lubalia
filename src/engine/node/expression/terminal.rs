@@ -1,6 +1,8 @@
 use crate::{
-    lang::{parser::{data::DataValue, error::ParserError, node::{statement::{ASTStatement, StatementNode}, Node}}, token::{clasification::is_built_in_keyword, Token, TokenSymbol}},
-    utils::transcriber::cursor::TranscriberCursor, vm::VMTick
+    engine::{data::DataValue, node::{statement::{ASTStatement, StatementNode}, Node}},
+    lang::{parser::error::ParserError, token::{clasification::is_built_in_keyword, Token, TokenSymbol}},
+    utils::transcriber::cursor::TranscriberCursor,
+    vm::VMTick
 };
 
 use super::ExpressionNode;

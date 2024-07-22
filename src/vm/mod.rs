@@ -2,7 +2,7 @@ pub mod context;
 
 use context::Context;
 
-use crate::lang::parser::{data::DataValue, node::ASTNode, root::ASTRootItem};
+use crate::engine::{data::DataValue, node::ASTNode, root::ASTRootItem};
 
 /// A virtual machine that executes a program in bytecode
 #[derive(Debug)]

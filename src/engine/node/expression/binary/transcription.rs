@@ -1,11 +1,6 @@
 use crate::{
-    lang::{
-        parser::{
-            error::ParserError,
-            node::Node
-        },
-        token::Token
-    },
+    engine::node::Node,
+    lang::{parser::error::ParserError, token::Token},
     utils::transcriber::cursor::TranscriberCursor
 };
 

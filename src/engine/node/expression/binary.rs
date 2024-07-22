@@ -5,7 +5,7 @@ use std::ops::Not;
 
 use operator::BinaryOperator;
 
-use crate::{lang::parser::data::{arithmetic::ArithmeticValue, DataValue}, vm::VMTick};
+use crate::{engine::data::{arithmetic::ArithmeticValue, DataValue}, vm::VMTick};
 
 use super::{ASTExpression, ExpressionNode};
 
