@@ -58,7 +58,36 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_transcription() {
+    fn test_empty_transcription() {
+        let source: Vec<char> = vec![];
+        let transcription = Transcription::<char, usize>::new(source);
+
+        assert_eq!(transcription.units(), vec![&0; 0], "transcription units should be empty");
+        assert_eq!(transcription.result, vec![], "result should be empty");
+        
+        assert!(!transcription.completed, "transcription should not be completed");
+    }
+
+    #[test]
+    fn test_incomplete_transcription() {
+        let source = String::from("one two three").chars().collect();
+        let mut transcription = Transcription::<char, usize>::new(source);
+
+        transcription.push(1, Some(0), Some(2));
+        transcription.push(2, Some(4), Some(7));
+
+        assert_eq!(transcription.units(), vec![&1, &2], "transcription units should be [1, 2]");
+        assert_eq!(transcription.result.iter().map(|itu| itu.source_position).collect::<Vec<_>>(), vec![Some(0), Some(4)], "testing units' source positions");
+        assert_eq!(transcription.result.iter().map(|itu| itu.source_length).collect::<Vec<_>>(), vec![Some(2), Some(3)], "testing units' source lengths");
+
+        assert_eq!(transcription.result[0].value, 1, "testing unit 0 value");
+        assert_eq!(transcription.result[1].value, 2, "testing unit 1 value");
+
+        assert!(!transcription.completed, "transcription should not be completed");
+    }
+
+    #[test]
+    fn test_completed_transcription() {
         let source = String::from("one two three").chars().collect();
         let mut transcription = Transcription::<char, usize>::new(source);
 
@@ -73,5 +102,7 @@ mod tests {
         assert_eq!(transcription.result[0].value, 1, "testing unit 0 value");
         assert_eq!(transcription.result[1].value, 2, "testing unit 1 value");
         assert_eq!(transcription.result[2].value, 3, "testing unit 2 value");
+
+        assert!(!transcription.completed, "transcription should not be completed");
     }
 }

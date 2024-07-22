@@ -84,3 +84,6 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
         }
     }
 }
+
+#[cfg(test)]
+mod tests;
