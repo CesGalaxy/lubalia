@@ -1,12 +1,12 @@
 use crate::{lang::{parser::{data::DataValue, error::ParserError, node::{expression::{ASTExpression, ExpressionNode}, ASTNode, Node}}, token::Token}, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
 
-use super::StatementNode;
+use super::{scope::ScopeStruct, StatementNode};
 
 #[derive(Debug, Clone)]
 pub struct ConditionalStatement {
     pub condition: Box<ASTExpression>,
-    pub then_branch: Box<ASTNode>,
-    pub else_branch: Option<Box<ASTNode>>,
+    pub then_branch: ScopeStruct,
+    pub else_branch: Option<ScopeStruct>,
 }
 
 impl Node for ConditionalStatement {
@@ -17,18 +17,18 @@ impl Node for ConditionalStatement {
 
         let condition = ASTExpression::transcribe(cursor)?.ok_or(ParserError::Expected("condition@conditional <expr>".to_string()))?;
 
-        let then_branch = ASTNode::transcribe(cursor)?.ok_or(ParserError::Expected("then_branch@conditional <node>".to_string()))?;
+        let then_branch = ScopeStruct::transcribe(cursor)?.ok_or(ParserError::Expected("then_branch@conditional <node>".to_string()))?;
 
         let else_branch = if cursor.consume() == Some(&Token::Keyword("else".to_string())) {
-            Some(ASTNode::transcribe(cursor)?.ok_or(ParserError::Expected("else_branch@conditional <node>".to_string()))?)
+            Some(ScopeStruct::transcribe(cursor)?.ok_or(ParserError::Expected("else_branch@conditional <node>".to_string()))?)
         } else {
             None
         };
 
         Ok(Some(Self {
             condition: Box::new(condition),
-            then_branch: Box::new(then_branch),
-            else_branch: else_branch.map(Box::new)
+            then_branch: then_branch,
+            else_branch: else_branch
         }))
     }
 }
