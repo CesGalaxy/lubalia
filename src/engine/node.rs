@@ -1,7 +1,7 @@
 pub mod expression;
 pub mod statement;
 
-use expression::{terminal::TerminalExpression, ASTExpression, ExpressionNode};
+use expression::{ASTExpression, ExpressionNode};
 use statement::{ASTStatement, StatementNode};
 
 use crate::{lang::{parser::error::ParserError, token::Token}, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
@@ -11,10 +11,14 @@ use super::data::DataValue;
 /// An instruction for the VM
 #[derive(Debug, Clone)]
 pub enum ASTNode {
-    /// An instruction that returns a value (doesn't modify the context, usually)
+    /// An instruction that ALWAYS returns a value (doesn't modify the context, usually)
     Expression(ASTExpression),
 
+    // A statement that SOMETIMES can return a value, but doesn't have to
+    SemiExpression(ASTStatement),
+
     /// An instruction that works and manipulates the context and data
+    /// It won't NEVER return a value
     Statement(ASTStatement)
 }
 
@@ -28,6 +32,7 @@ impl ASTNode {
     pub fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             Self::Expression(expr) => Some(expr.evaluate(tick)),
+            Self::SemiExpression(statement) => statement.execute(tick),
             Self::Statement(statement) => {
                 statement.execute(tick);
                 None
@@ -49,7 +54,7 @@ impl Node for ASTNode {
                             cursor.next();
                             Self::Statement(stmnt)
                         } else {
-                            Self::Expression(ASTExpression::Terminal(TerminalExpression::StatementResult(Box::new(stmnt))))
+                            Self::SemiExpression(stmnt)
                         }
                     })
                         // if no statement was found, try to transcribe an expression (which won't be a statament-result).
@@ -66,7 +71,8 @@ impl std::fmt::Display for ASTNode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Expression(expr) => write!(f, "{}{expr}{}", "<", ">"),
-            Self::Statement(stmt) => write!(f, "{}{stmt}{}", "[", "]")
+            Self::Statement(stmt) => write!(f, "{}{stmt}{}", "[", "]"),
+            Self::SemiExpression(stmt) => write!(f, "{}{stmt}{}", "[~", "]"),
         }
     }
 }
