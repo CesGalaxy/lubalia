@@ -1,4 +1,4 @@
-use crate::lang::token::{Token, TokenSymbol};
+use crate::lang::token::{symbol::TokenSymbol, Token};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum BinaryOperator {
@@ -72,7 +72,7 @@ impl From<&Token> for Option<BinaryOperator> {
             Token::Symbol(TokenSymbol::LessThan) => Some(BinaryOperator::Less),
             Token::Symbol(TokenSymbol::Ampersand) => Some(BinaryOperator::AND),
             Token::Symbol(TokenSymbol::Pipe) => Some(BinaryOperator::OR),
-            Token::Keyword(keyword) => match keyword.to_ascii_lowercase().as_str() {
+            Token::CustomKeyword(keyword) => match keyword.to_ascii_lowercase().as_str() {
                 "and" => Some(BinaryOperator::AND),
                 "or" => Some(BinaryOperator::OR),
                 "nand" => Some(BinaryOperator::NAND),

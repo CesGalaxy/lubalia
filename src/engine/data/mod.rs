@@ -9,7 +9,7 @@ pub mod comparasion;
 
 use colored::Colorize;
 
-use crate::lang::token::TokenLiteral;
+use crate::lang::token::literal::TokenLiteral;
 
 /// Represents a posible data value which the language can work with.
 #[derive(Debug, Clone)]

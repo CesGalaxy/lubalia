@@ -1,6 +1,6 @@
 use crate::{
     engine::{data::DataValue, node::{expression::{ASTExpression, ExpressionNode}, Node}},
-    lang::{parser::error::ParserError, token::Token},
+    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, Token}},
     utils::transcriber::cursor::TranscriberCursor,
     vm::VMTick
 };
@@ -16,7 +16,7 @@ pub struct ConditionalStatement {
 
 impl Node for ConditionalStatement {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized {
-        if cursor.consume() != Some(&Token::Keyword("if".to_string())) {
+        if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::If)) {
             return Err(ParserError::Expected("start@conditional <keyword:if> 'if'".to_string()));
         }
 
@@ -24,7 +24,7 @@ impl Node for ConditionalStatement {
 
         let then_branch = ScopeStruct::transcribe(cursor)?.ok_or(ParserError::Expected("then_branch@conditional <node>".to_string()))?;
 
-        let else_branch = if cursor.consume() == Some(&Token::Keyword("else".to_string())) {
+        let else_branch = if cursor.consume() == Some(&Token::LangKeyword(TokenLangKeyword::Else)) {
             Some(ScopeStruct::transcribe(cursor)?.ok_or(ParserError::Expected("else_branch@conditional <node>".to_string()))?)
         } else {
             None

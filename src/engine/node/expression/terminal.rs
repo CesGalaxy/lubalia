@@ -1,6 +1,6 @@
 use crate::{
     engine::{data::DataValue, node::{statement::{ASTStatement, StatementNode}, Node}},
-    lang::{parser::error::ParserError, token::{clasification::is_built_in_keyword, Token, TokenSymbol}},
+    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     utils::transcriber::cursor::TranscriberCursor,
     vm::VMTick
 };
@@ -33,13 +33,13 @@ impl Node for TerminalExpression {
         
         match cursor.consume() {
             Some(Token::Literal(literal)) => Ok(Some(Self::Literal(literal.clone().into()))),
-            Some(Token::Keyword(keyword)) => match keyword.as_str() {
-                "true" => Ok(Some(Self::Literal(DataValue::Boolean(true)))),
-                "false" => Ok(Some(Self::Literal(DataValue::Boolean(false)))),
-                "null" => Ok(Some(Self::Literal(DataValue::Null))),
-                _ if !is_built_in_keyword(keyword) => Ok(Some(Self::VarRef(keyword.clone()))),
+            Some(Token::LangKeyword(keyword)) => match keyword {
+                TokenLangKeyword::True => Ok(Some(Self::Literal(DataValue::Boolean(true)))),
+                TokenLangKeyword::False => Ok(Some(Self::Literal(DataValue::Boolean(false)))),
+                TokenLangKeyword::Null => Ok(Some(Self::Literal(DataValue::Null))),
                 _ => return_statament(cursor)
             },
+            Some(Token::CustomKeyword(keyword)) => Ok(Some(Self::VarRef(keyword.clone()))),
             Some(Token::Symbol(TokenSymbol::Underscore)) => Ok(Some(Self::LastValue)),
             _ => return_statament(cursor)
         }

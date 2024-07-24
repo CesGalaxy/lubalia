@@ -1,4 +1,4 @@
-use crate::lang::token::Token;
+use crate::lang::token::{symbol::TokenSymbol, Token};
 
 /// Examines the tokens searching for errors, bugs or other problems.
 /// The linter doesn't distuish from fatal errors and warnings.
@@ -15,11 +15,14 @@ pub fn linter(tokens: &Vec<Token>) -> Option<LinterError> {
     // Iterate over the tokens
     while let Some(t) = tokens.get(pos) {
         // Check if the semicolon is at the end of the line
-        if t == &Token::Semicolon {
-            if tokens.get(pos + 1) != Some(&Token::EOL) {
+        if t == &Token::Symbol(TokenSymbol::Semicolon) {
+            if tokens.get(pos + 1) != Some(&Token::Symbol(TokenSymbol::EOL)) {
                 return Some(LinterError::SemicolonNotAtEnd);
             }
         }
+
+        // TODO: Check for EOL being before EOF
+        // TODO: Check for Semicolon before EOL, not EOL after Semicolon
 
         pos += 1;
     }

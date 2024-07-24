@@ -1,6 +1,6 @@
 use crate::{
     engine::{data::DataValue, node::{ASTNode, Node}},
-    lang::{parser::error::ParserError, token::{Token, TokenSymbol}},
+    lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}},
     utils::transcriber::cursor::TranscriberCursor,
     vm::{context::Context, VMTick}
 };

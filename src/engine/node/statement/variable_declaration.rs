@@ -1,6 +1,6 @@
 use crate::{
     engine::{data::DataValue, node::{expression::{ASTExpression, ExpressionNode}, Node}},
-    lang::{parser::error::ParserError, token::{Token, TokenSymbol}},
+    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     utils::transcriber::cursor::TranscriberCursor,
     vm::VMTick
 };
@@ -33,11 +33,11 @@ pub struct VariableDeclaration {
 impl Node for VariableDeclaration {
     /// Transcribes the declaration of ONE variable
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized {
-        if cursor.consume() != Some(&Token::Keyword("let".to_string())) {
+        if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Let)) {
             return Err(ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string()));
         }
 
-        if let Some(Token::Keyword(varname)) = cursor.consume() {
+        if let Some(Token::CustomKeyword(varname)) = cursor.consume() {
             let varname = varname.clone();
 
             let value = if let Some(&Token::Symbol(TokenSymbol::Equal)) = cursor.peek() {

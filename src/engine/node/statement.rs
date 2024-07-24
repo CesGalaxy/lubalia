@@ -3,7 +3,7 @@ pub mod scope;
 pub mod conditional;
 
 use crate::{
-    engine::data::DataValue, lang::{parser::error::ParserError, token::{Token, TokenSymbol}},
+    engine::data::DataValue, lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     utils::transcriber::cursor::TranscriberCursor,
     vm::VMTick
 };
@@ -27,12 +27,10 @@ impl Node for ASTStatement {
         //? Should this return Err if no statement is found? So node transcription ignores all errors and tries an expr (which will the one that can fail)
         //* This must make sure that the transcribed node is the correct one. In case of error, it will fail.
         match cursor.peek() {
-            Some(Token::Keyword(keyword)) => {
-                match keyword.as_str() {
-                    "let" => variable_declaration::VariableDeclaration::transcribe(cursor).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
-                    "if" => conditional::ConditionalStatement::transcribe(cursor).map(|cond| cond.map(ASTStatement::Conditional)),
-                    _ => Ok(None)
-                }
+            Some(Token::LangKeyword(keyword)) => match keyword {
+                TokenLangKeyword::Let => variable_declaration::VariableDeclaration::transcribe(cursor).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
+                TokenLangKeyword::If => conditional::ConditionalStatement::transcribe(cursor).map(|cond| cond.map(ASTStatement::Conditional)),
+                _ => Ok(None)
             },
             Some(Token::Symbol(TokenSymbol::BraceOpen)) => scope::ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope)),
             _ => Ok(None)

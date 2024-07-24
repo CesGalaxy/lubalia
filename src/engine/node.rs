@@ -4,7 +4,7 @@ pub mod statement;
 use expression::{ASTExpression, ExpressionNode};
 use statement::{ASTStatement, StatementNode};
 
-use crate::{lang::{parser::error::ParserError, token::Token}, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
+use crate::{lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, utils::transcriber::cursor::TranscriberCursor, vm::VMTick};
 
 use super::data::DataValue;
 
@@ -46,11 +46,11 @@ impl Node for ASTNode {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTNode>, ParserError> {
         match cursor.peek() {
             Some(token) => match token {
-                Token::EOL => Ok(None),
+                Token::Symbol(TokenSymbol::EOL) => Ok(None),
                 _ => Ok(
                     // Try to transcribe a statement (error handled with ControlFlow),
                     ASTStatement::transcribe(cursor)?.map(|stmnt| {
-                        if cursor.peek() == Some(&Token::Semicolon) {
+                        if cursor.peek() == Some(&Token::Symbol(TokenSymbol::Semicolon)) {
                             cursor.next();
                             Self::Statement(stmnt)
                         } else {

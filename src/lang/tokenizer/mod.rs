@@ -2,7 +2,7 @@ use error::TokenizerError;
 
 use crate::utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber};
 
-use super::token::{Token, TokenLiteral, TokenSymbol};
+use super::token::{keyword::TokenLangKeyword, literal::TokenLiteral, symbol::TokenSymbol, Token};
 
 pub mod error;
 
@@ -16,71 +16,78 @@ pub fn tokenizer(code: String) -> TranscriptionResult<char, Token, TokenizerErro
 
     let mut transcription = transcriber(code.chars().collect(), tokenizer_tick)?;
 
-    transcription.push(Token::EOL, Some(code_len), None);
-    transcription.push(Token::EOF, Some(code_len), None);
+    transcription.push(Token::Symbol(TokenSymbol::EOL), Some(code_len), None);
+    transcription.push(Token::Symbol(TokenSymbol::EOF), Some(code_len), None);
 
     Ok(transcription)
 }
 
 fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> Result<Option<Token>, TokenizerError> {
-    if initial_unit == &' ' || initial_unit == &'\t' {
-        cursor.next();
-        Ok(None)
-    } else if initial_unit.is_ascii_alphabetic() {
-        let mut keyword = String::new();
-        keyword.push(*initial_unit);
-        cursor.next();
+    cursor.next();
 
-        while let Some(c) = cursor.peek() {
-            if !c.is_ascii_alphanumeric() {
-                break;
+    match initial_unit {
+        // Ignore this
+        ' ' | '\t' | '\r' => Ok(None),
+
+        // Strings
+        '"' => Ok(Some(Token::Literal(TokenLiteral::String({
+            let mut literal = String::new();
+    
+            while let Some(c) = cursor.consume() {
+                if c == &'"' {
+                    break;
+                }
+    
+                literal.push(*c);
+            }
+    
+            literal
+        })))),
+
+        // Keywords
+        // TODO: What about keyword starting with two underscores?
+        _ if initial_unit.is_ascii_alphabetic() || (initial_unit == &'_' && cursor.peek().is_some_and(char::is_ascii_alphanumeric)) => Ok(Some({
+            let mut keyword = String::from(*initial_unit);
+    
+            while let Some(c) = cursor.peek() {
+                if !c.is_ascii_alphanumeric() || c != &'_' {
+                    break;
+                }
+    
+                keyword.push(*c);
+                cursor.next();
             }
 
-            keyword.push(*c);
-            cursor.next();
-        }
-
-        Ok(Some(Token::Keyword(keyword)))
-    } else if initial_unit.is_numeric() {
-        let mut literal = String::new();
-        literal.push(*initial_unit);
-        cursor.next();
-
-        while let Some(c) = cursor.peek() {
-            if !c.is_numeric() {
-                break;
+            if let Some(keyword) = TokenLangKeyword::from_string(&keyword) {
+                Token::LangKeyword(keyword)
+            } else {
+                Token::CustomKeyword(keyword)
             }
+        })),
 
-            literal.push(*c);
-            cursor.next();
-        }
-
-        Ok(Some(Token::Literal(TokenLiteral::Number(literal.parse().or_else(|_| Err(TokenizerError::ErrorParsingNumber(literal)))?))))
-    } else if initial_unit == &'"' {
-        let mut literal = String::new();
-        cursor.next();
-
-        // Here you can use 'consume', as the odd one out will be the '"'.
-        while let Some(c) = cursor.consume() {
-            if c == &'"' {
-                break;
+        // Numbers
+        _ if initial_unit.is_numeric() => Ok(Some(Token::Literal(TokenLiteral::Number({
+            let mut literal = String::from(*initial_unit);
+    
+            while let Some(c) = cursor.peek() {
+                if c.is_numeric() || c == &'.' {
+                    literal.push(*c);
+                } else if c != &'_' {
+                    break;
+                }
+    
+                
+                cursor.next();
             }
+    
+            literal.parse().or_else(|_| Err(TokenizerError::ErrorParsingNumber(literal)))?
+        })))),
 
-            literal.push(*c);
-        }
-
-        Ok(Some(Token::Literal(TokenLiteral::String(literal))))
-    } else {
-        if let Some(symbol) = TokenSymbol::from_char(*initial_unit) {
+        // Symbols (or Error if neither)
+        _ => if let Some(symbol) = TokenSymbol::from_char(*initial_unit) {
             Ok(Some(Token::Symbol(symbol)))
         } else {
-            match initial_unit {
-                ';' => Ok(Some(Token::Semicolon)),
-                '\n' => Ok(Some(Token::EOL)),
-                // For Windows, the CRLF consists of: '\n' for the EOL and '\r' will be ignored.
-                '\r' => Ok(None),
-                _ => return Err(TokenizerError::UnknownCharacter(*initial_unit)),
-            }
+            Err(TokenizerError::UnknownCharacter(*initial_unit))
         }
     }
 }
