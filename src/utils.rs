@@ -4,3 +4,4 @@
 /// - Converting raw code into tokens
 /// - Generate nodes from tokens
 pub mod transcriber;
+pub mod logging;

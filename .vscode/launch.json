@@ -7,16 +7,34 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in library 'app'",
+            "name": "Debug executable 'debugger'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=debugger",
+                    "--package=lubalia"
+                ],
+                "filter": {
+                    "name": "debugger",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'lubalia'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
                     "--lib",
-                    "--package=app"
+                    "--package=lubalia"
                 ],
                 "filter": {
-                    "name": "app",
+                    "name": "lubalia",
                     "kind": "lib"
                 }
             },
@@ -31,10 +49,10 @@
                 "args": [
                     "build",
                     "--bin=app",
-                    "--package=app"
+                    "--package=lubalia"
                 ],
                 "filter": {
-                    "name": "app",
+                    "name": "lubalia",
                     "kind": "bin"
                 }
             },
@@ -50,10 +68,10 @@
                     "test",
                     "--no-run",
                     "--bin=app",
-                    "--package=app"
+                    "--package=lubalia"
                 ],
                 "filter": {
-                    "name": "app",
+                    "name": "lubalia",
                     "kind": "bin"
                 }
             },
