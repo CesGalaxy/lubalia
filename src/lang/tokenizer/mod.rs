@@ -50,7 +50,7 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
             let mut keyword = String::from(*initial_unit);
     
             while let Some(c) = cursor.peek() {
-                if !c.is_ascii_alphanumeric() || c != &'_' {
+                if !c.is_ascii_alphanumeric() && c != &'_' {
                     break;
                 }
     
