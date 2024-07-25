@@ -12,7 +12,7 @@
                 "args": [
                     "build",
                     "--bin=debugger",
-                    "--package=lubalia"
+                    "--package=debugger"
                 ],
                 "filter": {
                     "name": "debugger",
@@ -48,7 +48,7 @@
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=app",
+                    "--bin=lubalia",
                     "--package=lubalia"
                 ],
                 "filter": {

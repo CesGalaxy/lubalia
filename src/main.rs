@@ -1,4 +1,4 @@
-use app::{lang::{lexer::lexer, parser::parser}, vm::VM};
+use engine::{lang::{lexer::lexer, parser::parser}, vm::VM};
 
 fn main() {
     println!("Hello, world!");

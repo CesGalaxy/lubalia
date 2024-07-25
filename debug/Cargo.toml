@@ -1,0 +1,5 @@
+[package]
+name = "debugger"
+
+[dependencies]
+colored = { workspace = true }
