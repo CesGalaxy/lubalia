@@ -3,3 +3,4 @@ name = "debugger"
 
 [dependencies]
 colored = { workspace = true }
+iced = "0.12.1"
