@@ -3,10 +3,10 @@
 ## Nomenclature
 
 - Node
-    - Can be represented as a list of tokens: `node[token_pos]`
-    - `prev`: The node before `current`
-    - `current`: The current node to parse
-    - `next`: The next node to parse, after `current`
+  - Can be represented as a list of tokens: `node[token_pos]`
+  - `prev`: The node before `current`
+  - `current`: The current node to parse
+  - `next`: The next node to parse, after `current`
 
 ## Main loop (parse_tree -> AST)
 

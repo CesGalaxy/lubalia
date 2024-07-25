@@ -1,3 +1,5 @@
+# Idea of generated flowcharts
+
 ```mermaid
 ---
 title: Example of the flowchart I wanna make

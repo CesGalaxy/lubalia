@@ -1,3 +1,5 @@
+# How to parse binary expressions
+
 ```mermaid
 ---
 title: Parse an arithmetic expression
