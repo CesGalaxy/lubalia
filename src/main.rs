@@ -1,14 +1,18 @@
 use lubengine::{lang::{lexer::lexer, parser::parser}, vm::VM};
 
 fn main() {
-    println!("Hello, world!");
+    println!("Welcome to Lubalia!");
 
     if cfg!(windows) {
         colored::control::set_override(true);
     }
 
+    let args: Vec<_> = std::env::args().collect();
+
+    let file = args.get(1).expect("No file provided!");
+
     // Read test file
-    test_file("examples/variables.lub");
+    test_file(file);
 }
 
 /// Get a file from storage, parse it and run it in the VM
@@ -31,6 +35,8 @@ fn test_file(file_name: &str) {
     
                 if let Ok(program) = tree {
                     let program: Vec<_> = program.units().into_iter().cloned().collect();
+
+                    println!("Program:");
 
                     for astri in &program {
                         println!("{astri}");

@@ -27,6 +27,8 @@ impl VM {
         // ip stands for instruction pointer
         let mut ip = 0;
 
+        println!("Evaluating program...");
+
         while ip < program.len() {
             // Tick while the program is not finished
             if let Some(ASTRootItem::Node(node)) = program.get(ip).cloned() {
@@ -44,10 +46,8 @@ impl VM {
             context: None
         };
 
-        println!("TICK =======================================");
-
         if let Some(value) = node.execute(&mut tick) {
-            println!("NODE: {node}");
+            println!("Value got by node: {node}");
             println!("{} => {value}", if let ASTNode::Statement(_) = node { "S" } else { "E" });
         }
     }
