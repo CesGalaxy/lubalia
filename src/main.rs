@@ -1,4 +1,4 @@
-use engine::{lang::{lexer::lexer, parser::parser}, vm::VM};
+use lubengine::{lang::{lexer::lexer, parser::parser}, vm::VM};
 
 fn main() {
     println!("Hello, world!");
