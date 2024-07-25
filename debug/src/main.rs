@@ -1,5 +1,12 @@
-mod log;
+extern crate iced;
+use iced::{Sandbox, Settings};
+use ui::DebuggerApp;
 
-pub fn main() {
+mod log;
+pub mod ui;
+
+pub fn main() -> Result<(), iced::Error> {
     println!("Hello, world!");
+
+    DebuggerApp::run(Settings::default())
 }
