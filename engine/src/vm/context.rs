@@ -65,6 +65,7 @@ impl Context {
 }
 
 impl Default for Context {
+    /// Geta an empty context
     fn default() -> Self {
         Context::new()
     }

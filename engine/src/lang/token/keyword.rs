@@ -1,5 +1,6 @@
 use colored::Colorize;
 
+/// A keyword that is reserved for special uses and is part from the language grammar.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TokenLangKeyword {
     Let,
@@ -15,6 +16,8 @@ pub enum TokenLangKeyword {
 }
 
 impl TokenLangKeyword {
+    /// Tells if a given string (should be a keyword) is representing a lang keyword.
+    /// It will return None is there's no keyword that matches the provided value.
     pub fn from_string(value: &str) -> Option<Self> {
         match value {
             "let" => Some(Self::Let),

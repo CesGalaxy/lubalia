@@ -2,7 +2,10 @@ use colored::Colorize;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum TokenLiteral {
+    /// A string containing any text
     String(String),
+
+    /// A number (with decimals)
     Number(f64),
 }
 

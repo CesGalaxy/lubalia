@@ -25,15 +25,18 @@ pub trait StatementNode: Node {
 }
 
 impl Node for ASTStatement {
+    /// Transcribe an statement (if possible)
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTStatement>, ParserError> {
         //? Should this return Err if no statement is found? So node transcription ignores all errors and tries an expr (which will the one that can fail)
         //* This must make sure that the transcribed node is the correct one. In case of error, it will fail.
         match cursor.peek() {
+            // Statements are usually defined with an initial keyword
             Some(Token::LangKeyword(keyword)) => match keyword {
                 TokenLangKeyword::Let => variable_declaration::VariableDeclaration::transcribe(cursor).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
                 TokenLangKeyword::If => conditional::ConditionalStatement::transcribe(cursor).map(|cond| cond.map(ASTStatement::Conditional)),
                 _ => Ok(None)
             },
+            // Scopes are statements too
             Some(Token::Symbol(TokenSymbol::BraceOpen)) => scope::ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope)),
             _ => Ok(None)
         }
@@ -41,6 +44,7 @@ impl Node for ASTStatement {
 }
 
 impl StatementNode for ASTStatement {
+    /// Execute an statement and return a value if any is provided
     fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             ASTStatement::VariableDeclaration(vd) => vd.execute(tick),

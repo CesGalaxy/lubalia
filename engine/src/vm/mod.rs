@@ -54,11 +54,16 @@ impl VM {
 }
 
 pub struct VMTick<'a> {
+    /// The VM running the tick
     pub vm: &'a mut VM,
+
+    /// The smallest on which the tick is run
     pub context: Option<Box<Context>>,
 }
 
 impl VMTick<'_> {
+    /// Gets the current context used ing the VM,
+    /// if there's no custom context it returns the global
     pub fn get_context(&mut self) -> &mut Context {
         if let Some(context) = &mut self.context {
             context
@@ -66,11 +71,4 @@ impl VMTick<'_> {
             &mut self.vm.global
         }
     }
-
-    // pub fn tmp_context(&'a mut self) -> VMTick<'a> {
-    //     VMTick {
-    //         vm: self.vm,
-    //         context: Some(Context::with_parent(self.context.clone()))
-    //     }
-    // }
 }

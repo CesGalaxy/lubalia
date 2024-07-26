@@ -54,7 +54,7 @@ impl ExpressionNode for ASTExpression {
 
         // Save the result of the last evaluated expression for the `_` variable
         tick.vm.last_value = result.clone();
-        
+
         result
     }
 }

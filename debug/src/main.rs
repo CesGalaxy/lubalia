@@ -4,6 +4,7 @@ use ui::DebuggerApp;
 
 mod log;
 pub mod ui;
+pub mod vm;
 
 pub fn main() -> Result<(), iced::Error> {
     println!("Hello, world!");

@@ -47,6 +47,7 @@ impl Node for ASTNode {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTNode>, ParserError> {
         match cursor.peek() {
             Some(token) => match token {
+                // Ignore EOLs (note: the trancriber will automatly move the cursor)
                 Token::Symbol(TokenSymbol::EOL) => Ok(None),
                 _ => Ok(
                     // Try to transcribe a statement (error handled with ControlFlow),
