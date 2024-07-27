@@ -9,6 +9,7 @@ edition = "2021"
 colored = { workspace = true }
 clap = { workspace = true }
 lubengine = { path = "engine" }
+lubalia_utils = { path = "utils" }
 
 [workspace]
 members = ["debug", "engine", "utils"]

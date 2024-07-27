@@ -1,4 +1,7 @@
-use lubengine::{lang::{lexer::lexer, parser::parser}, vm::VM};
+use eval::evaluate_code;
+use lubengine::vm::VM;
+
+pub mod eval;
 
 fn main() {
     println!("Welcome to Lubalia!");
@@ -20,39 +23,14 @@ fn test_file(file_name: &str) {
     let file = std::fs::read_to_string(file_name);
 
     if let Ok(code) = file {
-        let tokenizer_result = lexer(code);
+        let mut vm = VM::new();
 
-        match tokenizer_result {
-            Ok(tokens) => {
-                // Print the tokens lexed
-                for token in &tokens {
-                    print!("{token}");
-                }
-    
-                println!(" {} tokens lexed!", tokens.len());
-                
-                let tree = parser(tokens);
-    
-                if let Ok(program) = tree {
-                    let program: Vec<_> = program.units().into_iter().cloned().collect();
+        let result = evaluate_code(&mut vm, code);
 
-                    println!("Program:");
-
-                    for astri in &program {
-                        println!("{astri}");
-                    }
-    
-                    // Create and run the VM
-                    let mut vm = VM::new();
-
-                    vm.evaluate(program);
-
-                    println!("{}", vm.global);
-                } else {
-                    println!("TREE: {:?}", tree);
-                }
-            },
-            Err(error) => panic!("LexerError:\n{error}")
+        if let Err(e) = result {
+            println!("Evaluation error: {:?}", e);
+        } else {
+            println!("Program evaluated and executed successfully!");
         }
     }
 }
