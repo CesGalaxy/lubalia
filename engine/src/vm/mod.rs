@@ -9,8 +9,9 @@ use crate::{data::DataValue, node::ASTNode, root::ASTRootItem};
 pub struct VM {
     /// The global scope (context) of the VM
     pub global: Context,
+
     /// The last value returned by an expression (_)
-    pub last_value: DataValue
+    pub last_value: DataValue,
 }
 
 impl VM {

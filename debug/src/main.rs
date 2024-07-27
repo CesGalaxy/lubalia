@@ -1,13 +1,25 @@
+extern crate clap;
 extern crate iced;
-use iced::{Sandbox, Settings};
-use ui::DebuggerApp;
 
-mod log;
+// use iced::{Sandbox, Settings};
+// use ui::DebuggerApp;
+
+pub mod log;
 pub mod ui;
 pub mod vm;
+pub mod cli;
+
+use clap::Parser;
+use cli::commands::LubuggerCommand;
 
 pub fn main() -> Result<(), iced::Error> {
-    println!("Hello, world!");
+    let cmd = cli::LubuggerCli::parse();
 
-    DebuggerApp::run(Settings::default())
+    println!("{:?}", cmd);
+
+    cmd.run();
+
+    Ok(())
+
+    //DebuggerApp::run(Settings::default())
 }
