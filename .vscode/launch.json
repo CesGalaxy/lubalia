@@ -7,17 +7,21 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'debugger'",
+            "name": "Debug executable 'lubugger'",
             "cargo": {
-                "args": [
-                    "build",
-                    "--bin=debugger",
-                    "--package=debugger"
-                ],
-                "filter": {
-                    "name": "debugger",
-                    "kind": "bin"
-                }
+                "args": [ "build",  "--bin=lubugger", "--package=lubugger" ],
+                "filter": { "name": "lubugger", "kind": "bin" }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'lubengine'",
+            "cargo": {
+                "args": [ "test", "--no-run", "--lib", "--package=lubengine" ],
+                "filter": { "name": "lubengine", "kind": "lib" }
             },
             "args": [],
             "cwd": "${workspaceFolder}"
@@ -27,16 +31,8 @@
             "request": "launch",
             "name": "Debug unit tests in library 'lubalia'",
             "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--lib",
-                    "--package=lubalia"
-                ],
-                "filter": {
-                    "name": "lubalia",
-                    "kind": "lib"
-                }
+                "args": [ "test", "--no-run", "--lib", "--package=lubalia" ],
+                "filter": { "name": "lubalia", "kind": "lib" }
             },
             "args": [],
             "cwd": "${workspaceFolder}"
@@ -44,42 +40,23 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'app'",
+            "name": "Debug executable 'lubalia'",
             "cargo": {
-                "args": [
-                    "build",
-                    "--bin=lubalia",
-                    "--package=lubalia",
-                ],
-                "filter": {
-                    "name": "lubalia",
-                    "kind": "bin"
-                }
+                "args": [ "build", "--bin=lubalia", "--package=lubalia" ],
+                "filter": { "name": "lubalia", "kind": "bin" }
             },
-            "args": [
-                "examples/program.luba"
-            ],
+            "args": [ "examples/program.luba" ],
             "cwd": "${workspaceFolder}"
         },
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'app'",
+            "name": "Debug unit tests in executable 'lubalia'",
             "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=app",
-                    "--package=lubalia"
-                ],
-                "filter": {
-                    "name": "lubalia",
-                    "kind": "bin"
-                }
+                "args": [ "test", "--no-run", "--bin=app", "--package=lubalia" ],
+                "filter": { "name": "lubalia", "kind": "bin" }
             },
-            "args": [
-                "examples/program.luba"
-            ],
+            "args": [ "examples/program.luba" ],
             "cwd": "${workspaceFolder}"
         }
     ]

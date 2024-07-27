@@ -1,6 +1,8 @@
 [package]
-name = "debugger"
+name = "lubugger"
+version = "0.1.0"
 
 [dependencies]
 colored = { workspace = true }
+clap = { workspace = true }
 iced = "0.12.1"
