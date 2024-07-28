@@ -6,11 +6,14 @@ use cursor::TranscriberCursor;
 use error::TranscriberError;
 use result::{Transcription, TranscriptionResult};
 
+pub type TranscriberTick<SourceUnit, ResultUnit, Error> = fn(&mut TranscriberCursor<SourceUnit>, &SourceUnit) -> TranscriberTickResult<ResultUnit, Error>;
+pub type TranscriberTickResult<ResultUnit, Error> = Result<Option<ResultUnit>, Error>;
+
 /// Transcribe a vec of iUnits into a vec of oUnits.
 /// Create an iteration over the iUnits for transcribing them to oUnits
 pub fn transcriber<SourceUnit: Clone, ResultUnit: std::fmt::Debug, Error: std::fmt::Display>(
     source: Vec<SourceUnit>,
-    tick: impl Fn(&mut TranscriberCursor<SourceUnit>, &SourceUnit) -> Result<Option<ResultUnit>, Error>,
+    tick: TranscriberTick<SourceUnit, ResultUnit, Error>,
 ) -> TranscriptionResult<SourceUnit, ResultUnit, Error> {
     // Create an empty transcription result and a cursor for navigation through the source
     let mut transcription = Transcription::new(source.clone());
