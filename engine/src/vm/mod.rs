@@ -24,33 +24,28 @@ impl VM {
     }
 
     /// Start running the emulation
-    pub fn evaluate(&mut self, program: Vec<ASTRootItem>) {
-        // ip stands for instruction pointer
-        let mut ip = 0;
-
-        println!("Evaluating program...");
-
-        while ip < program.len() {
-            // Tick while the program is not finished
-            if let Some(ASTRootItem::Node(node)) = program.get(ip).cloned() {
-                self.tick(node);
+    pub fn evaluate(&mut self, program: Vec<ASTRootItem>) -> Option<DataValue> {
+        // Loop through all the nodes in the program
+        for astri in program {
+            // Execute all the nodes until a value is returned
+            if let ASTRootItem::Node(node) = astri {
+                if let Some(value) = self.tick(node) {
+                    return Some(value);
+                }
             }
-
-            ip += 1;
         }
+
+        None
     }
 
     /// Each tick corresponds to the execution of a single instruction/node.
-    pub fn tick(&mut self, node: ASTNode) {
+    pub fn tick(&mut self, node: ASTNode) -> Option<DataValue> {
         let mut tick = VMTick {
             vm: self,
             context: None
         };
 
-        if let Some(value) = node.execute(&mut tick) {
-            println!("Value got by node: {node}");
-            println!("{} => {value}", if let ASTNode::Statement(_) = node { "S" } else { "E" });
-        }
+        node.execute(&mut tick)
     }
 }
 

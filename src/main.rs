@@ -27,10 +27,12 @@ fn test_file(file_name: &str) {
 
         let result = evaluate_code(&mut vm, code);
 
-        if let Err(e) = result {
-            println!("Evaluation error: {:?}", e);
-        } else {
-            println!("Program evaluated and executed successfully!");
+        match result {
+            Ok(Some(value)) => println!("OK -> Result: {}", value),
+            Ok(None) => println!("OK -> No result"),
+            Err(e) => println!("ERROR -> {}", e),
         }
+    } else {
+        println!("Error reading file: {:?}", file.err());
     }
 }

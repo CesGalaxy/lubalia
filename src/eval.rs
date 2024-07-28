@@ -1,8 +1,8 @@
 use lubalia_utils::transcriber::error::TranscriberError;
-use lubengine::{lang::{lexer::{lexer, LexerError}, parser::{error::ParserError, parser}, token::Token}, root::ASTRootItem, vm::VM};
+use lubengine::{data::DataValue, lang::{lexer::{lexer, LexerError}, parser::{error::ParserError, parser}, token::Token}, root::ASTRootItem, vm::VM};
 
 /// Evaluate a source code in the VM
-pub fn evaluate_code(vm: &mut VM, code: String) -> Result<(), EvaluationError> {
+pub fn evaluate_code(vm: &mut VM, code: String) -> Result<Option<DataValue>, EvaluationError> {
     // Get the tokens from the source code
     let tokens = lexer(code).map_err(EvaluationError::LexerError)?;
 
@@ -12,11 +12,8 @@ pub fn evaluate_code(vm: &mut VM, code: String) -> Result<(), EvaluationError> {
     // Get all the root-nodes from the AST
     let program: Vec<_> = tree.units().into_iter().cloned().collect();
 
-    // Evaluate the program
-    vm.evaluate(program);
-
-    // Return the result
-    Ok(())
+    // Evaluate the program & return the result
+    Ok(vm.evaluate(program))
 }
 
 /// An error during the evaluation process of a code
