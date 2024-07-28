@@ -29,7 +29,7 @@ pub trait Node: std::fmt::Display {
 }
 
 impl ASTNode {
-    /// Execute the instruction og the node
+    /// Execute the instruction of the node
     pub fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             Self::Expression(expr) => Some(expr.evaluate(tick)),

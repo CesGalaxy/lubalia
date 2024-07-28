@@ -35,13 +35,16 @@ pub struct VariableDeclaration {
 impl Node for VariableDeclaration {
     /// Transcribes the declaration of ONE variable
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized {
+        // Variables should start with the keyword `let`
         if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Let)) {
             return Err(ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string()));
         }
 
+        // The statement is followed by a variable name
         if let Some(Token::CustomKeyword(varname)) = cursor.consume() {
             let varname = varname.clone();
 
+            // Optionally, the variable can be assigned a value (after an equal sign)
             let value = if let Some(&Token::Symbol(TokenSymbol::Equal)) = cursor.peek() {
                 cursor.next();
                 ASTExpression::transcribe(cursor)?
@@ -49,6 +52,7 @@ impl Node for VariableDeclaration {
                 None
             };
 
+            // By default, variables are mutable (variable)
             Ok(Some(VariableDeclaration {
                 vartype: VariableType::Variable,
                 varname,
@@ -64,10 +68,13 @@ impl StatementNode for VariableDeclaration {
     /// Creates a new variable for the current context and assigns a value to it.
     /// Returns the value of the variable.
     fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
+        // Evaluate the expression containing it's value
         let value = self.value.clone().map(|expr| expr.evaluate(tick)).unwrap_or_default();
 
+        // Create a new variable in the context with it's data
         tick.get_context().create(self.varname.clone(), value.clone());
 
+        // [SemiExpression] Return (if any) the value returned by the first node of the scope that returned a value
         Some(value)
     }
 }
@@ -75,6 +82,7 @@ impl StatementNode for VariableDeclaration {
 impl std::fmt::Display for VariableDeclaration {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "let {}", self.varname)?;
+
         if let Some(value) = &self.value {
             write!(f, " = {}", value)
         } else {

@@ -13,6 +13,7 @@ impl Context {
     pub fn new() -> Self {
         Context { variables: Vec::new(), parent: None }
     }
+
     /// Create a new context with a parent
     pub fn with_parent(parent: Context) -> Self {
         Context {

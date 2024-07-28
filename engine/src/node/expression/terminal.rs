@@ -32,7 +32,7 @@ impl Node for TerminalExpression {
             cursor.back();
             ASTStatement::transcribe(cursor).map(|o| o.map(|stmt| TerminalExpression::StatementResult(Box::new(stmt))))
         }
-        
+
         match cursor.consume() {
             Some(Token::Literal(literal)) => Ok(Some(Self::Literal(literal.clone().into()))),
             Some(Token::LangKeyword(keyword)) => match keyword {

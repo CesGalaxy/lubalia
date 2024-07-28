@@ -9,6 +9,7 @@ use crate::{
 
 use super::StatementNode;
 
+/// A scope that will run a set of nodes in a new context (child of the current one)
 #[derive(Debug, Clone)]
 pub struct ScopeStruct {
     /// The nodes to execute inside the scope
@@ -17,12 +18,15 @@ pub struct ScopeStruct {
 
 impl Node for ScopeStruct {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ScopeStruct>, ParserError> {
+        // Scopes should start with an opening brace
         if cursor.consume() != Some(&Token::Symbol(TokenSymbol::BraceOpen)) {
             return Err(ParserError::Expected("start@scope/sym <sym:brace:open> '{'".to_string()));
         }
 
         let mut nodes = vec![];
 
+        // Save all nodes found inside the scope until a closing brace is found (and ends the scope)
+        // FIXME: When None it will loop forever
         while Some(&Token::Symbol(TokenSymbol::BraceClose)) != cursor.peek() {
             let initial_position = cursor.pos;
 
@@ -36,6 +40,7 @@ impl Node for ScopeStruct {
             }
         }
 
+        // Scopes should end with a closing brace
         if cursor.consume() != Some(&Token::Symbol(TokenSymbol::BraceClose)) {
             return Err(ParserError::Expected("end@scope/sym <sym:brace:close> '}'".to_string()));
         }
@@ -72,6 +77,7 @@ impl StatementNode for ScopeStruct {
             }
         }
 
+        // [SemiExpression] Return the value returned (if any) by the executed branch
         result
     }
 }
@@ -79,9 +85,11 @@ impl StatementNode for ScopeStruct {
 impl std::fmt::Display for ScopeStruct {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{{\n")?;
+
         for node in &self.nodes {
             write!(f, "\t{}\n", node)?;
         }
+
         write!(f, "}}")
     }
 }

@@ -17,7 +17,6 @@ pub fn evaluate_code(vm: &mut VM, code: String) -> Result<Option<DataValue>, Eva
 }
 
 /// An error during the evaluation process of a code
-#[derive(Debug)]
 pub enum EvaluationError {
     /// An error during the lexing process of the code to evaluate
     LexerError(LexerError),
