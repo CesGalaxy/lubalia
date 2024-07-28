@@ -7,7 +7,7 @@ use lubalia_utils::transcriber::cursor::TranscriberCursor;
 use crate::{
     data::DataValue,
     lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
-    vm::VMTick
+    vm::tick::VMTick
 };
 
 use super::Node;

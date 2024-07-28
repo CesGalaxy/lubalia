@@ -1,6 +1,8 @@
 pub mod context;
+pub mod tick;
 
 use context::Context;
+use tick::VMTick;
 
 use crate::{data::DataValue, node::ASTNode, root::ASTRootItem};
 
@@ -28,10 +30,10 @@ impl VM {
         // Loop through all the nodes in the program
         for astri in program {
             // Execute all the nodes until a value is returned
-            if let ASTRootItem::Node(node) = astri {
-                if let Some(value) = self.tick(node) {
-                    return Some(value);
-                }
+            let ASTRootItem::Node(node) = astri;
+
+            if let Some(value) = self.tick(node) {
+                return Some(value);
             }
         }
 
@@ -46,25 +48,5 @@ impl VM {
         };
 
         node.execute(&mut tick)
-    }
-}
-
-pub struct VMTick<'a> {
-    /// The VM running the tick
-    pub vm: &'a mut VM,
-
-    /// The smallest on which the tick is run
-    pub context: Option<Box<Context>>,
-}
-
-impl VMTick<'_> {
-    /// Gets the current context used ing the VM,
-    /// if there's no custom context it returns the global
-    pub fn get_context(&mut self) -> &mut Context {
-        if let Some(context) = &mut self.context {
-            context
-        } else {
-            &mut self.vm.global
-        }
     }
 }

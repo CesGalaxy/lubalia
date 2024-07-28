@@ -5,7 +5,7 @@ use expression::{ASTExpression, ExpressionNode};
 use lubalia_utils::transcriber::cursor::TranscriberCursor;
 use statement::{ASTStatement, StatementNode};
 
-use crate::{lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, vm::VMTick};
+use crate::{lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
 
 use super::data::DataValue;
 

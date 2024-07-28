@@ -4,7 +4,7 @@ use crate::{
     data::DataValue,
     node::{ASTNode, Node},
     lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}},
-    vm::{context::Context, VMTick}
+    vm::{context::Context, tick::VMTick}
 };
 
 use super::StatementNode;
