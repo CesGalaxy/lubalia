@@ -2,7 +2,7 @@ pub mod variable_declaration;
 pub mod scope;
 pub mod conditional;
 
-use lubalia_utils::transcriber::cursor::TranscriberCursor;
+use lubalia_utils::{cursor::Cursor, transcriber::cursor::TranscriberCursor};
 
 use crate::{
     data::DataValue,

@@ -1,3 +1,5 @@
+use crate::cursor::Cursor;
+
 /// A set of tools for moving through a vector of units with a cursor.
 #[derive(Debug, Clone)]
 pub struct TranscriberCursor<'a, Unit> {
@@ -6,46 +8,46 @@ pub struct TranscriberCursor<'a, Unit> {
     pub source: &'a Vec<Unit>,
 }
 
-impl<'a, Unit> TranscriberCursor<'a, Unit> {
+impl<'a, Unit> Cursor<'a, Vec<Unit>, Unit> for TranscriberCursor<'a, Unit> {
     /// Create a new cursor for the given vec of units
     /// The cursor starts at the first unit (position 0)
-    pub fn new(source: &'a Vec<Unit>) -> Self {
+    fn new(source: &'a Vec<Unit>) -> Self {
         Self { pos: 0, source }
     }
 
     /// Move forward the cursor
-    pub fn next(&mut self) {
+    fn next(&mut self) {
         self.pos += 1;
     }
 
     /// Move backward the cursor
-    pub fn back(&mut self) {
+    fn back(&mut self) {
         self.pos -= 1;
     }
 
     /// Get the unit at the cursor position
-    pub fn peek(&self) -> Option<&Unit> {
+    fn peek(&self) -> Option<&Unit> {
         self.source.get(self.pos)
     }
 
     // Get the unit at the next cursor position
-    pub fn peek_next(&self) -> Option<&Unit> {
+    fn peek_next(&self) -> Option<&Unit> {
         self.source.get(self.pos + 1)
     }
 
     /// Get the unit at the previous cursor position
-    pub fn peek_prev(&self) -> Option<&Unit> {
+    fn peek_prev(&self) -> Option<&Unit> {
         self.source.get(self.pos - 1)
     }
 
     /// Get the unit at the cursor position and move the cursor forward
-    pub fn consume(&mut self) -> Option<&Unit> {
+    fn consume(&mut self) -> Option<&Unit> {
         self.next();
         self.peek_prev()
     }
 
     /// Check if the cursor is outside the source (cursor position >= source length)
-    pub fn is_overflow(&self) -> bool {
+    fn is_overflow(&self) -> bool {
         self.pos >= self.source.len()
     }
 }

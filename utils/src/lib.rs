@@ -5,3 +5,4 @@
 /// - Generate nodes from tokens
 pub mod transcriber;
 pub mod logging;
+pub mod cursor;
