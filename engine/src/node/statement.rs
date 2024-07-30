@@ -36,11 +36,11 @@ impl Node for ASTStatement {
             Some(Token::LangKeyword(keyword)) => match keyword {
                 TokenLangKeyword::Let => variable_declaration::VariableDeclaration::transcribe(cursor).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
                 TokenLangKeyword::If => conditional::ConditionalStatement::transcribe(cursor).map(|cond| cond.map(ASTStatement::Conditional)),
-                _ => Ok(None)
+                _ => Err(ParserError::Expected("LangKeyword $ <stmnt>".to_string()))
             },
             // Scopes are statements too
             Some(Token::Symbol(TokenSymbol::BraceOpen)) => scope::ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope)),
-            _ => Ok(None)
+            _ => Err(ParserError::Expected("<stmnt>".to_string()))
         }
     }
 }

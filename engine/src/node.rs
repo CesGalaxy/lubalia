@@ -51,20 +51,18 @@ impl Node for ASTNode {
             Some(token) => match token {
                 // Ignore EOLs (note: the trancriber will automatly move the cursor)
                 Token::Symbol(TokenSymbol::EOL) => Ok(None),
-                _ => Ok(
-                    // Try to transcribe a statement (error handled with ControlFlow),
-                    ASTStatement::transcribe(cursor)?.map(|stmnt| {
+                // Try (intent) to transcribe a statement
+                _ => cursor.intent(ASTStatement::transcribe).map(|stmnt| stmnt.map(|stmnt| {
                         if cursor.peek() == Some(&Token::Symbol(TokenSymbol::Semicolon)) {
                             cursor.next();
                             Self::Statement(stmnt)
                         } else {
                             Self::SemiExpression(stmnt)
                         }
-                    })
+                    }))
                         // if no statement was found, try to transcribe an expression (which won't be a statament-result).
-                        // The error is also handled with ControlFlow
-                        .or(ASTExpression::transcribe(cursor)?.map(ASTNode::Expression))
-                )
+                        .or_else(|_| cursor.intent(ASTExpression::transcribe).map(|expr| expr.map(ASTNode::Expression)))
+                        .map_err(|_| ParserError::Expected("<node>".to_string()))
             },
             None => Ok(None)
         }
@@ -76,7 +74,7 @@ impl fmt::Display for ASTNode {
         match self {
             Self::Expression(expr) => write!(f, "{}{expr}{}", "<", ">"),
             Self::Statement(stmt) => write!(f, "{}{stmt}{}", "[", "]"),
-            Self::SemiExpression(stmt) => write!(f, "{}{stmt}{}", "[~", "]"),
+            Self::SemiExpression(stmt) => write!(f, "{}{stmt}{}", "[¿", "?]"),
         }
     }
 }
