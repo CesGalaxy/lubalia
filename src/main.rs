@@ -27,8 +27,9 @@ fn test_file(file_name: &str) {
 
         let result = evaluate_code(&mut vm, code);
 
+        // TODO: Shall I move the Display implementations into the main bin?
         match result {
-            Ok(Some(value)) => println!("OK -> Result: {}", value),
+            Ok(Some(value)) => println!("OK -> {}", value),
             Ok(None) => println!("OK -> No result"),
             Err(e) => println!("ERROR -> {}", e),
         }

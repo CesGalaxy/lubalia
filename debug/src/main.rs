@@ -15,8 +15,6 @@ use cli::commands::LubuggerCommand;
 pub fn main() -> Result<(), iced::Error> {
     let cmd = cli::LubuggerCli::parse();
 
-    println!("{:?}", cmd);
-
     cmd.run();
 
     Ok(())
