@@ -1,3 +1,5 @@
+use std::fmt;
+
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
@@ -82,8 +84,8 @@ impl StatementNode for ScopeStruct {
     }
 }
 
-impl std::fmt::Display for ScopeStruct {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+impl fmt::Display for ScopeStruct {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{{\n")?;
 
         for node in &self.nodes {

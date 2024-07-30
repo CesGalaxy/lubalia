@@ -1,5 +1,6 @@
 use super::{context::Context, VM};
 
+/// A tick is the execution of a single instruction/node in the VM
 pub struct VMTick<'a> {
     /// The VM running the tick
     pub vm: &'a mut VM,

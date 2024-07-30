@@ -1,3 +1,5 @@
+use std::fmt;
+
 use lubalia_utils::transcriber::error::TranscriberError;
 use lubengine::{data::DataValue, lang::{lexer::{lexer, LexerError}, parser::{error::ParserError, parser}, token::Token}, root::ASTRootItem, vm::VM};
 
@@ -25,8 +27,8 @@ pub enum EvaluationError {
     ParserError(TranscriberError<Token, ASTRootItem, ParserError>),
 }
 
-impl std::fmt::Display for EvaluationError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for EvaluationError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             EvaluationError::LexerError(e) => write!(f, "Lexer error:\n{}", e),
             EvaluationError::ParserError(e) => write!(f, "Parser error:\n{}", e),

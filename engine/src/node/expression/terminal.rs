@@ -1,3 +1,5 @@
+use std::fmt;
+
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
@@ -60,8 +62,8 @@ impl ExpressionNode for TerminalExpression {
     }
 }
 
-impl std::fmt::Display for TerminalExpression {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for TerminalExpression {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Literal(literal) => write!(f, "{}", literal),
             Self::VarRef(varname) => write!(f, "{}", varname),

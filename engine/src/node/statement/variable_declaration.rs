@@ -1,3 +1,5 @@
+use std::fmt;
+
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
@@ -79,8 +81,8 @@ impl StatementNode for VariableDeclaration {
     }
 }
 
-impl std::fmt::Display for VariableDeclaration {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for VariableDeclaration {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "let {}", self.varname)?;
 
         if let Some(value) = &self.value {

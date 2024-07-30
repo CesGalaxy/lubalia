@@ -1,6 +1,8 @@
 pub mod terminal;
 pub mod binary;
 
+use std::fmt;
+
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
@@ -59,8 +61,8 @@ impl ExpressionNode for ASTExpression {
     }
 }
 
-impl std::fmt::Display for ASTExpression {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ASTExpression {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ASTExpression::Terminal(expr) => write!(f, "{}", expr),
             ASTExpression::Binary(expr) => write!(f, "{}", expr)

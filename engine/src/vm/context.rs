@@ -1,3 +1,5 @@
+use std::fmt;
+
 use crate::data::DataValue;
 
 /// A context for running code, contains all variables.
@@ -72,8 +74,8 @@ impl Default for Context {
     }
 }
 
-impl std::fmt::Display for Context {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for Context {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Context ================================\n")?;
 
         for (name, value) in &self.variables {

@@ -7,6 +7,8 @@ pub mod logic;
 /// This module contains the comparasion operations for the language data values.
 pub mod comparasion;
 
+use std::fmt;
+
 use colored::Colorize;
 
 use crate::lang::token::literal::TokenLiteral;
@@ -36,8 +38,8 @@ impl Default for DataValue {
     }
 }
 
-impl std::fmt::Display for DataValue {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for DataValue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             DataValue::Number(number) => write!(f, "{}", number.to_string().bright_blue()),
             DataValue::String(string) => write!(f, "\"{}\"", string.yellow()),

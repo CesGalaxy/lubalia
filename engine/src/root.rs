@@ -1,3 +1,5 @@
+use std::fmt;
+
 use super::node::ASTNode;
 
 /// A script can contain multiple items,
@@ -8,8 +10,8 @@ pub enum ASTRootItem {
     Node(ASTNode)
 }
 
-impl std::fmt::Display for ASTRootItem {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ASTRootItem {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ASTRootItem::Node(node) => write!(f, "{}", node)
         }

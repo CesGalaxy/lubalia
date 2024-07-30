@@ -1,3 +1,5 @@
+use std::fmt;
+
 use linter::{linter, LinterError};
 use lubalia_utils::transcriber::error::TranscriberError;
 
@@ -36,8 +38,8 @@ pub enum LexerError {
     LinterError(LinterError)
 }
 
-impl std::fmt::Display for LexerError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for LexerError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::TokenizerError(error) => write!(f, "TokenizerError >> {error}"),
             Self::LinterError(error) => write!(f, "LinterError >> {error}"),

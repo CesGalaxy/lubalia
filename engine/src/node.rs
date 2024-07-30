@@ -1,6 +1,8 @@
 pub mod expression;
 pub mod statement;
 
+use std::fmt;
+
 use expression::{ASTExpression, ExpressionNode};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 use statement::{ASTStatement, StatementNode};
@@ -23,7 +25,7 @@ pub enum ASTNode {
     Statement(ASTStatement)
 }
 
-pub trait Node: std::fmt::Display {
+pub trait Node: fmt::Display {
     /// Transcribe a node from the source code (tokens)
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized;
 }
@@ -69,8 +71,8 @@ impl Node for ASTNode {
     }
 }
 
-impl std::fmt::Display for ASTNode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ASTNode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Expression(expr) => write!(f, "{}{expr}{}", "<", ">"),
             Self::Statement(stmt) => write!(f, "{}{stmt}{}", "[", "]"),

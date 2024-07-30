@@ -2,6 +2,8 @@ pub mod variable_declaration;
 pub mod scope;
 pub mod conditional;
 
+use std::fmt;
+
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
@@ -54,8 +56,8 @@ impl StatementNode for ASTStatement {
     }
 }
 
-impl std::fmt::Display for ASTStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ASTStatement {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ASTStatement::VariableDeclaration(vd) => write!(f, "{}", vd),
             ASTStatement::Scope(scope) => write!(f, "{}", scope),

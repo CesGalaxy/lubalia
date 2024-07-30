@@ -1,7 +1,7 @@
 mod operator;
 mod transcription;
 
-use std::ops::Not;
+use std::{fmt, ops::Not};
 
 use operator::BinaryOperator;
 
@@ -40,8 +40,8 @@ impl ExpressionNode for BinaryExpression {
     }
 }
 
-impl std::fmt::Display for BinaryExpression {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for BinaryExpression {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "( {} {:?} {} )", self.lhs, self.operator, self.rhs)
     }
 }

@@ -1,3 +1,5 @@
+use std::fmt;
+
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
@@ -65,8 +67,8 @@ impl StatementNode for ConditionalStatement {
     }
 }
 
-impl std::fmt::Display for ConditionalStatement {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for ConditionalStatement {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "if {} {}", self.condition, self.then_branch)?;
 
         if let Some(else_branch) = &self.else_branch {

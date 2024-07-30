@@ -1,3 +1,5 @@
+use std::fmt;
+
 /// Errors that can happen during the tokenization of the source code
 #[derive(Debug, Clone)]
 pub enum TokenizerError {
@@ -13,8 +15,8 @@ pub enum TokenizerError {
     ErrorParsingNumber(String),
 }
 
-impl std::fmt::Display for TokenizerError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl fmt::Display for TokenizerError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             TokenizerError::UnexcepedSymbolAtKeyword(keyword, symbol) => write!(f, "Unexceped symbol '{}' at keyword '{}'", symbol, keyword),
             TokenizerError::UnknownCharacter(c) => write!(f, "Unknown character '{}'", c),
