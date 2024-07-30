@@ -1,5 +1,5 @@
-let x = 0;
-let n;
+let x = 0
+let n
 
 if true {
     6

@@ -17,11 +17,8 @@ pub enum ASTNode {
     /// An instruction that ALWAYS returns a value (doesn't modify the context, usually)
     Expression(ASTExpression),
 
-    // A statement that SOMETIMES can return a value, but doesn't have to
-    SemiExpression(ASTStatement),
-
     /// An instruction that works and manipulates the context and data
-    /// It won't NEVER return a value
+    /// It can return a value SOMETIMES
     Statement(ASTStatement)
 }
 
@@ -35,11 +32,7 @@ impl ASTNode {
     pub fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             Self::Expression(expr) => Some(expr.evaluate(tick)),
-            Self::SemiExpression(statement) => statement.execute(tick),
-            Self::Statement(statement) => {
-                statement.execute(tick);
-                None
-            }
+            Self::Statement(statement) => statement.execute(tick)
         }
     }
 }
@@ -52,14 +45,7 @@ impl Node for ASTNode {
                 // Ignore EOLs (note: the trancriber will automatly move the cursor)
                 Token::Symbol(TokenSymbol::EOL) => Ok(None),
                 // Try (intent) to transcribe a statement
-                _ => cursor.intent(ASTStatement::transcribe).map(|stmnt| stmnt.map(|stmnt| {
-                        if cursor.peek() == Some(&Token::Symbol(TokenSymbol::Semicolon)) {
-                            cursor.next();
-                            Self::Statement(stmnt)
-                        } else {
-                            Self::SemiExpression(stmnt)
-                        }
-                    }))
+                _ => cursor.intent(ASTStatement::transcribe).map(|stmnt| stmnt.map(Self::Statement))
                         // if no statement was found, try to transcribe an expression (which won't be a statament-result).
                         .or_else(|_| cursor.intent(ASTExpression::transcribe).map(|expr| expr.map(ASTNode::Expression)))
                         .map_err(|_| ParserError::Expected("<node>".to_string()))
@@ -74,7 +60,6 @@ impl fmt::Display for ASTNode {
         match self {
             Self::Expression(expr) => write!(f, "{}{expr}{}", "<", ">"),
             Self::Statement(stmt) => write!(f, "{}{stmt}{}", "[", "]"),
-            Self::SemiExpression(stmt) => write!(f, "{}{stmt}{}", "[¿", "?]"),
         }
     }
 }

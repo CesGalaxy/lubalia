@@ -23,10 +23,11 @@ pub struct TranscriberError<SourceUnit: Clone, ResultUnit, Error: fmt::Display> 
     pub error: Error,
 }
 
-impl<SourceUnit: fmt::Debug + Clone, ResultUnit, Error: fmt::Display> fmt::Display for TranscriberError<SourceUnit, ResultUnit, Error> {
+impl<SourceUnit: fmt::Debug + Clone, ResultUnit: fmt::Debug, Error: fmt::Display> fmt::Display for TranscriberError<SourceUnit, ResultUnit, Error> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} (at position {})\n", "Transcriber Error".red().bold(), self.cursor_position.to_string().yellow().bold())?;
         write!(f, "\t{}\n", self.error)?;
-        write!(f, "\tBuffer (starts at {}): {:?}", self.tick_initial_position.to_string().yellow().bold(), self.tick_buffer)
+        write!(f, "\tBuffer: tick (starts at {}): {:?}\n", self.tick_initial_position.to_string().yellow().bold(), self.tick_buffer)?;
+        write!(f, "\tBuffer: transcription: {:?}", self.transcription_buffer)
     }
 }

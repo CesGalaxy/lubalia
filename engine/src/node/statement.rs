@@ -12,14 +12,15 @@ use crate::{
     vm::tick::VMTick
 };
 
-use super::Node;
+use super::{expression::ExpressionNode, ASTNode, Node};
 
 /// An instruction the VM executes without returning a value
 #[derive(Debug, Clone)]
 pub enum ASTStatement {
     VariableDeclaration(variable_declaration::VariableDeclaration),
     Scope(scope::ScopeStruct),
-    Conditional(conditional::ConditionalStatement)
+    Conditional(conditional::ConditionalStatement),
+    Return(Box<ASTNode>)
 }
 
 pub trait StatementNode: Node {
@@ -49,9 +50,16 @@ impl StatementNode for ASTStatement {
     /// Execute an statement and return a value if any is provided
     fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
-            ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
-            ASTStatement::Scope(scope) => scope.execute(tick),
-            ASTStatement::Conditional(cond) => cond.execute(tick)
+            Self::Return(node) => match *node.clone() {
+                ASTNode::Statement(statement) => match statement {
+                    ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
+                    ASTStatement::Scope(scope) => scope.execute(tick),
+                    ASTStatement::Conditional(cond) => cond.execute(tick),
+                    ASTStatement::Return(_) => todo!("Are you stupid?")
+                },
+                ASTNode::Expression(expr) => Some(expr.evaluate(tick))
+            }
+            _ => None
         }
     }
 }
@@ -61,7 +69,8 @@ impl fmt::Display for ASTStatement {
         match self {
             ASTStatement::VariableDeclaration(vd) => write!(f, "{}", vd),
             ASTStatement::Scope(scope) => write!(f, "{}", scope),
-            ASTStatement::Conditional(cond) => write!(f, "{}", cond)
+            ASTStatement::Conditional(cond) => write!(f, "{}", cond),
+            ASTStatement::Return(node) => write!(f, "return ( {} )", node)
         }
     }
 }
