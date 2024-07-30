@@ -1,4 +1,4 @@
-pub trait Cursor<'a, Source, Unit> {
+pub trait CursorNavigation<'a, Source, Unit> {
     /// Create a new cursor for a given source
     fn new(source: &'a Source) -> Self;
 

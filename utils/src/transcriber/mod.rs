@@ -4,6 +4,7 @@ pub mod result;
 
 #[cfg(test)]
 mod tests;
+pub mod intent;
 
 use std::fmt;
 
@@ -11,7 +12,7 @@ use cursor::TranscriberCursor;
 use error::TranscriberError;
 use result::{IdentifiedTranscriptionUnit, Transcription, TranscriptionResult};
 
-use crate::cursor::Cursor;
+use crate::cursor::CursorNavigation;
 
 pub type TranscriberTick<SourceUnit, ResultUnit, Error> = fn(&mut TranscriberCursor<SourceUnit>, &SourceUnit) -> TranscriberTickResult<ResultUnit, Error>;
 pub type TranscriberTickResult<ResultUnit, Error> = Result<Option<ResultUnit>, Error>;

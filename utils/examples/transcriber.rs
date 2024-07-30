@@ -1,4 +1,4 @@
-use lubalia_utils::{cursor::Cursor, transcriber::{cursor::TranscriberCursor, transcriber, TranscriberTickResult}};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, transcriber, TranscriberTickResult}};
 
 const EXAMPLE_CODE: &str = r#"1234567890"#;
 

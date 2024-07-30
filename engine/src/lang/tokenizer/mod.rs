@@ -1,5 +1,5 @@
 use error::TokenizerError;
-use lubalia_utils::{cursor::Cursor, transcriber::{cursor::TranscriberCursor, result::{IdentifiedTranscriptionUnit, TranscriptionResult}, transcriber}};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, result::{IdentifiedTranscriptionUnit, TranscriptionResult}, transcriber}};
 
 use super::token::{keyword::TokenLangKeyword, literal::TokenLiteral, symbol::TokenSymbol, Token};
 

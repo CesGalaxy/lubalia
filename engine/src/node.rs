@@ -2,7 +2,7 @@ pub mod expression;
 pub mod statement;
 
 use expression::{ASTExpression, ExpressionNode};
-use lubalia_utils::{cursor::Cursor, transcriber::cursor::TranscriberCursor};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 use statement::{ASTStatement, StatementNode};
 
 use crate::{lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};

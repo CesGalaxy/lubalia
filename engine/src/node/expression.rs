@@ -1,7 +1,7 @@
 pub mod terminal;
 pub mod binary;
 
-use lubalia_utils::{cursor::Cursor, transcriber::cursor::TranscriberCursor};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
     data::DataValue,

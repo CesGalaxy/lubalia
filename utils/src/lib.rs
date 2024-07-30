@@ -6,3 +6,4 @@
 pub mod transcriber;
 pub mod logging;
 pub mod cursor;
+pub mod checkpoint;
