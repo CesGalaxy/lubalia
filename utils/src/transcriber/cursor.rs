@@ -26,24 +26,18 @@ impl<'a, Unit> Cursor<'a, Vec<Unit>, Unit> for TranscriberCursor<'a, Unit> {
     }
 
     /// Get the unit at the cursor position
-    fn peek(&self) -> Option<&Unit> {
+    fn peek(&self) -> Option<&'a Unit> {
         self.source.get(self.pos)
     }
 
     // Get the unit at the next cursor position
-    fn peek_next(&self) -> Option<&Unit> {
+    fn peek_next(&self) -> Option<&'a Unit> {
         self.source.get(self.pos + 1)
     }
 
     /// Get the unit at the previous cursor position
-    fn peek_prev(&self) -> Option<&Unit> {
+    fn peek_prev(&self) -> Option<&'a Unit> {
         self.source.get(self.pos - 1)
-    }
-
-    /// Get the unit at the cursor position and move the cursor forward
-    fn consume(&mut self) -> Option<&Unit> {
-        self.next();
-        self.peek_prev()
     }
 
     /// Check if the cursor is outside the source (cursor position >= source length)
