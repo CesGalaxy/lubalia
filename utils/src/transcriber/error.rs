@@ -1,10 +1,12 @@
+use std::fmt;
+
 use colored::Colorize;
 
-use super::result::Transcription;
+use super::result::IdentifiedTranscriptionUnit;
 
 /// An error during the transcription process
 #[derive(Debug)]
-pub struct TranscriberError<SourceUnit: Clone, ResultUnit, Error: std::fmt::Display> {
+pub struct TranscriberError<SourceUnit: Clone, ResultUnit, Error: fmt::Display> {
     /// The cursor position when the falied tick started
     pub tick_initial_position: usize,
 
@@ -15,14 +17,14 @@ pub struct TranscriberError<SourceUnit: Clone, ResultUnit, Error: std::fmt::Disp
     pub cursor_position: usize,
 
     /// The uncompleted transcription before the time of the error
-    pub transcription_buffer: Transcription<SourceUnit, ResultUnit>,
+    pub transcription_buffer: Vec<IdentifiedTranscriptionUnit<ResultUnit>>,
 
     /// The error that occured
     pub error: Error,
 }
 
-impl<S: std::fmt::Debug + Clone, R, E: std::fmt::Display> std::fmt::Display for TranscriberError<S, R, E> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl<SourceUnit: fmt::Debug + Clone, ResultUnit, Error: fmt::Display> fmt::Display for TranscriberError<SourceUnit, ResultUnit, Error> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} (at position {})\n", "Transcriber Error".red().bold(), self.cursor_position.to_string().yellow().bold())?;
         write!(f, "\t{}\n", self.error)?;
         write!(f, "\tBuffer (starts at {}): {:?}", self.tick_initial_position.to_string().yellow().bold(), self.tick_buffer)

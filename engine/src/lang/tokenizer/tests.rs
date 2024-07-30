@@ -40,6 +40,5 @@ fn test_tokenization() {
 fn test_tokenization_details() {
     let transcription = tokenizer(TEST_CODE.to_string()).unwrap();
 
-    assert!(transcription.completed, "the transcription should be completed");
     assert_eq!(transcription.source, TEST_CODE.chars().collect::<Vec<_>>() , "the transcription source should be the same as the input source");
 }

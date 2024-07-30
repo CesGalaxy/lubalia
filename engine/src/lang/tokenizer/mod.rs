@@ -1,5 +1,5 @@
 use error::TokenizerError;
-use lubalia_utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber};
+use lubalia_utils::transcriber::{cursor::TranscriberCursor, result::{IdentifiedTranscriptionUnit, TranscriptionResult}, transcriber};
 
 use super::token::{keyword::TokenLangKeyword, literal::TokenLiteral, symbol::TokenSymbol, Token};
 
@@ -15,8 +15,8 @@ pub fn tokenizer(code: String) -> TranscriptionResult<char, Token, TokenizerErro
 
     let mut transcription = transcriber(code.chars().collect(), tokenizer_tick)?;
 
-    transcription.push(Token::Symbol(TokenSymbol::EOL), Some(code_len), None);
-    transcription.push(Token::Symbol(TokenSymbol::EOF), Some(code_len), None);
+    transcription.result.push(IdentifiedTranscriptionUnit::new(Token::Symbol(TokenSymbol::EOL), Some(code_len), None));
+    transcription.result.push(IdentifiedTranscriptionUnit::new(Token::Symbol(TokenSymbol::EOF), Some(code_len), None));
 
     Ok(transcription)
 }
@@ -31,15 +31,15 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
         // Strings
         '"' => Ok(Some(Token::Literal(TokenLiteral::String({
             let mut literal = String::new();
-    
+
             while let Some(c) = cursor.consume() {
                 if c == &'"' {
                     break;
                 }
-    
+
                 literal.push(*c);
             }
-    
+
             literal
         })))),
 
@@ -47,12 +47,12 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
         // TODO: What about keyword starting with two underscores?
         _ if initial_unit.is_ascii_alphabetic() || (initial_unit == &'_' && cursor.peek().is_some_and(char::is_ascii_alphanumeric)) => Ok(Some({
             let mut keyword = String::from(*initial_unit);
-    
+
             while let Some(c) = cursor.peek() {
                 if !c.is_ascii_alphanumeric() && c != &'_' {
                     break;
                 }
-    
+
                 keyword.push(*c);
                 cursor.next();
             }
@@ -67,18 +67,17 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
         // Numbers
         _ if initial_unit.is_numeric() => Ok(Some(Token::Literal(TokenLiteral::Number({
             let mut literal = String::from(*initial_unit);
-    
+
             while let Some(c) = cursor.peek() {
                 if c.is_numeric() || c == &'.' {
                     literal.push(*c);
                 } else if c != &'_' {
                     break;
                 }
-    
-                
+
                 cursor.next();
             }
-    
+
             literal.parse().or_else(|_| Err(TokenizerError::ErrorParsingNumber(literal)))?
         })))),
 
