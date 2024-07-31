@@ -13,7 +13,6 @@ impl<'a, Unit> TranscriberCursor<'a, Unit> {
 
         // If error, rollback the cursor
         if result.is_err() {
-            println!("ERROR");
             self.rollback(checkpoint);
         }
 

@@ -21,7 +21,7 @@ pub fn parser(tokens: Vec<Token>) -> TranscriptionResult<Token, ASTRootItem, Par
 fn parser_tick(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<ASTRootItem>, ParserError> {
     // TODO: This task should be for ASTRootItem
     match initial_token {
-        Token::Symbol(TokenSymbol::EOL) => Ok(None),
+        Token::Symbol(TokenSymbol::EOF) => Ok(None),
         _ => ASTNode::transcribe(cursor).map(|astn| astn.map(ASTRootItem::Node))
     }
 }

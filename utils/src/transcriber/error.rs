@@ -6,7 +6,7 @@ use super::result::IdentifiedTranscriptionUnit;
 
 /// An error during the transcription process
 #[derive(Debug)]
-pub struct TranscriberError<SourceUnit: Clone, ResultUnit, Error: fmt::Display> {
+pub struct TranscriberError<SourceUnit, ResultUnit, Error: fmt::Display> {
     /// The cursor position when the falied tick started
     pub tick_initial_position: usize,
 
@@ -23,7 +23,7 @@ pub struct TranscriberError<SourceUnit: Clone, ResultUnit, Error: fmt::Display> 
     pub error: Error,
 }
 
-impl<SourceUnit: fmt::Debug + Clone, ResultUnit: fmt::Debug, Error: fmt::Display> fmt::Display for TranscriberError<SourceUnit, ResultUnit, Error> {
+impl<SourceUnit: fmt::Debug, ResultUnit: fmt::Debug, Error: fmt::Display> fmt::Display for TranscriberError<SourceUnit, ResultUnit, Error> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} (at position {})\n", "Transcriber Error".red().bold(), self.cursor_position.to_string().yellow().bold())?;
         write!(f, "\t{}\n", self.error)?;
