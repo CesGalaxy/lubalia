@@ -27,6 +27,7 @@ impl From<DataValue> for ArithmeticValue {
         match value {
             DataValue::Number(number) => Self::Number(number),
             DataValue::String(string) => Self::String(string),
+            DataValue::Char(character) => Self::String(character.to_string()),
             DataValue::Boolean(boolean) => Self::Number(boolean.into()),
             DataValue::List(list) => Self::List(list.into_iter().map(|item| item.into()).collect()),
             DataValue::Null => Self::Null

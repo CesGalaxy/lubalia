@@ -18,6 +18,7 @@ use crate::lang::token::literal::TokenLiteral;
 pub enum DataValue {
     Number(f64),
     String(String),
+    Char(char),
     Boolean(bool),
     List(Vec<DataValue>),
     Null
@@ -28,6 +29,9 @@ impl From<TokenLiteral> for DataValue {
         match literal {
             TokenLiteral::Number(number) => DataValue::Number(number),
             TokenLiteral::String(string) => DataValue::String(string),
+            TokenLiteral::Character(character) => DataValue::Char(character),
+            // TODO: This shouldn't even be a literal
+            TokenLiteral::Identifier(_) => DataValue::Null,
         }
     }
 }
@@ -43,6 +47,7 @@ impl fmt::Display for DataValue {
         match self {
             DataValue::Number(number) => write!(f, "{}", number.to_string().bright_blue()),
             DataValue::String(string) => write!(f, "\"{}\"", string.yellow()),
+            DataValue::Char(character) => write!(f, "'{}'", character.to_string().bright_green()),
             DataValue::Boolean(boolean) => write!(f, "{}", boolean.to_string().bright_green()),
             DataValue::List(list) => {
                 let mut list_str = String::new();

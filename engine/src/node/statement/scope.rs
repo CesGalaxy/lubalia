@@ -15,7 +15,12 @@ use super::StatementNode;
 #[derive(Debug, Clone)]
 pub struct ScopeStruct {
     /// The nodes to execute inside the scope
-    nodes: Vec<ASTNode>
+    nodes: Vec<ASTNode>,
+
+    /// The ID the scope will be referenced by
+    /// TODO: Implement this. How? This needs a new token
+    #[allow(dead_code)]
+    name: String
 }
 
 impl Node for ScopeStruct {
@@ -47,7 +52,7 @@ impl Node for ScopeStruct {
             return Err(ParserError::Expected("end@scope/sym <sym:brace:close> '}'".to_string()));
         }
 
-        Ok(Some(ScopeStruct { nodes }))
+        Ok(Some(ScopeStruct { nodes, name: String::new() }))
     }
 }
 

@@ -3,9 +3,11 @@ use std::fmt;
 /// Errors that can happen during the tokenization of the source code
 #[derive(Debug, Clone)]
 pub enum TokenizerError {
-    // TODO: Error only when the symbol isn't a TokenSymbol
-    /// There was an unexcepted symbol during the tokenization of a keyword
-    UnexcepedSymbolAtKeyword(String, char),
+    /// An unexpected symbol was found, can provide an expected symbol
+    UnexpectedSymbol(char, Option<&'static str>),
+
+    /// The end of the code was reached unexpectedly
+    UnexpectedEnd,
 
     /// An unknown character was found
     UnknownCharacter(char),
@@ -18,7 +20,12 @@ pub enum TokenizerError {
 impl fmt::Display for TokenizerError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            TokenizerError::UnexcepedSymbolAtKeyword(keyword, symbol) => write!(f, "Unexceped symbol '{}' at keyword '{}'", symbol, keyword),
+            TokenizerError::UnexpectedSymbol(symbol, expected) => if let Some(expected) = expected {
+                write!(f, "Unexpected symbol '{symbol}', expected '{expected}'")
+            } else {
+                write!(f, "Unexpected symbol '{symbol}'")
+            },
+            TokenizerError::UnexpectedEnd => write!(f, "Unexpected end of the code"),
             TokenizerError::UnknownCharacter(c) => write!(f, "Unknown character '{}'", c),
             TokenizerError::ErrorParsingNumber(number) => write!(f, "Error parsing number '{}'", number),
         }

@@ -6,10 +6,10 @@ impl PartialEq for DataValue {
             // Same type
             (DataValue::Number(a), DataValue::Number(b)) => a == b,
             (DataValue::String(a), DataValue::String(b)) => a == b,
+            (DataValue::Char(a), DataValue::Char(b)) => a == b,
             (DataValue::Boolean(a), DataValue::Boolean(b)) => a == b,
             (DataValue::Null, DataValue::Null) => true,
-            
-            // Different types
+
             // String - Number
             (DataValue::Number(a), DataValue::String(b)) => &a.to_string() == b,
             (DataValue::String(a), DataValue::Number(b)) => a == &b.to_string(),
@@ -25,6 +25,18 @@ impl PartialEq for DataValue {
             // List - List
             (DataValue::List(a), DataValue::List(b)) => a == b,
 
+            // Char - String
+            (DataValue::Char(a), DataValue::String(b)) => a.to_string() == *b,
+            (DataValue::String(a), DataValue::Char(b)) => *a == b.to_string(),
+
+            // Char - Number
+            (DataValue::Char(a), DataValue::Number(b)) => a.to_string() == b.to_string(),
+            (DataValue::Number(a), DataValue::Char(b)) => a.to_string() == b.to_string(),
+
+            // Char - Boolean
+            (DataValue::Char(a), DataValue::Boolean(b)) => a == if *b { &'1' } else { &'0' },
+            (DataValue::Boolean(a), DataValue::Char(b)) => (if *a { &'1' } else { &'0' }) == b,
+
             // Null and List always return false
             (DataValue::List(_), _) | (_, DataValue::List(_)) => false,
             (DataValue::Null, _) | (_, DataValue::Null) => false,
@@ -38,10 +50,10 @@ impl PartialOrd for DataValue {
             // Same type
             (DataValue::Number(a), DataValue::Number(b)) => a.partial_cmp(b),
             (DataValue::String(a), DataValue::String(b)) => Some(a.cmp(b)),
+            (DataValue::Char(a), DataValue::Char(b)) => Some(a.cmp(b)),
             (DataValue::Boolean(a), DataValue::Boolean(b)) => Some(a.cmp(b)),
             (DataValue::Null, DataValue::Null) => Some(std::cmp::Ordering::Equal),
 
-            // Different types
             // String - Number
             (DataValue::Number(a), DataValue::String(b)) => Some(a.to_string().cmp(b)),
             (DataValue::String(a), DataValue::Number(b)) => Some(a.cmp(&b.to_string())),
@@ -65,11 +77,14 @@ impl PartialOrd for DataValue {
             // Null is always less than any other type
             (DataValue::Null, _) => Some(std::cmp::Ordering::Less),
             (_, DataValue::Null) => Some(std::cmp::Ordering::Greater),
+
+            // TODO: WTF is this
+            _ => None,
         }
     }
 }
 
-// VACIA + TRUE = false
+// EMPTY + TRUE = false
 // llena + TRUE = TRUE
-// VACIA + false = TRUE
+// EMPTY + false = TRUE
 // llena + false = false
