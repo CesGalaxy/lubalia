@@ -2,7 +2,7 @@ let x = 0
 let n
 
 if true {
-    return 6
+    return let a = 6
 }
 
 if false {

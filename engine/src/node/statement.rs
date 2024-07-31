@@ -12,7 +12,7 @@ use crate::{
     vm::tick::VMTick
 };
 
-use super::{ASTNode, Node};
+use super::{expression::{ASTExpression, ExpressionNode}, ASTNode, Node};
 
 /// Wether the statement returned a value for using it or the result is just a side effect
 pub enum StatementResult {
@@ -31,6 +31,14 @@ impl StatementResult {
             StatementResult::Usable(value) => value.clone()
         }
     }
+
+    /// Get the returned value (if any)
+    pub fn returned(&self) -> Option<DataValue> {
+        match self {
+            StatementResult::Return(value) => Some(value.clone()),
+            StatementResult::Usable(_) => None
+        }
+    }
 }
 
 /// An instruction the VM executes without returning a value
@@ -39,7 +47,7 @@ pub enum ASTStatement {
     VariableDeclaration(variable_declaration::VariableDeclaration),
     Scope(scope::ScopeStruct),
     Conditional(conditional::ConditionalStatement),
-    Return(Box<ASTNode>)
+    Return(ASTExpression)
 }
 
 pub trait StatementNode: Node {
@@ -58,7 +66,7 @@ impl Node for ASTStatement {
                 TokenLangKeyword::If => conditional::ConditionalStatement::transcribe(cursor).map(|cond| cond.map(ASTStatement::Conditional)),
                 TokenLangKeyword::Return => {
                     cursor.next();
-                    ASTNode::transcribe(cursor).map(|node| node.map(|node| ASTStatement::Return(Box::new(node))))
+                    ASTExpression::transcribe(cursor).map(|expr| expr.map(ASTStatement::Return))
                 },
                 _ => Err(ParserError::Expected("LangKeyword $ <stmnt>".to_string()))
             },
@@ -77,8 +85,21 @@ impl StatementNode for ASTStatement {
             ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
             ASTStatement::Scope(scope) => scope.execute(tick),
             ASTStatement::Conditional(cond) => cond.execute(tick),
-            ASTStatement::Return(node) => Some(StatementResult::Return(node.execute(tick).unwrap_or(DataValue::Null)))
+            ASTStatement::Return(expr) => Some(StatementResult::Return(expr.evaluate(tick)))
         }
+    }
+}
+
+impl ExpressionNode for ASTStatement {
+    /// Evaluate the statement and return the result value
+    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+        match self {
+            ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
+            ASTStatement::Scope(scope) => scope.execute(tick),
+            ASTStatement::Conditional(cond) => cond.execute(tick),
+            ASTStatement::Return(expr) => Some(StatementResult::Return(expr.evaluate(tick)))
+            // TODO: Handle this with 'From<StatementResult> for DataValue'
+        }.map(|result| result.value()).unwrap_or_default()
     }
 }
 

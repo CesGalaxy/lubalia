@@ -4,7 +4,7 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCu
 
 use crate::{
     data::DataValue,
-    node::{statement::{ASTStatement, StatementNode}, Node},
+    node::{statement::ASTStatement, Node},
     lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     vm::tick::VMTick
 };
@@ -56,7 +56,7 @@ impl ExpressionNode for TerminalExpression {
         match self {
             Self::Literal(literal) => literal.clone(),
             Self::VarRef(varname) => tick.get_context().get(varname.clone()).cloned().unwrap_or_default(),
-            Self::StatementResult(statement) => statement.execute(tick).map(|result| result.value()).unwrap_or_default(),
+            Self::StatementResult(statement) => statement.evaluate(tick),
             Self::LastValue => tick.vm.last_value.clone()
         }
     }

@@ -5,7 +5,7 @@ use std::fmt;
 
 use expression::{ASTExpression, ExpressionNode};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
-use statement::{ASTStatement, StatementNode, StatementResult};
+use statement::{ASTStatement, StatementNode};
 
 use crate::{lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
 
@@ -32,11 +32,7 @@ impl ASTNode {
     pub fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             Self::Expression(expr) => Some(expr.evaluate(tick)),
-            Self::Statement(statement) => match statement.execute(tick) {
-                Some(StatementResult::Return(value)) => Some(value),
-                Some(StatementResult::Usable(_)) => None,
-                None => None
-            }
+            Self::Statement(statement) => statement.execute(tick).map(|result| result.returned()).flatten()
         }
     }
 }
@@ -51,6 +47,7 @@ impl Node for ASTNode {
                 // Try (intent) to transcribe a statement
                 _ => cursor.intent(ASTStatement::transcribe).map(|stmnt| stmnt.map(Self::Statement))
                         // if no statement was found, try to transcribe an expression (which won't be a statament-result).
+                        // TODO: The expression will never be a statement, will it?
                         .or_else(|_| cursor.intent(ASTExpression::transcribe).map(|expr| expr.map(ASTNode::Expression)))
                         .map_err(|_| ParserError::Expected("<node>".to_string()))
             },
