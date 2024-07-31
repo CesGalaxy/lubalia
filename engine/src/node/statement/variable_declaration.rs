@@ -3,13 +3,12 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
-    data::DataValue,
     node::{expression::{ASTExpression, ExpressionNode},Node},
     lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     vm::tick::VMTick
 };
 
-use super::StatementNode;
+use super::{StatementNode, StatementResult};
 
 /// Defined the method variables are stored
 #[derive(Debug, Clone)]
@@ -69,7 +68,7 @@ impl Node for VariableDeclaration {
 impl StatementNode for VariableDeclaration {
     /// Creates a new variable for the current context and assigns a value to it.
     /// Returns the value of the variable.
-    fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
+    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
         // Evaluate the expression containing it's value
         let value = self.value.clone().map(|expr| expr.evaluate(tick)).unwrap_or_default();
 
@@ -77,7 +76,7 @@ impl StatementNode for VariableDeclaration {
         tick.get_context().create(self.varname.clone(), value.clone());
 
         // [SemiExpression] Return (if any) the value returned by the first node of the scope that returned a value
-        Some(value)
+        Some(StatementResult::Usable(value))
     }
 }
 

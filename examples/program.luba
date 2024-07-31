@@ -2,9 +2,9 @@ let x = 0
 let n
 
 if true {
-    6
+    return 6
 }
 
 if false {
-    2
+    return 2
 }

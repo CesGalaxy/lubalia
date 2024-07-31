@@ -5,7 +5,7 @@ use std::fmt;
 
 use expression::{ASTExpression, ExpressionNode};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
-use statement::{ASTStatement, StatementNode};
+use statement::{ASTStatement, StatementNode, StatementResult};
 
 use crate::{lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
 
@@ -32,7 +32,11 @@ impl ASTNode {
     pub fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
         match self {
             Self::Expression(expr) => Some(expr.evaluate(tick)),
-            Self::Statement(statement) => statement.execute(tick)
+            Self::Statement(statement) => match statement.execute(tick) {
+                Some(StatementResult::Return(value)) => Some(value),
+                Some(StatementResult::Usable(_)) => None,
+                None => None
+            }
         }
     }
 }

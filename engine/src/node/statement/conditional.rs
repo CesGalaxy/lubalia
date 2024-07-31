@@ -3,13 +3,12 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
-    data::DataValue,
     node::{expression::{ASTExpression, ExpressionNode}, Node},
     lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, Token}},
     vm::tick::VMTick
 };
 
-use super::{scope::ScopeStruct, StatementNode};
+use super::{scope::ScopeStruct, StatementNode, StatementResult};
 
 /// A conditional statement that will run a branch based on a condition
 #[derive(Debug, Clone)]
@@ -55,8 +54,7 @@ impl Node for ConditionalStatement {
 
 impl StatementNode for ConditionalStatement {
     /// Run the conditional statement (with the corresponding branch) and return a value
-    fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
-        // [SemiExpression] Return the value of the new variable
+    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
         if self.condition.evaluate(tick).into() {
             self.then_branch.execute(tick)
         } else if let Some(else_branch) = &self.else_branch {

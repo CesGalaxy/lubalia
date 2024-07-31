@@ -3,13 +3,12 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
-    data::DataValue,
     node::{ASTNode, Node},
     lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}},
     vm::{context::Context, tick::VMTick}
 };
 
-use super::StatementNode;
+use super::{StatementNode, StatementResult};
 
 /// A scope that will run a set of nodes in a new context (child of the current one)
 #[derive(Debug, Clone)]
@@ -60,7 +59,7 @@ impl StatementNode for ScopeStruct {
     // TODO: This code is shit. But works!
     /// Run the scope (with it's own generated child context),
     /// it will return a value (NULL if not provided).
-    fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
+    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
         let mut result = None;
 
         let using_global_context = tick.context.is_none();
@@ -84,8 +83,7 @@ impl StatementNode for ScopeStruct {
             }
         }
 
-        // [SemiExpression] Return the value returned (if any) by the executed branch
-        result
+        result.map(StatementResult::Return)
     }
 }
 

@@ -56,7 +56,7 @@ impl ExpressionNode for TerminalExpression {
         match self {
             Self::Literal(literal) => literal.clone(),
             Self::VarRef(varname) => tick.get_context().get(varname.clone()).cloned().unwrap_or_default(),
-            Self::StatementResult(statement) => statement.execute(tick).unwrap_or_default(),
+            Self::StatementResult(statement) => statement.execute(tick).map(|result| result.value()).unwrap_or_default(),
             Self::LastValue => tick.vm.last_value.clone()
         }
     }
