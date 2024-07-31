@@ -48,6 +48,7 @@ impl Node for ASTNode {
                 _ => cursor.intent(ASTStatement::transcribe).map(|stmnt| stmnt.map(Self::Statement))
                         // if no statement was found, try to transcribe an expression (which won't be a statament-result).
                         // TODO: The expression will never be a statement, will it?
+                        // TODO: Two transcriber exceptions: NotFound and Exception
                         .or_else(|_| cursor.intent(ASTExpression::transcribe).map(|expr| expr.map(ASTNode::Expression)))
                         .map_err(|_| ParserError::Expected("<node>".to_string()))
             },

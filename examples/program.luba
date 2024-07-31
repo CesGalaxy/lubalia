@@ -1,6 +1,10 @@
 let x = 0
 let n
 
+repeat 3 {
+    return 12
+}
+
 if true {
     return let a = 6
 }

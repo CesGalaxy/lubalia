@@ -1,6 +1,7 @@
 pub mod variable_declaration;
 pub mod scope;
 pub mod conditional;
+pub mod repeat;
 
 use std::fmt;
 
@@ -15,6 +16,7 @@ use crate::{
 use super::{expression::{ASTExpression, ExpressionNode}, Node};
 
 /// Wether the statement returned a value for using it or the result is just a side effect
+#[derive(Debug, Clone)]
 pub enum StatementResult {
     /// Something was returned by the program
     Return(DataValue),
@@ -47,6 +49,7 @@ pub enum ASTStatement {
     VariableDeclaration(variable_declaration::VariableDeclaration),
     Scope(scope::ScopeStruct),
     Conditional(conditional::ConditionalStatement),
+    Repeat(repeat::Repeat),
     Return(ASTExpression)
 }
 
@@ -64,6 +67,7 @@ impl Node for ASTStatement {
             Some(Token::LangKeyword(keyword)) => match keyword {
                 TokenLangKeyword::Let => variable_declaration::VariableDeclaration::transcribe(cursor).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
                 TokenLangKeyword::If => conditional::ConditionalStatement::transcribe(cursor).map(|cond| cond.map(ASTStatement::Conditional)),
+                TokenLangKeyword::Repeat => repeat::Repeat::transcribe(cursor).map(|repeat| repeat.map(ASTStatement::Repeat)),
                 TokenLangKeyword::Return => {
                     cursor.next();
                     ASTExpression::transcribe(cursor).map(|expr| expr.map(ASTStatement::Return))
@@ -85,6 +89,7 @@ impl StatementNode for ASTStatement {
             ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
             ASTStatement::Scope(scope) => scope.execute(tick),
             ASTStatement::Conditional(cond) => cond.execute(tick),
+            ASTStatement::Repeat(repeat) => repeat.execute(tick),
             ASTStatement::Return(expr) => Some(StatementResult::Return(expr.evaluate(tick)))
         }
     }
@@ -97,6 +102,7 @@ impl ExpressionNode for ASTStatement {
             ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
             ASTStatement::Scope(scope) => scope.execute(tick),
             ASTStatement::Conditional(cond) => cond.execute(tick),
+            ASTStatement::Repeat(repeat) => repeat.execute(tick),
             ASTStatement::Return(expr) => Some(StatementResult::Return(expr.evaluate(tick)))
             // TODO: Handle this with 'From<StatementResult> for DataValue'
         }.map(|result| result.value()).unwrap_or_default()
@@ -109,6 +115,7 @@ impl fmt::Display for ASTStatement {
             ASTStatement::VariableDeclaration(vd) => write!(f, "{vd}"),
             ASTStatement::Scope(scope) => write!(f, "{scope}"),
             ASTStatement::Conditional(cond) => write!(f, "{cond}"),
+            ASTStatement::Repeat(repeat) => write!(f, "{repeat}"),
             ASTStatement::Return(node) => write!(f, "return ( {node} )")
         }
     }

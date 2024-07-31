@@ -13,6 +13,7 @@ pub enum TokenLangKeyword {
     False,
     Null,
     Undefined,
+    Repeat
 }
 
 impl TokenLangKeyword {
@@ -30,6 +31,7 @@ impl TokenLangKeyword {
             "false" => Some(Self::False),
             "null" => Some(Self::Null),
             "undefined" => Some(Self::Undefined),
+            "repeat" => Some(Self::Repeat),
             _ => None,
         }
     }
@@ -48,6 +50,7 @@ impl From<&TokenLangKeyword> for &'static str {
             TokenLangKeyword::False => "false",
             TokenLangKeyword::Null => "null",
             TokenLangKeyword::Undefined => "undefined",
+            TokenLangKeyword::Repeat => "repeat",
         }
     }
 }
