@@ -58,8 +58,8 @@ impl Node for ASTNode {
 impl fmt::Display for ASTNode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Expression(expr) => write!(f, "{}{expr}{}", "<", ">"),
-            Self::Statement(stmt) => write!(f, "{}{stmt}{}", "[", "]"),
+            Self::Expression(expr) => write!(f, "<{expr}>"),
+            Self::Statement(stmt) => write!(f, "[{stmt}]"),
         }
     }
 }

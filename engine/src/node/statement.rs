@@ -67,10 +67,10 @@ impl StatementNode for ASTStatement {
 impl fmt::Display for ASTStatement {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ASTStatement::VariableDeclaration(vd) => write!(f, "{}", vd),
-            ASTStatement::Scope(scope) => write!(f, "{}", scope),
-            ASTStatement::Conditional(cond) => write!(f, "{}", cond),
-            ASTStatement::Return(node) => write!(f, "return ( {} )", node)
+            ASTStatement::VariableDeclaration(vd) => write!(f, "{vd}"),
+            ASTStatement::Scope(scope) => write!(f, "{scope}"),
+            ASTStatement::Conditional(cond) => write!(f, "{cond}"),
+            ASTStatement::Return(node) => write!(f, "return ( {node} )")
         }
     }
 }

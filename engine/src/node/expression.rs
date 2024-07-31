@@ -64,8 +64,8 @@ impl ExpressionNode for ASTExpression {
 impl fmt::Display for ASTExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ASTExpression::Terminal(expr) => write!(f, "{}", expr),
-            ASTExpression::Binary(expr) => write!(f, "{}", expr)
+            ASTExpression::Terminal(expr) => write!(f, "{expr}"),
+            ASTExpression::Binary(expr) => write!(f, "{expr}")
         }
     }
 }

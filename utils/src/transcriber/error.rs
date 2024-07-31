@@ -27,7 +27,7 @@ impl<SourceUnit: fmt::Debug, ResultUnit: fmt::Debug, Error: fmt::Display> fmt::D
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{} (at position {})\n", "Transcriber Error".red().bold(), self.cursor_position.to_string().yellow().bold())?;
         write!(f, "\t{}\n", self.error)?;
-        write!(f, "\tBuffer: tick (starts at {}): {:?}\n", self.tick_initial_position.to_string().yellow().bold(), self.tick_buffer)?;
-        write!(f, "\tBuffer: transcription: {:?}", self.transcription_buffer)
+        write!(f, "\tTick buffer (starts at {}): {:?}\n", self.tick_initial_position.to_string().yellow().bold(), self.tick_buffer)?;
+        write!(f, "\tTranscription buffer: {:?}", self.transcription_buffer)
     }
 }
