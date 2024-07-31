@@ -12,7 +12,7 @@ use crate::{
     vm::tick::VMTick
 };
 
-use super::{expression::{ASTExpression, ExpressionNode}, ASTNode, Node};
+use super::{expression::{ASTExpression, ExpressionNode}, Node};
 
 /// Wether the statement returned a value for using it or the result is just a side effect
 pub enum StatementResult {
