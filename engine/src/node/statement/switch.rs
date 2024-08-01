@@ -18,18 +18,13 @@ pub struct SwitchStatement {
 impl Node for SwitchStatement {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
         // Switch statements should start with the keyword `if`
-        if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Switch)) {
-            // TODO: Move this shit to the cursor
-            return Err(TranscriptionException::Error(ParserError::Expected("start@switch <keyword:switch> 'switch'".to_string())));
-        }
+        cursor.expect(&Token::LangKeyword(TokenLangKeyword::Switch), ParserError::Expected("start@switch <keyword:switch> 'switch'".to_string()))?;
 
         // Get the expression to evaluate
         let expression = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@switch <expr>".to_string())))?;
 
         // Then list the cases between braces
-        if cursor.consume() != Some(&Token::Symbol(TokenSymbol::BraceOpen)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("opening@switch/sym <sym:brace:open> '{'".to_string())));
-        }
+        cursor.expect(&Token::Symbol(TokenSymbol::BraceOpen), ParserError::Expected("opening@switch/sym <sym:brace:open> '{'".to_string()))?;
 
         // TODO: Move this shit to the cursor (x2)
         while let Some(Token::Symbol(TokenSymbol::EOL)) = cursor.peek() {
@@ -42,15 +37,14 @@ impl Node for SwitchStatement {
         while let TranscriptionIntent(Ok(Some(case_node))) = cursor.intent(SwitchCase::transcribe) {
             cases.push(case_node);
 
+            // TODO: This can be handled with cursor.expect()
             while let Some(Token::Symbol(TokenSymbol::EOL)) = cursor.peek() {
                 cursor.next();
             }
         }
 
         // Get the closing brace
-        if cursor.consume() != Some(&Token::Symbol(TokenSymbol::BraceClose)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("closing@switch/sym <sym:brace:close> '}'".to_string())));
-        }
+        cursor.expect(&Token::Symbol(TokenSymbol::BraceClose), ParserError::Expected("closing@switch/sym <sym:brace:close> '}'".to_string()))?;
 
         Ok(Some(Self { expression, cases }))
     }

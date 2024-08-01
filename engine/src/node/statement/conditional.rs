@@ -25,9 +25,7 @@ impl Node for ConditionalStatement {
     /// Transcribe a conditional statement from the source code (tokens)
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
         // Conditionals should start with the keyword `if`
-        if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::If)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("start@conditional <keyword:if> 'if'".to_string())));
-        }
+        cursor.expect(&Token::LangKeyword(TokenLangKeyword::If), ParserError::Expected("start@conditional <keyword:if> 'if'".to_string()))?;
 
         // Get the condition expression
         let condition = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("condition@conditional <expr>".to_string())))?;

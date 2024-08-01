@@ -3,7 +3,9 @@ pub mod navigation;
 #[cfg(test)]
 mod tests;
 
-use crate::checkpoint::Checkpoint;
+use crate::{checkpoint::Checkpoint, cursor::CursorNavigation};
+
+use super::error::TranscriptionException;
 
 /// A set of tools for moving through a vector of units with a cursor.
 #[derive(Debug, Clone)]
@@ -15,7 +17,7 @@ pub struct TranscriberCursor<'a, Unit> {
     pub source: &'a Vec<Unit>,
 }
 
-impl <'a, Unit> Checkpoint<usize> for TranscriberCursor<'a, Unit> {
+impl<'a, Unit> Checkpoint<usize> for TranscriberCursor<'a, Unit> {
     /// Save the current cursor position
     fn checkpoint(&self) -> usize {
         self.pos
@@ -24,5 +26,17 @@ impl <'a, Unit> Checkpoint<usize> for TranscriberCursor<'a, Unit> {
     /// Rollback the cursor to the saved position
     fn rollback(&mut self, save: usize) {
         self.pos = save;
+    }
+}
+
+impl<'a, Unit> TranscriberCursor<'a, Unit> {
+    /// Checks if the cursor is at an expected token, if it is, it will be consumed and returned.
+    pub fn expect<'b, Error>(&mut self, expectation: &'b Unit, error: Error) -> Result<&'b Unit, TranscriptionException<Error>> where Unit: PartialEq {
+        if self.peek() == Some(expectation) {
+            self.next();
+            Ok(expectation)
+        } else {
+            Err(TranscriptionException::Error(error))
+        }
     }
 }

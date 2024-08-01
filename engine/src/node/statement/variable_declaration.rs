@@ -35,9 +35,7 @@ impl Node for VariableDeclaration {
     /// Transcribes the declaration of ONE variable
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
         // Variables should start with the keyword `let`
-        if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Let)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string())));
-        }
+        cursor.expect(&Token::LangKeyword(TokenLangKeyword::Let), ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string()))?;
 
         // The statement is followed by a variable name
         if let Some(Token::CustomKeyword(varname)) = cursor.consume() {
@@ -58,7 +56,7 @@ impl Node for VariableDeclaration {
                 value
             }))
         } else {
-            Err(TranscriptionException::Error(ParserError::Expected("varname@var_declaration".to_string())))
+            Err(TranscriptionException::Error(ParserError::Expected("varname@var_declaration <keyword:custom>".to_string())))
         }
     }
 }

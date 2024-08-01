@@ -1,6 +1,6 @@
 use std::fmt;
 
-use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
     lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::{context::Context, tick::VMTick}
@@ -23,9 +23,7 @@ pub struct ScopeStruct {
 impl Node for ScopeStruct {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
         // Scopes should start with an opening brace
-        if cursor.consume() != Some(&Token::Symbol(TokenSymbol::BraceOpen)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("start@scope/sym <sym:brace:open> '{'".to_string())));
-        }
+        cursor.expect(&Token::Symbol(TokenSymbol::BraceOpen), ParserError::Expected("start@scope/sym <sym:brace:open> '{'".to_string()))?;
 
         let mut nodes = vec![];
 
@@ -45,9 +43,7 @@ impl Node for ScopeStruct {
         }
 
         // Scopes should end with a closing brace
-        if cursor.consume() != Some(&Token::Symbol(TokenSymbol::BraceClose)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("end@scope/sym <sym:brace:close> '}'".to_string())));
-        }
+        cursor.expect(&Token::Symbol(TokenSymbol::BraceClose), ParserError::Expected("end@scope/sym <sym:brace:close> '}'".to_string()))?;
 
         Ok(Some(ScopeStruct { nodes, name: String::new() }))
     }
