@@ -1,6 +1,6 @@
 use std::fmt;
 
-use lubalia_utils::transcriber::error::TranscriberError;
+use lubalia_utils::transcriber::error::TranscriptionError;
 use lubengine::{data::DataValue, lang::{lexer::{lexer, LexerError}, parser::{error::ParserError, parser}, token::Token}, root::ASTRootItem, vm::VM};
 
 /// Evaluate a source code in the VM
@@ -24,7 +24,7 @@ pub enum EvaluationError {
     LexerError(LexerError),
 
     /// An error during the parsing process of the code to evaluate
-    ParserError(TranscriberError<Token, ASTRootItem, ParserError>),
+    ParserError(TranscriptionError<Token, ASTRootItem, ParserError>),
 }
 
 impl fmt::Display for EvaluationError {

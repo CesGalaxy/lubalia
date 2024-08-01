@@ -9,20 +9,17 @@ mod tests;
 use std::fmt;
 
 use cursor::TranscriberCursor;
-use error::{TranscriberError, TranscriptionException};
+use error::{TranscriptionError, TranscriptionException};
 use result::{IdentifiedTranscriptionUnit, Transcription, TranscriptionResult};
 
 use crate::cursor::CursorNavigation;
 
-pub type TranscriberTick<SourceUnit, ResultUnit, Error> = fn(&mut TranscriberCursor<SourceUnit>, &SourceUnit) -> TranscriberTickResult<ResultUnit, Error>;
-pub type TranscriberTickResult<ResultUnit, Error> = Result<Option<ResultUnit>, TranscriptionException<Error>>;
+pub type TranscriberTick<S, R, E> = fn(&mut TranscriberCursor<S>, &S) -> TranscriberTickResult<R, E>;
+pub type TranscriberTickResult<R, E> = Result<Option<R>, TranscriptionException<E>>;
 
 /// Transcribe a vec of iUnits into a vec of oUnits.
 /// Create an iteration over the iUnits for transcribing them to oUnits
-pub fn transcriber<SourceUnit: Clone, ResultUnit: fmt::Debug, Error: fmt::Display>(
-    source: Vec<SourceUnit>,
-    tick: TranscriberTick<SourceUnit, ResultUnit, Error>,
-) -> TranscriptionResult<SourceUnit, ResultUnit, Error> {
+pub fn transcriber<S: Clone, R, E: fmt::Display>(source: Vec<S>, tick: TranscriberTick<S, R, E>) -> TranscriptionResult<S, R, E> {
     let mut cursor = TranscriberCursor::new(&source);
     let mut result = Vec::new();
 
@@ -42,12 +39,12 @@ pub fn transcriber<SourceUnit: Clone, ResultUnit: fmt::Debug, Error: fmt::Displa
                 result.push(IdentifiedTranscriptionUnit::new(unit, Some(tick_initial_position), Some(current_position)))
             },
             // If the tick fails, the transcription can't continue and the error is returned with additional information
-            Err(error) => return Err(TranscriberError {
+            Err(error) => return Err(TranscriptionError {
                 tick_initial_position,
                 tick_buffer: source[tick_initial_position..cursor.pos].to_vec(),
                 cursor_position: cursor.pos,
                 transcription_buffer: result,
-                error: error,
+                error,
             }),
             // The tick can return None if there's nothing to transcribe
             _ => {}

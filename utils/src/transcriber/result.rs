@@ -1,7 +1,7 @@
-use super::error::TranscriberError;
+use super::error::TranscriptionError;
 
 /// After transcribing, the result can be a `TranscriberError` or a completed `Transcription`
-pub type TranscriptionResult<SourceUnit, ResultUnit, Error> = Result<Transcription<SourceUnit, ResultUnit>, TranscriberError<SourceUnit, ResultUnit, Error>>;
+pub type TranscriptionResult<SourceUnit, ResultUnit, Error> = Result<Transcription<SourceUnit, ResultUnit>, TranscriptionError<SourceUnit, ResultUnit, Error>>;
 
 /// The result of a successful transcription (can check if it's `completed`)
 #[derive(Debug, PartialEq)]

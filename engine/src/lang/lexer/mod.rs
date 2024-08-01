@@ -1,7 +1,7 @@
 use std::fmt;
 
 use linter::{linter, LinterError};
-use lubalia_utils::transcriber::error::TranscriberError;
+use lubalia_utils::transcriber::error::TranscriptionError;
 
 use super::{token::Token, tokenizer::{error::TokenizerError, tokenizer}};
 mod linter;
@@ -32,7 +32,7 @@ pub fn lexer(code: String) -> Result<Vec<Token>, LexerError> {
 #[derive(Debug)]
 pub enum LexerError {
     /// An error during the tokenizer (transcribing) process.
-    TokenizerError(TranscriberError<char, Token, TokenizerError>),
+    TokenizerError(TranscriptionError<char, Token, TokenizerError>),
 
     /// A linter error, usually a missing semicolon.
     LinterError(LinterError)
@@ -47,8 +47,8 @@ impl fmt::Display for LexerError {
     }
 }
 
-impl From<TranscriberError<char, Token, TokenizerError>> for LexerError {
-    fn from(err: TranscriberError<char, Token, TokenizerError>) -> Self {
+impl From<TranscriptionError<char, Token, TokenizerError>> for LexerError {
+    fn from(err: TranscriptionError<char, Token, TokenizerError>) -> Self {
         Self::TokenizerError(err)
     }
 }
