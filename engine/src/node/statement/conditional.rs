@@ -36,7 +36,9 @@ impl Node for ConditionalStatement {
         let then_branch = ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("then_branch@conditional <node>".to_string())))?;
 
         // Optionally, if the statement continues with the `else` keyword, get the else branch
-        let else_branch = if cursor.consume() == Some(&Token::LangKeyword(TokenLangKeyword::Else)) {
+        let else_branch = if cursor.peek() == Some(&Token::LangKeyword(TokenLangKeyword::Else)) {
+            // TODO: Automate this in the cursor?
+            cursor.next();
             Some(ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("else_branch@conditional <node>".to_string())))?)
         } else {
             None
