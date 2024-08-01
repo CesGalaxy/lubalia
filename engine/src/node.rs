@@ -16,11 +16,11 @@ pub type NodeParserTickResult<T> = TranscriberTickResult<T, ParserError>;
 /// An instruction for the VM
 #[derive(Debug, Clone)]
 pub enum ASTNode {
-    /// An instruction that ALWAYS returns a value (doesn't modify the context, usually)
+    /// An instruction that ALWAYS returns a value (doesn't modify the context, usually).
     Expression(ASTExpression),
 
-    /// An instruction that works and manipulates the context and data
-    /// It can return a value SOMETIMES
+    /// An instruction that works and manipulates the context and data.
+    /// It can return a value SOMETIMES.
     Statement(ASTStatement)
 }
 
@@ -49,12 +49,12 @@ impl Node for ASTNode {
                 // Try (intent) to transcribe a statement
                 _ => cursor.intent(ASTStatement::transcribe).map(|stmnt| stmnt.map(|stmnt| stmnt.map(Self::Statement)))
                         // if no statement was found, try to transcribe an expression (which won't be a statament-result).
-                        // TODO: The expression will never be a statement, will it?
                         .alt(|| cursor.intent(ASTExpression::transcribe).map(|expr| expr.map(|expr| expr.map(ASTNode::Expression))))
                         // All nodes must end with a new line
                         .check(|_| if let Some(Token::Symbol(TokenSymbol::EOL)) = cursor.consume() {
                             None
                         } else {
+                            // TODO: Provide expected and position
                             Some(Err(TranscriptionException::Error(ParserError::Expected("end of line".to_string()))))
                         })
                         // Is no expression was found neither, no node was found

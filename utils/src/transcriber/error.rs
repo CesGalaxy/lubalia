@@ -4,9 +4,13 @@ use colored::Colorize;
 
 use super::result::IdentifiedTranscriptionUnit;
 
+/// An exception during the transcription process
 #[derive(Debug)]
 pub enum TranscriptionException<Error> {
+    /// The interpreter didn't know how to transcribe the unit
     NotFound(String),
+
+    /// An error ocurred during the transcription process of a known unit
     Error(Error),
 }
 
