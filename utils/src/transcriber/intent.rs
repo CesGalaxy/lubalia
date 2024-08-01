@@ -17,6 +17,15 @@ impl<ResultUnit, Error> TranscriptionIntent<ResultUnit, Error> {
         }
     }
 
+    pub fn check(self, check: impl FnOnce(&ResultUnit) -> Option<TranscriberTickResult<ResultUnit, Error>>) -> TranscriptionIntent<ResultUnit, Error> {
+        if let Self(Ok(Some(unit))) = &self {
+            check(unit).map(TranscriptionIntent).unwrap_or(self)
+        } else {
+            self
+        }
+
+    }
+
     pub fn tag(self, tag: String) -> TranscriberTickResult<ResultUnit, Error> {
         if let Err(TranscriptionException::NotFound(_)) = self.0 {
             Err(TranscriptionException::NotFound(tag))

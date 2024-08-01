@@ -4,7 +4,7 @@ pub mod statement;
 use std::fmt;
 
 use expression::{ASTExpression, ExpressionNode};
-use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, TranscriberTickResult}};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException, TranscriberTickResult}};
 use statement::{ASTStatement, StatementNode};
 
 use crate::{lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
@@ -51,6 +51,12 @@ impl Node for ASTNode {
                         // if no statement was found, try to transcribe an expression (which won't be a statament-result).
                         // TODO: The expression will never be a statement, will it?
                         .alt(|| cursor.intent(ASTExpression::transcribe).map(|expr| expr.map(|expr| expr.map(ASTNode::Expression))))
+                        // All nodes must end with a new line
+                        .check(|_| if let Some(Token::Symbol(TokenSymbol::EOL)) = cursor.consume() {
+                            None
+                        } else {
+                            Some(Err(TranscriptionException::Error(ParserError::Expected("end of line".to_string()))))
+                        })
                         // Is no expression was found neither, no node was found
                         .tag("<node>".to_string())
             },
