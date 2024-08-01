@@ -27,7 +27,7 @@ impl<SourceUnit, ResultUnit> Transcription<SourceUnit, ResultUnit> {
 }
 
 /// A unit with extra data for localizing it's source in the transcription source. (aka ITU)
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct IdentifiedTranscriptionUnit<Unit> {
     /// The transcribed unit
     pub value: Unit,
@@ -54,48 +54,40 @@ impl<Unit> IdentifiedTranscriptionUnit<Unit> {
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
 
-    // #[test]
-    // fn test_empty_transcription() {
-    //     let source: Vec<char> = vec![];
-    //     let transcription = Transcription::<char, usize>::new(source);
+    #[test]
+    fn test_new_transcription() {
+        let result = vec![
+            IdentifiedTranscriptionUnit::new("Result 1", Some(0), Some(5)),
+            IdentifiedTranscriptionUnit::new("Result 2", Some(6), Some(11)),
+        ];
+        let source = vec!["Source 1", "Source 2"];
+        let transcription = Transcription::new(result.clone(), source.clone());
 
-    //     assert_eq!(transcription.units(), vec![&0; 0], "transcription units should be empty");
-    //     assert_eq!(transcription.result, vec![], "result should be empty");
-    // }
+        assert_eq!(transcription.result, result);
+        assert_eq!(transcription.source, source);
+    }
 
-    // #[test]
-    // fn test_incomplete_transcription() {
-    //     let source = String::from("one two three").chars().collect();
-    //     let mut transcription = Transcription::<char, usize>::new(source);
+    #[test]
+    fn test_units() {
+        let result = vec![
+            IdentifiedTranscriptionUnit::new("Result 1", Some(0), Some(5)),
+            IdentifiedTranscriptionUnit::new("Result 2", Some(6), Some(11)),
+        ];
+        let source = vec!["Source 1", "Source 2"];
+        let transcription = Transcription::new(result.clone(), source.clone());
 
-    //     transcription.push(1, Some(0), Some(2));
-    //     transcription.push(2, Some(4), Some(7));
+        let expected_units = vec!["Result 1", "Result 2"];
+        assert_eq!(transcription.units().iter().map(|unit| *unit as &str).collect::<Vec<&str>>(), expected_units);
+    }
 
-    //     assert_eq!(transcription.units(), vec![&1, &2], "transcription units should be [1, 2]");
-    //     assert_eq!(transcription.result.iter().map(|itu| itu.source_position).collect::<Vec<_>>(), vec![Some(0), Some(4)], "testing units' source positions");
-    //     assert_eq!(transcription.result.iter().map(|itu| itu.source_length).collect::<Vec<_>>(), vec![Some(2), Some(3)], "testing units' source lengths");
+    #[test]
+    fn test_identified_transcription_unit() {
+        let unit = IdentifiedTranscriptionUnit::new("Result", Some(0), Some(5));
 
-    //     assert_eq!(transcription.result[0].value, 1, "testing unit 0 value");
-    //     assert_eq!(transcription.result[1].value, 2, "testing unit 1 value");
-    // }
-
-    // #[test]
-    // fn test_completed_transcription() {
-    //     let source = String::from("one two three").chars().collect();
-    //     let mut transcription = Transcription::<char, usize>::new(source);
-
-    //     transcription.push(1, Some(0), Some(2));
-    //     transcription.push(2, Some(4), Some(7));
-    //     transcription.push(3, Some(8), Some(13));
-
-    //     assert_eq!(transcription.units(), vec![&1, &2, &3], "transcription units should be [1, 2, 3]");
-    //     assert_eq!(transcription.result.iter().map(|itu| itu.source_position).collect::<Vec<_>>(), vec![Some(0), Some(4), Some(8)], "testing units' source positions");
-    //     assert_eq!(transcription.result.iter().map(|itu| itu.source_length).collect::<Vec<_>>(), vec![Some(2), Some(3), Some(5)], "testing units' source lengths");
-
-    //     assert_eq!(transcription.result[0].value, 1, "testing unit 0 value");
-    //     assert_eq!(transcription.result[1].value, 2, "testing unit 1 value");
-    //     assert_eq!(transcription.result[2].value, 3, "testing unit 2 value");
-    // }
+        assert_eq!(unit.value, "Result");
+        assert_eq!(unit.source_position, Some(0));
+        assert_eq!(unit.source_length, Some(5));
+    }
 }
