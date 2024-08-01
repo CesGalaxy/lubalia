@@ -43,13 +43,15 @@ impl Add for ArithmeticValue {
             // Same type
             (ArithmeticValue::Number(lhs), ArithmeticValue::Number(rhs)) => ArithmeticValue::Number(lhs + rhs),
             (ArithmeticValue::String(lhs), ArithmeticValue::String(rhs)) => ArithmeticValue::String(lhs + &rhs),
+            (ArithmeticValue::List(lhs), ArithmeticValue::List(rhs)) => ArithmeticValue::List(lhs.into_iter().chain(rhs.into_iter()).collect()),
+            // TODO: Should this be here?
+            (ArithmeticValue::Null, ArithmeticValue::Null) => ArithmeticValue::Null,
 
             // String
             (ArithmeticValue::String(lhs), ArithmeticValue::Number(rhs)) => ArithmeticValue::String(lhs + &rhs.to_string()),
             (ArithmeticValue::Number(lhs), ArithmeticValue::String(rhs)) => ArithmeticValue::String(lhs.to_string() + &rhs),
 
-            // List
-            (ArithmeticValue::List(lhs), ArithmeticValue::List(rhs)) => ArithmeticValue::List(lhs.into_iter().chain(rhs.into_iter()).collect()),
+            // List: Will add the item to the list (depending on the order)
             (ArithmeticValue::List(mut list), value) => {
                 list.push(value);
                 ArithmeticValue::List(list)
@@ -60,8 +62,7 @@ impl Add for ArithmeticValue {
             },
 
             // Null will do nothing
-            (Self::Null, value) => value,
-            (value, Self::Null) => value,
+            (Self::Null, value) | (value, Self::Null) => value,
         }
     }
 }

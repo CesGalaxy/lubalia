@@ -3,10 +3,12 @@ use super::DataValue;
 impl From<DataValue> for bool {
     fn from(value: DataValue) -> Self {
         match value {
-            DataValue::Boolean(boolean) => boolean,
             DataValue::Number(number) => number != 0.0,
             DataValue::String(string) => !string.is_empty(),
-            _ => false
+            DataValue::Char(character) => character != '\0',
+            DataValue::Boolean(boolean) => boolean,
+            DataValue::List(list) => !list.is_empty(),
+            DataValue::Null => false
         }
     }
 }

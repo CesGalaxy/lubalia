@@ -52,14 +52,16 @@ impl fmt::Display for DataValue {
             DataValue::Boolean(boolean) => write!(f, "{}", boolean.to_string().bright_green()),
             DataValue::List(list) => {
                 let mut list_str = String::new();
-                list_str.push_str("[");
 
                 for item in list {
                     list_str.push_str(&format!("{item}, "));
                 }
 
-                list_str.push_str("]");
-                write!(f, "{}", list_str)
+                // Remove the last comma and space
+                list_str.pop();
+                list_str.pop();
+
+                write!(f, "[ {} ]", list_str)
             },
             DataValue::Null => write!(f, "{}", "NULL".bright_red()),
         }

@@ -8,6 +8,7 @@ impl PartialEq for DataValue {
             (DataValue::String(a), DataValue::String(b)) => a == b,
             (DataValue::Char(a), DataValue::Char(b)) => a == b,
             (DataValue::Boolean(a), DataValue::Boolean(b)) => a == b,
+            (DataValue::List(a), DataValue::List(b)) => a == b,
             (DataValue::Null, DataValue::Null) => true,
 
             // String - Number
@@ -21,9 +22,6 @@ impl PartialEq for DataValue {
             // Number - Boolean
             (DataValue::Number(a), DataValue::Boolean(b)) => a == &f64::from(*b),
             (DataValue::Boolean(a), DataValue::Number(b)) => &f64::from(*a) == b,
-
-            // List - List
-            (DataValue::List(a), DataValue::List(b)) => a == b,
 
             // Char - String
             (DataValue::Char(a), DataValue::String(b)) => a.to_string() == *b,
@@ -63,8 +61,8 @@ impl PartialOrd for DataValue {
             (DataValue::String(a), DataValue::Boolean(b)) => Some(a.cmp(&b.to_string())),
 
             // Number - Boolean
-            (DataValue::Number(a), DataValue::Boolean(b)) => Some(a.partial_cmp(&f64::from(*b)).unwrap_or(std::cmp::Ordering::Equal)),
-            (DataValue::Boolean(a), DataValue::Number(b)) => Some(f64::from(*a).partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal)),
+            (DataValue::Number(a), DataValue::Boolean(b)) => Some((*a as usize).cmp(&(*b as usize))),
+            (DataValue::Boolean(a), DataValue::Number(b)) => Some((*a as usize).cmp(&(*b as usize))),
 
             // List - Number (use list length)
             (DataValue::List(a), DataValue::Number(b)) => Some(b.total_cmp(&(a.len() as f64))),
