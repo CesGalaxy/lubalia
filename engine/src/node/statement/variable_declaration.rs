@@ -1,11 +1,9 @@
 use std::fmt;
 
-use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    node::{expression::{ASTExpression, ExpressionNode},Node},
-    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
-    vm::tick::VMTick
+    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode},Node, NodeParserTickResult}, vm::tick::VMTick
 };
 
 use super::{StatementNode, StatementResult};
@@ -35,10 +33,10 @@ pub struct VariableDeclaration {
 
 impl Node for VariableDeclaration {
     /// Transcribes the declaration of ONE variable
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
         // Variables should start with the keyword `let`
         if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Let)) {
-            return Err(ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string()));
+            return Err(TranscriptionException::Error(ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string())));
         }
 
         // The statement is followed by a variable name
@@ -60,7 +58,7 @@ impl Node for VariableDeclaration {
                 value
             }))
         } else {
-            Err(ParserError::Expected("varname@var_declaration".to_string()))
+            Err(TranscriptionException::Error(ParserError::Expected("varname@var_declaration".to_string())))
         }
     }
 }

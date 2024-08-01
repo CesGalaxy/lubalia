@@ -4,8 +4,8 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCu
 
 use crate::{
     data::DataValue,
-    node::{statement::ASTStatement, Node},
-    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
+    lang::token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token},
+    node::{statement::ASTStatement, Node, NodeParserTickResult},
     vm::tick::VMTick
 };
 
@@ -29,8 +29,8 @@ pub enum TerminalExpression {
 
 impl Node for TerminalExpression {
     /// Transcribe a terminal expression (literal, variable reference, scope, etc.)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<TerminalExpression>, ParserError> {
-        fn return_statament(cursor: &mut TranscriberCursor<Token>) -> Result<Option<TerminalExpression>, ParserError> {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
+        fn return_statament(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<TerminalExpression> {
             cursor.back();
             ASTStatement::transcribe(cursor).map(|o| o.map(|stmt| TerminalExpression::StatementResult(Box::new(stmt))))
         }

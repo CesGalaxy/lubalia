@@ -1,11 +1,13 @@
 use error::TokenizerError;
 use intents::{transcribe_keyword, transcribe_string, transcribe_number};
-use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, result::{IdentifiedTranscriptionUnit, TranscriptionResult}, transcriber}};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException, result::{IdentifiedTranscriptionUnit, TranscriptionResult}, transcriber, TranscriberTickResult}};
 
 use super::token::{symbol::TokenSymbol, Token};
 
 pub mod error;
 pub mod intents;
+
+pub type TokenizerTickResult = TranscriberTickResult<Token, TokenizerError>;
 
 /// Returns a vector of tokens from the given code.
 /// 
@@ -23,7 +25,7 @@ pub fn tokenizer(code: String) -> TranscriptionResult<char, Token, TokenizerErro
     Ok(transcription)
 }
 
-fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> Result<Option<Token>, TokenizerError> {
+fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> TokenizerTickResult {
     match initial_unit {
         ' ' | '\t' | '\r' => Ok(None),
 
@@ -46,7 +48,7 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
         _ => if let Some(symbol) = TokenSymbol::from_char(*initial_unit) {
             Ok(Some(Token::Symbol(symbol)))
         } else {
-            Err(TokenizerError::UnknownCharacter(*initial_unit))
+            Err(TranscriptionException::Error(TokenizerError::UnknownCharacter(*initial_unit)))
         }
     }
 }

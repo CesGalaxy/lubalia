@@ -1,21 +1,21 @@
 pub mod cursor;
 pub mod error;
 pub mod result;
+pub mod intent;
 
 #[cfg(test)]
 mod tests;
-pub mod intent;
 
 use std::fmt;
 
 use cursor::TranscriberCursor;
-use error::TranscriberError;
+use error::{TranscriberError, TranscriptionException};
 use result::{IdentifiedTranscriptionUnit, Transcription, TranscriptionResult};
 
 use crate::cursor::CursorNavigation;
 
 pub type TranscriberTick<SourceUnit, ResultUnit, Error> = fn(&mut TranscriberCursor<SourceUnit>, &SourceUnit) -> TranscriberTickResult<ResultUnit, Error>;
-pub type TranscriberTickResult<ResultUnit, Error> = Result<Option<ResultUnit>, Error>;
+pub type TranscriberTickResult<ResultUnit, Error> = Result<Option<ResultUnit>, TranscriptionException<Error>>;
 
 /// Transcribe a vec of iUnits into a vec of oUnits.
 /// Create an iteration over the iUnits for transcribing them to oUnits

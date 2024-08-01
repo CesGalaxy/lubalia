@@ -1,4 +1,4 @@
-use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, transcriber, TranscriberTickResult}};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException, transcriber, TranscriberTickResult}};
 
 const EXAMPLE_CODE: &str = r#"1234567890"#;
 
@@ -40,6 +40,6 @@ fn tick(cursor: &mut TranscriberCursor<char>, initial_char: &char) -> Transcribe
         '8' => Ok(Some(Token::Eight)),
         '9' => Ok(Some(Token::Nine)),
         '0' => Ok(Some(Token::Zero)),
-        _ => Err("Invalid token"),
+        _ => Err(TranscriptionException::Error("Invalid token")),
     }
 }

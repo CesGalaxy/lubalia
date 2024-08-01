@@ -1,11 +1,9 @@
 use std::fmt;
 
-use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    node::{expression::{ASTExpression, ExpressionNode}, Node},
-    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, Token}},
-    vm::tick::VMTick
+    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::tick::VMTick
 };
 
 use super::{scope::ScopeStruct, StatementNode, StatementResult};
@@ -25,21 +23,21 @@ pub struct ConditionalStatement {
 
 impl Node for ConditionalStatement {
     /// Transcribe a conditional statement from the source code (tokens)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
         // Conditionals should start with the keyword `if`
         if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::If)) {
-            return Err(ParserError::Expected("start@conditional <keyword:if> 'if'".to_string()));
+            return Err(TranscriptionException::Error(ParserError::Expected("start@conditional <keyword:if> 'if'".to_string())));
         }
 
         // Get the condition expression
-        let condition = ASTExpression::transcribe(cursor)?.ok_or(ParserError::Expected("condition@conditional <expr>".to_string()))?;
+        let condition = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("condition@conditional <expr>".to_string())))?;
 
         // Get a scope with the branch to run if the condition is true
-        let then_branch = ScopeStruct::transcribe(cursor)?.ok_or(ParserError::Expected("then_branch@conditional <node>".to_string()))?;
+        let then_branch = ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("then_branch@conditional <node>".to_string())))?;
 
         // Optionally, if the statement continues with the `else` keyword, get the else branch
         let else_branch = if cursor.consume() == Some(&Token::LangKeyword(TokenLangKeyword::Else)) {
-            Some(ScopeStruct::transcribe(cursor)?.ok_or(ParserError::Expected("else_branch@conditional <node>".to_string()))?)
+            Some(ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("else_branch@conditional <node>".to_string())))?)
         } else {
             None
         };

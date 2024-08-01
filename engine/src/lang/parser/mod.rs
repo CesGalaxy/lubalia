@@ -1,7 +1,7 @@
 pub mod error;
 
 use error::ParserError;
-use lubalia_utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber};
+use lubalia_utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber, TranscriberTickResult};
 
 use crate::{
     node::{ASTNode, Node},
@@ -18,7 +18,7 @@ pub fn parser(tokens: Vec<Token>) -> TranscriptionResult<Token, ASTRootItem, Par
 }
 
 /// Each tick of the parser transcriber
-fn parser_tick(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> Result<Option<ASTRootItem>, ParserError> {
+fn parser_tick(cursor: &mut TranscriberCursor<Token>, initial_token: &Token) -> TranscriberTickResult<ASTRootItem, ParserError> {
     // TODO: This task should be for ASTRootItem
     match initial_token {
         Token::Symbol(TokenSymbol::EOF) => Ok(None),

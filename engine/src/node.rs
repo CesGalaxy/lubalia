@@ -4,12 +4,14 @@ pub mod statement;
 use std::fmt;
 
 use expression::{ASTExpression, ExpressionNode};
-use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, TranscriberTickResult}};
 use statement::{ASTStatement, StatementNode};
 
 use crate::{lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
 
 use super::data::DataValue;
+
+pub type NodeParserTickResult<T> = TranscriberTickResult<T, ParserError>;
 
 /// An instruction for the VM
 #[derive(Debug, Clone)]
@@ -24,7 +26,7 @@ pub enum ASTNode {
 
 pub trait Node: fmt::Display {
     /// Transcribe a node from the source code (tokens)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized;
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized;
 }
 
 impl ASTNode {
@@ -39,18 +41,18 @@ impl ASTNode {
 
 impl Node for ASTNode {
     /// Get a node from the source code (tokens)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTNode>, ParserError> {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
         match cursor.peek() {
             Some(token) => match token {
                 // Ignore EOLs (note: the trancriber will automatly move the cursor)
                 Token::Symbol(TokenSymbol::EOL) => Ok(None),
                 // Try (intent) to transcribe a statement
-                _ => cursor.intent(ASTStatement::transcribe).map(|stmnt| stmnt.map(Self::Statement))
+                _ => cursor.intent(ASTStatement::transcribe).map(|stmnt| stmnt.map(|stmnt| stmnt.map(Self::Statement)))
                         // if no statement was found, try to transcribe an expression (which won't be a statament-result).
                         // TODO: The expression will never be a statement, will it?
-                        // TODO: Two transcriber exceptions: NotFound and Exception
-                        .or_else(|_| cursor.intent(ASTExpression::transcribe).map(|expr| expr.map(ASTNode::Expression)))
-                        .map_err(|_| ParserError::Expected("<node>".to_string()))
+                        .alt(|| cursor.intent(ASTExpression::transcribe).map(|expr| expr.map(|expr| expr.map(ASTNode::Expression))))
+                        // Is no expression was found neither, no node was found
+                        .tag("<node>".to_string())
             },
             None => Ok(None)
         }

@@ -5,7 +5,7 @@ pub mod repeat;
 
 use std::fmt;
 
-use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
     data::DataValue,
@@ -13,7 +13,7 @@ use crate::{
     vm::tick::VMTick
 };
 
-use super::{expression::{ASTExpression, ExpressionNode}, Node};
+use super::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult};
 
 /// Wether the statement returned a value for using it or the result is just a side effect
 #[derive(Debug, Clone)]
@@ -59,7 +59,7 @@ pub trait StatementNode: Node {
 
 impl Node for ASTStatement {
     /// Transcribe an statement (if possible)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<ASTStatement>, ParserError> {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
         //? Should this return Err if no statement is found? So node transcription ignores all errors and tries an expr (which will the one that can fail)
         //* This must make sure that the transcribed node is the correct one. In case of error, it will fail.
         match cursor.peek() {
@@ -72,11 +72,11 @@ impl Node for ASTStatement {
                     cursor.next();
                     ASTExpression::transcribe(cursor).map(|expr| expr.map(ASTStatement::Return))
                 },
-                _ => Err(ParserError::Expected("LangKeyword $ <stmnt>".to_string()))
+                _ => Err(TranscriptionException::Error(ParserError::Expected("LangKeyword $ <stmnt>".to_string())))
             },
             // Scopes are statements too
             Some(Token::Symbol(TokenSymbol::BraceOpen)) => scope::ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope)),
-            _ => Err(ParserError::Expected("<stmnt>".to_string()))
+            _ => Err(TranscriptionException::NotFound("<stmnt>".to_string()))
         }
     }
 }

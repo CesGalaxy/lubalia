@@ -1,14 +1,14 @@
-use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::lang::token::{keyword::TokenLangKeyword, literal::TokenLiteral, Token};
 
 use super::error::TokenizerError;
 
-pub fn transcribe_string(cursor: &mut TranscriberCursor<char>) -> Result<Option<Token>, TokenizerError> {
-    let opening = cursor.consume().ok_or(TokenizerError::UnexpectedEnd)?;
+pub fn transcribe_string(cursor: &mut TranscriberCursor<char>) -> Result<Option<Token>, TranscriptionException<TokenizerError>> {
+    let opening = cursor.consume().ok_or(TokenizerError::UnexpectedEnd).map_err(TranscriptionException::Error)?;
 
     if opening != &'"' {
-        return Err(TokenizerError::UnexpectedSymbol(*opening, Some("\"")));
+        return Err(TranscriptionException::Error(TokenizerError::UnexpectedSymbol(*opening, Some("\""))));
     }
 
     let mut buffer = String::new();
@@ -28,13 +28,13 @@ pub fn transcribe_string(cursor: &mut TranscriberCursor<char>) -> Result<Option<
     Ok(Some(Token::Literal(TokenLiteral::String(buffer))))
 }
 
-pub fn transcribe_keyword(cursor: &mut TranscriberCursor<char>) -> Result<Token, TokenizerError> {
+pub fn transcribe_keyword(cursor: &mut TranscriberCursor<char>) -> Result<Token, TranscriptionException<TokenizerError>> {
     let mut keyword = String::new();
 
-    let initial_char = cursor.consume().ok_or(TokenizerError::UnexpectedEnd)?;
+    let initial_char = cursor.consume().ok_or(TokenizerError::UnexpectedEnd).map_err(TranscriptionException::Error)?;
 
     if !initial_char.is_ascii_alphabetic() && initial_char != &'_' {
-        return Err(TokenizerError::UnexpectedSymbol(*initial_char, Some("keyword:initial /[a-zA-Z_]/")));
+        return Err(TranscriptionException::Error(TokenizerError::UnexpectedSymbol(*initial_char, Some("keyword:initial /[a-zA-Z_]/"))));
     } else {
         keyword.push(*initial_char);
     }
@@ -55,13 +55,13 @@ pub fn transcribe_keyword(cursor: &mut TranscriberCursor<char>) -> Result<Token,
     }
 }
 
-pub fn transcribe_number(cursor: &mut TranscriberCursor<char>) -> Result<Token, TokenizerError> {
+pub fn transcribe_number(cursor: &mut TranscriberCursor<char>) -> Result<Token, TranscriptionException<TokenizerError>> {
     let mut literal = String::new();
 
-    let initial_char = cursor.consume().ok_or(TokenizerError::UnexpectedEnd)?;
+    let initial_char = cursor.consume().ok_or(TokenizerError::UnexpectedEnd).map_err(TranscriptionException::Error)?;
 
     if !initial_char.is_numeric() {
-        return Err(TokenizerError::UnexpectedSymbol(*initial_char, Some("number:initial /[0-9]/")));
+        return Err(TranscriptionException::Error(TokenizerError::UnexpectedSymbol(*initial_char, Some("number:initial /[0-9]/"))));
     } else {
         literal.push(*initial_char);
     }
@@ -75,5 +75,5 @@ pub fn transcribe_number(cursor: &mut TranscriberCursor<char>) -> Result<Token, 
         }
     }
 
-    literal.parse().map_err(|_| TokenizerError::ErrorParsingNumber(literal)).map(TokenLiteral::Number).map(Token::Literal)
+    literal.parse().map_err(|_| TranscriptionException::Error(TokenizerError::ErrorParsingNumber(literal))).map(TokenLiteral::Number).map(Token::Literal)
 }

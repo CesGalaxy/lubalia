@@ -4,6 +4,21 @@ use colored::Colorize;
 
 use super::result::IdentifiedTranscriptionUnit;
 
+#[derive(Debug)]
+pub enum TranscriptionException<Error> {
+    NotFound(String),
+    Error(Error),
+}
+
+impl<Error: fmt::Display> fmt::Display for TranscriptionException<Error> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            TranscriptionException::NotFound(name) => write!(f, "{}", format!("{} not found", name).red().bold()),
+            TranscriptionException::Error(error) => write!(f, "{}", error),
+        }
+    }
+}
+
 /// An error during the transcription process
 #[derive(Debug)]
 pub struct TranscriberError<SourceUnit, ResultUnit, Error: fmt::Display> {
@@ -20,7 +35,7 @@ pub struct TranscriberError<SourceUnit, ResultUnit, Error: fmt::Display> {
     pub transcription_buffer: Vec<IdentifiedTranscriptionUnit<ResultUnit>>,
 
     /// The error that occured
-    pub error: Error,
+    pub error: TranscriptionException<Error>,
 }
 
 impl<SourceUnit: fmt::Debug, ResultUnit: fmt::Debug, Error: fmt::Display> fmt::Display for TranscriberError<SourceUnit, ResultUnit, Error> {

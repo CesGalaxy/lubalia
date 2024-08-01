@@ -1,8 +1,8 @@
 use std::fmt;
 
-use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node}};
+use crate::{lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}};
 
 use super::{ASTStatement, StatementNode, StatementResult};
 
@@ -16,15 +16,15 @@ pub struct Repeat {
 }
 
 impl Node for Repeat {
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> Result<Option<Self>, ParserError> where Self: Sized {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
         // Repeat loops should start with the keyword `repeat`
         if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Repeat)) {
-            return Err(ParserError::Expected("start@repeat <keyword:repeat> 'repeat'".to_string()));
+            return Err(TranscriptionException::Error(ParserError::Expected("start@repeat <keyword:repeat> 'repeat'".to_string())));
         }
 
-        let times = ASTExpression::transcribe(cursor)?.ok_or(ParserError::Expected("times@repeat <expr>".to_string()))?;
+        let times = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("times@repeat <expr>".to_string())))?;
 
-        let iteration = Box::new(ASTStatement::transcribe(cursor)?.ok_or(ParserError::Expected("iteration@repeat <stmt>".to_string()))?);
+        let iteration = Box::new(ASTStatement::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("iteration@repeat <stmt>".to_string())))?);
 
         Ok(Some(Self { times, iteration }))
     }

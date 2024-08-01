@@ -54,6 +54,7 @@ impl From<&TokenSymbol> for &'static str {
     }
 }
 
+// TODO: TryForm
 impl TokenSymbol {
     pub fn from_char(value: char) -> Option<Self> {
         match value {
