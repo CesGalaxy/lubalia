@@ -2,6 +2,7 @@ pub mod variable_declaration;
 pub mod scope;
 pub mod conditional;
 pub mod repeat;
+pub mod switch;
 
 use std::fmt;
 
@@ -50,6 +51,7 @@ pub enum ASTStatement {
     Scope(scope::ScopeStruct),
     Conditional(conditional::ConditionalStatement),
     Repeat(repeat::Repeat),
+    Switch(switch::SwitchStatement),
     Return(ASTExpression)
 }
 
@@ -68,6 +70,7 @@ impl Node for ASTStatement {
                 TokenLangKeyword::Let => variable_declaration::VariableDeclaration::transcribe(cursor).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
                 TokenLangKeyword::If => conditional::ConditionalStatement::transcribe(cursor).map(|cond| cond.map(ASTStatement::Conditional)),
                 TokenLangKeyword::Repeat => repeat::Repeat::transcribe(cursor).map(|repeat| repeat.map(ASTStatement::Repeat)),
+                TokenLangKeyword::Switch => switch::SwitchStatement::transcribe(cursor).map(|switch| switch.map(ASTStatement::Switch)),
                 TokenLangKeyword::Return => {
                     cursor.next();
                     ASTExpression::transcribe(cursor).map(|expr| expr.map(ASTStatement::Return))
@@ -90,6 +93,7 @@ impl StatementNode for ASTStatement {
             ASTStatement::Scope(scope) => scope.execute(tick),
             ASTStatement::Conditional(cond) => cond.execute(tick),
             ASTStatement::Repeat(repeat) => repeat.execute(tick),
+            ASTStatement::Switch(switch) => switch.execute(tick),
             ASTStatement::Return(expr) => Some(StatementResult::Return(expr.evaluate(tick)))
         }
     }
@@ -103,6 +107,7 @@ impl ExpressionNode for ASTStatement {
             ASTStatement::Scope(scope) => scope.execute(tick),
             ASTStatement::Conditional(cond) => cond.execute(tick),
             ASTStatement::Repeat(repeat) => repeat.execute(tick),
+            ASTStatement::Switch(switch) => switch.execute(tick),
             ASTStatement::Return(expr) => Some(StatementResult::Return(expr.evaluate(tick)))
             // TODO: Handle this with 'From<StatementResult> for DataValue'
         }.map(|result| result.value()).unwrap_or_default()
@@ -116,6 +121,7 @@ impl fmt::Display for ASTStatement {
             ASTStatement::Scope(scope) => write!(f, "{scope}"),
             ASTStatement::Conditional(cond) => write!(f, "{cond}"),
             ASTStatement::Repeat(repeat) => write!(f, "{repeat}"),
+            ASTStatement::Switch(switch) => write!(f, "{switch}"),
             ASTStatement::Return(node) => write!(f, "return ( {node} )")
         }
     }
