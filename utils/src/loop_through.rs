@@ -90,12 +90,14 @@ impl<'a, T> LoopThrough<'a, T> {
                 LoopThrough::Count(amount) => {
                     cursor.move_by(*amount as isize);
                     count += *amount;
+                    break;
                 },
                 LoopThrough::Before(amount, inner) => {
                     inner.over(cursor);
 
                     cursor.move_by(-(*amount as isize));
                     count = count.saturating_sub(*amount);
+                    break;
                 }
             }
         }

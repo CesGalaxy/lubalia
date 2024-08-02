@@ -20,8 +20,12 @@ impl Node for SwitchStatement {
         // Switch statements should start with the keyword `if`
         cursor.expect(&Token::LangKeyword(TokenLangKeyword::Switch), ParserError::Expected("start@switch <keyword:switch> 'switch'".to_string()))?;
 
+        ignore_eols(cursor);
+
         // Get the expression to evaluate
         let expression = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@switch <expr>".to_string())))?;
+
+        ignore_eols(cursor);
 
         // Then list the cases between braces
         cursor.expect(&Token::Symbol(TokenSymbol::BraceOpen), ParserError::Expected("opening@switch/sym <sym:brace:open> '{'".to_string()))?;
@@ -71,7 +75,7 @@ impl fmt::Display for SwitchStatement {
 }
 
 #[derive(Debug, Clone)]
-pub struct SwitchCase {
+struct SwitchCase {
     /// The expression to compare
     expression: ASTExpression,
 
@@ -80,7 +84,7 @@ pub struct SwitchCase {
 }
 
 impl SwitchCase {
-    pub fn case(&self, tick: &mut VMTick, main_value: &DataValue) -> Option<Option<StatementResult>> {
+    fn case(&self, tick: &mut VMTick, main_value: &DataValue) -> Option<Option<StatementResult>> {
         let case_value = self.expression.evaluate(tick);
 
         // Return Some if matches, None if doesn't
@@ -100,8 +104,12 @@ impl Node for SwitchCase {
             return Err(TranscriptionException::Error(ParserError::Expected("start@case <keyword:case> 'case'".to_string())));
         }
 
+        ignore_eols(cursor);
+
         // Get the expression to compare
         let expression = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@case <expr>".to_string())))?;
+
+        ignore_eols(cursor);
 
         // Get the body of the case
         let body = ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("body@case <scope>".to_string())))?;

@@ -3,7 +3,7 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode},Node, NodeParserTickResult}, vm::tick::VMTick
+    lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode},Node, NodeParserTickResult}, vm::tick::VMTick
 };
 
 use super::{StatementNode, StatementResult};
@@ -37,15 +37,22 @@ impl Node for VariableDeclaration {
         // Variables should start with the keyword `let`
         cursor.expect(&Token::LangKeyword(TokenLangKeyword::Let), ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string()))?;
 
+        ignore_eols(cursor);
+
         // The statement is followed by a variable name
         if let Some(Token::CustomKeyword(varname)) = cursor.consume() {
             let varname = varname.clone();
 
+            ignore_eols(cursor);
+
             // Optionally, the variable can be assigned a value (after an equal sign)
             let value = if let Some(&Token::Symbol(TokenSymbol::Equal)) = cursor.peek() {
                 cursor.next();
+                ignore_eols(cursor);
                 ASTExpression::transcribe(cursor)?
             } else {
+                // Keep last EOL
+                cursor.back();
                 None
             };
 

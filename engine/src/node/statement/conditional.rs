@@ -3,7 +3,7 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::tick::VMTick
+    lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::tick::VMTick
 };
 
 use super::{scope::ScopeStruct, StatementNode, StatementResult};
@@ -27,18 +27,27 @@ impl Node for ConditionalStatement {
         // Conditionals should start with the keyword `if`
         cursor.expect(&Token::LangKeyword(TokenLangKeyword::If), ParserError::Expected("start@conditional <keyword:if> 'if'".to_string()))?;
 
+        ignore_eols(cursor);
+
         // Get the condition expression
         let condition = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("condition@conditional <expr>".to_string())))?;
 
+        ignore_eols(cursor);
+
         // Get a scope with the branch to run if the condition is true
         let then_branch = ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("then_branch@conditional <node>".to_string())))?;
+
+        ignore_eols(cursor);
 
         // Optionally, if the statement continues with the `else` keyword, get the else branch
         let else_branch = if cursor.peek() == Some(&Token::LangKeyword(TokenLangKeyword::Else)) {
             // TODO: Automate this in the cursor?
             cursor.next();
+            ignore_eols(cursor);
             Some(ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("else_branch@conditional <node>".to_string())))?)
         } else {
+            // Keep last EOL
+            cursor.back();
             None
         };
 
