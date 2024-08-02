@@ -15,7 +15,7 @@ pub enum TokenLangKeyword {
     Undefined,
     Repeat,
     Switch,
-    Case
+    Case,
 }
 
 impl TokenLangKeyword {

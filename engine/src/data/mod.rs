@@ -12,7 +12,7 @@ use std::fmt;
 
 use colored::Colorize;
 
-use crate::lang::token::literal::TokenLiteral;
+use crate::{lang::token::literal::TokenLiteral, node::statement::scope::ScopeStruct};
 
 /// Represents a posible data value which the language can work with.
 #[derive(Debug, Clone)]
@@ -22,7 +22,8 @@ pub enum DataValue {
     Char(char),
     Boolean(bool),
     List(Vec<DataValue>),
-    Null
+    Null,
+    Callable(Vec<String>, ScopeStruct),
 }
 
 impl From<TokenLiteral> for DataValue {
@@ -64,6 +65,7 @@ impl fmt::Display for DataValue {
                 write!(f, "[ {} ]", list_str)
             },
             DataValue::Null => write!(f, "{}", "NULL".bright_red()),
+            DataValue::Callable(args, body) => write!(f, "{}{args:?} {body}", "fn".bright_red().bold()),
         }
     }
 }

@@ -8,7 +8,8 @@ impl From<DataValue> for bool {
             DataValue::Char(character) => character != '\0',
             DataValue::Boolean(boolean) => boolean,
             DataValue::List(list) => !list.is_empty(),
-            DataValue::Null => false
+            DataValue::Null => false,
+            DataValue::Callable(_, _) => true,
         }
     }
 }

@@ -9,7 +9,7 @@ use crate::{
     vm::tick::VMTick
 };
 
-use super::ExpressionNode;
+use super::{ufunc_constructor::UnnamedFunctionConstructor, ExpressionNode};
 
 /// An expression which evaluated result doesn't need manipulation
 #[derive(Debug, Clone)]
@@ -24,7 +24,13 @@ pub enum TerminalExpression {
     StatementResult(Box<ASTStatement>),
 
     /// A reference to the last evaluated expression value
-    LastValue
+    LastValue,
+
+    /// An unnamed function
+    UnnamedFunction(UnnamedFunctionConstructor),
+
+    // A call to a function
+    //FunctionCall(String, Vec<TerminalExpression>)
 }
 
 impl Node for TerminalExpression {
@@ -41,6 +47,10 @@ impl Node for TerminalExpression {
                 TokenLangKeyword::True => Ok(Some(Self::Literal(DataValue::Boolean(true)))),
                 TokenLangKeyword::False => Ok(Some(Self::Literal(DataValue::Boolean(false)))),
                 TokenLangKeyword::Null => Ok(Some(Self::Literal(DataValue::Null))),
+                TokenLangKeyword::Fn => {
+                    cursor.back();
+                    UnnamedFunctionConstructor::transcribe(cursor).map(|o| o.map(Self::UnnamedFunction))
+                },
                 _ => return_statament(cursor)
             },
             Some(Token::CustomKeyword(keyword)) => Ok(Some(Self::VarRef(keyword.clone()))),
@@ -57,7 +67,8 @@ impl ExpressionNode for TerminalExpression {
             Self::Literal(literal) => literal.clone(),
             Self::VarRef(varname) => tick.get_context().get(varname.clone()).cloned().unwrap_or_default(),
             Self::StatementResult(statement) => statement.evaluate(tick),
-            Self::LastValue => tick.vm.last_value.clone()
+            Self::LastValue => tick.vm.last_value.clone(),
+            Self::UnnamedFunction(constructor) => constructor.evaluate(tick)
         }
     }
 }
@@ -65,10 +76,11 @@ impl ExpressionNode for TerminalExpression {
 impl fmt::Display for TerminalExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Literal(literal) => write!(f, "{}", literal),
-            Self::VarRef(varname) => write!(f, "{}", varname),
-            Self::StatementResult(stmt) => write!(f, "~{}", stmt),
-            Self::LastValue => write!(f, "_")
+            Self::Literal(literal) => write!(f, "{literal}"),
+            Self::VarRef(varname) => write!(f, "{varname}"),
+            Self::StatementResult(stmnt) => write!(f, "~{stmnt}"),
+            Self::LastValue => write!(f, "_"),
+            Self::UnnamedFunction(ufn) => write!(f, "{ufn}")
         }
     }
 }

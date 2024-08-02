@@ -1,23 +1,19 @@
-let x
-    = 1
+let x = 1
 
-let n
+let myFunction = fn(name day) {
+    return name
+}
 
-switch
-        16
-    {
-        case
-            2 {
-                return "no"
-            }
-        case 16
-        {
-            return "yes"
-        }
-    }
-
-if
-    true
+switch 16
 {
+    case 2 {
+        return "no"
+    }
+    case 16 {
+        return myFunction
+    }
+}
+
+if true {
     return a
 }
