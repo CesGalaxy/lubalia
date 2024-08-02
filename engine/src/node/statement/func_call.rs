@@ -2,7 +2,7 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::{context::Context, tick::VMTick}};
 
 use super::{StatementNode, StatementResult};
 
@@ -52,12 +52,37 @@ impl StatementNode for FunctionCallStatement {
             args.push(arg.evaluate(tick));
         }
 
-        if let DataValue::Callable(required_args, _optional_args, body) = called {
+        if let DataValue::Callable(required_args, optional_args, body) = called {
             if args.len() < required_args.len() {
                 panic!("Param {} is required", required_args[args.len()]);
             }
 
-            body.execute(tick)
+            let mut variables: Vec<(String, DataValue)> = required_args.iter().cloned().zip(args.clone()).collect();
+
+            let mut i = 0;
+
+            for (name, default) in optional_args {
+                variables.push((name, args.get(i).map(|v| v.clone()).unwrap_or(default)));
+                i += 1;
+            }
+
+            let is_global_context = tick.context.is_none();
+
+            let parent_ctx = tick.get_context().clone();
+            tick.context = Some(Box::new(Context::with_parent(variables, Some(parent_ctx))));
+
+            let result = body.execute(tick);
+
+            if let Some(child) = &tick.context {
+                tick.context = if is_global_context {
+                    tick.vm.global = *child.parent.clone().expect("Matryoshka: global context missing!");
+                    None
+                } else {
+                    child.parent.clone()
+                }
+            }
+
+            result
         } else {
             // TODO: Please, fix this
             panic!("Function call to non-function value: {}", called);

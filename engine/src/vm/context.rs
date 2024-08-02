@@ -12,16 +12,13 @@ pub struct Context{
 
 impl Context {
     /// Create a new empty context
-    pub fn new() -> Self {
-        Context { variables: Vec::new(), parent: None }
+    pub fn new(variables: Vec<(String, DataValue)>) -> Self {
+        Context { variables, parent: None }
     }
 
     /// Create a new context with a parent
-    pub fn with_parent(parent: Option<Context>) -> Self {
-        Context {
-            variables: Vec::new(),
-            parent: parent.map(Box::new)
-        }
+    pub fn with_parent(variables: Vec<(String, DataValue)>, parent: Option<Context>) -> Self {
+        Context { variables, parent: parent.map(Box::new) }
     }
 
     /// Add a new variable to the current scope (or overwrite it if it already exists).
@@ -70,7 +67,7 @@ impl Context {
 impl Default for Context {
     /// Geta an empty context
     fn default() -> Self {
-        Context::new()
+        Context::new(vec![])
     }
 }
 

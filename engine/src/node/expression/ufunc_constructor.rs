@@ -49,8 +49,6 @@ impl Node for UnnamedFunctionConstructor {
                 optional_args.push((arg.clone(), Some(default_value)));
             } else if let Some(Token::Symbol(TokenSymbol::Question)) = cursor.peek() {
                 cursor.next();
-                ignore_eols(cursor);
-
                 optional_args.push((arg.clone(), None));
 
             } else {

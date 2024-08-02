@@ -20,7 +20,7 @@ impl VM {
     /// Create a new VM with a program
     pub fn new() -> Self {
         VM {
-            global: Context::new(),
+            global: Context::default(),
             last_value: DataValue::default()
         }
     }
