@@ -12,7 +12,7 @@
                 "args": [ "build",  "--bin=lubugger", "--package=lubugger" ],
                 "filter": { "name": "lubugger", "kind": "bin" }
             },
-            "args": [ "run", "examples/program.luba" ],
+            "args": [ "run", "program.luba" ],
             "cwd": "${workspaceFolder}"
         },
         {
@@ -45,7 +45,7 @@
                 "args": [ "build", "--bin=lubalia", "--package=lubalia" ],
                 "filter": { "name": "lubalia", "kind": "bin" }
             },
-            "args": [ "examples/program.luba" ],
+            "args": [ "program.luba" ],
             "cwd": "${workspaceFolder}"
         },
         {
@@ -56,7 +56,7 @@
                 "args": [ "test", "--no-run", "--bin=app", "--package=lubalia" ],
                 "filter": { "name": "lubalia", "kind": "bin" }
             },
-            "args": [ "examples/program.luba" ],
+            "args": [ "program.luba" ],
             "cwd": "${workspaceFolder}"
         }
     ]
