@@ -23,7 +23,7 @@ pub enum LoopThrough<'a, T> {
     UntilNot(&'a T),
 
     /// Run a fixed number of times
-    Count(usize),
+    Times(usize),
 
     /// Run until end and then go back n units
     Before(usize, Box<Self>)
@@ -87,7 +87,7 @@ impl<'a, T> LoopThrough<'a, T> {
                         count += 1;
                     }
                 },
-                LoopThrough::Count(amount) => {
+                LoopThrough::Times(amount) => {
                     cursor.move_by(*amount as isize);
                     count += *amount;
                     break;

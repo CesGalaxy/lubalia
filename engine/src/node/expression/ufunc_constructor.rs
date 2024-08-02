@@ -58,6 +58,11 @@ impl Node for UnnamedFunctionConstructor {
             }
 
             ignore_eols(cursor);
+
+            if let Some(Token::Symbol(TokenSymbol::Comma)) = cursor.peek() {
+                cursor.next();
+                ignore_eols(cursor);
+            }
         }
 
         // Then, a closing parenthesis should follow

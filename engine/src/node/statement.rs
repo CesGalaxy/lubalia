@@ -78,7 +78,7 @@ impl Node for ASTStatement {
                     cursor.next();
                     ASTNode::transcribe(cursor).map(|expr| expr.map(Box::new).map(ASTStatement::Return))
                 },
-                _ => Err(TranscriptionException::Error(ParserError::Expected(expected_token!(LangKeyword; <stmnt>))))
+                _ => Err(TranscriptionException::NotFound(expected_token!(LangKeyword; <stmnt>)))
             },
             Some(Token::CustomKeyword(_)) => if let Some(Token::Symbol(TokenSymbol::ParenOpen)) = cursor.peek_next() {
                 func_call::FunctionCallStatement::transcribe(cursor).map(|call| call.map(ASTStatement::FunctionCall))
