@@ -12,7 +12,7 @@ use std::fmt;
 
 use colored::Colorize;
 
-use crate::{lang::token::literal::TokenLiteral, node::statement::scope::ScopeStruct};
+use crate::{lang::token::literal::TokenLiteral, node::ASTNode};
 
 /// Represents a posible data value which the language can work with.
 #[derive(Debug, Clone)]
@@ -23,7 +23,7 @@ pub enum DataValue {
     Boolean(bool),
     List(Vec<DataValue>),
     Null,
-    Callable(Vec<String>, Vec<(String, DataValue)>, ScopeStruct),
+    Callable(Vec<String>, Vec<(String, DataValue)>, Box<ASTNode>),
 }
 
 impl From<TokenLiteral> for DataValue {

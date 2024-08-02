@@ -3,7 +3,7 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode},Node, NodeParserTickResult}, vm::tick::VMTick
+    lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
 };
 
 use super::{StatementNode, StatementResult};
@@ -28,7 +28,7 @@ pub struct VariableDeclaration {
     varname: String,
 
     /// The value of the variable
-    value: Option<ASTExpression>
+    value: Option<Box<ASTNode>>
 }
 
 impl Node for VariableDeclaration {
@@ -49,19 +49,16 @@ impl Node for VariableDeclaration {
             let value = if let Some(&Token::Symbol(TokenSymbol::Equal)) = cursor.peek() {
                 cursor.next();
                 ignore_eols(cursor);
-                ASTExpression::transcribe(cursor)?
+                // TODO: What I was even thinking when I wrote this?
+                ASTNode::transcribe(cursor)?
             } else {
                 // Keep last EOL
                 cursor.back();
                 None
-            };
+            }.map(Box::new);
 
             // By default, variables are mutable (variable)
-            Ok(Some(VariableDeclaration {
-                vartype: VariableType::Variable,
-                varname,
-                value
-            }))
+            Ok(Some(VariableDeclaration { vartype: VariableType::Variable, varname, value }))
         } else {
             Err(TranscriptionException::Error(ParserError::Expected("varname@var_declaration <keyword:custom>".to_string())))
         }
@@ -73,7 +70,7 @@ impl StatementNode for VariableDeclaration {
     /// Returns the value of the variable.
     fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
         // Evaluate the expression containing it's value
-        let value = self.value.clone().map(|expr| expr.evaluate(tick)).unwrap_or_default();
+        let value = self.value.clone().map(|node| node.evaluate(tick)).unwrap_or_default();
 
         // Create a new variable in the context with it's data
         tick.get_context().create(self.varname.clone(), value.clone());

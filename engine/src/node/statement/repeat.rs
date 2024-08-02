@@ -2,14 +2,14 @@ use std::fmt;
 
 use lubalia_utils::transcriber::{cursor::TranscriberCursor, error::TranscriptionException};
 
-use crate::{lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}};
+use crate::{lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, Token}}, node::{ASTNode, Node, NodeParserTickResult}};
 
 use super::{ASTStatement, StatementNode, StatementResult};
 
 #[derive(Debug, Clone)]
 pub struct Repeat {
     /// The number of times the loop will repeat
-    times: ASTExpression,
+    times: Box<ASTNode>,
 
     /// What will be executed on each iteration of the loop
     iteration: Box<ASTStatement>
@@ -22,7 +22,7 @@ impl Node for Repeat {
 
         ignore_eols(cursor);
 
-        let times = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("times@repeat <expr>".to_string())))?;
+        let times = Box::new(ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("times@repeat <node>".to_string())))?);
 
         ignore_eols(cursor);
 

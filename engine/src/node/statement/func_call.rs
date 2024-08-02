@@ -6,6 +6,7 @@ use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserE
 
 use super::{StatementNode, StatementResult};
 
+// TODO: Should this be an statement?
 #[derive(Debug, Clone)]
 pub struct FunctionCallStatement {
     called: ASTExpression,
@@ -71,6 +72,7 @@ impl StatementNode for FunctionCallStatement {
             let parent_ctx = tick.get_context().clone();
             tick.context = Some(Box::new(Context::with_parent(variables, Some(parent_ctx))));
 
+            // TODO: Execute or evaluate?
             let result = body.execute(tick);
 
             if let Some(child) = &tick.context {
@@ -82,7 +84,7 @@ impl StatementNode for FunctionCallStatement {
                 }
             }
 
-            result
+            result.map(StatementResult::Return)
         } else {
             // TODO: Please, fix this
             panic!("Function call to non-function value: {}", called);

@@ -2,14 +2,14 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
 
 use super::{scope::ScopeStruct, StatementNode, StatementResult};
 
 #[derive(Debug, Clone)]
 pub struct SwitchStatement {
     /// The expression to evaluate
-    expression: ASTExpression,
+    expression: Box<ASTNode>,
 
     /// The cases to evaluate
     cases: Vec<SwitchCase>
@@ -23,7 +23,7 @@ impl Node for SwitchStatement {
         ignore_eols(cursor);
 
         // Get the expression to evaluate
-        let expression = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@switch <expr>".to_string())))?;
+        let expression = Box::new(ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@switch <node>".to_string())))?);
 
         ignore_eols(cursor);
 
@@ -77,7 +77,7 @@ impl fmt::Display for SwitchStatement {
 #[derive(Debug, Clone)]
 struct SwitchCase {
     /// The expression to compare
-    expression: ASTExpression,
+    expression: ASTNode,
 
     /// The body of the case
     body: ScopeStruct
@@ -107,7 +107,7 @@ impl Node for SwitchCase {
         ignore_eols(cursor);
 
         // Get the expression to compare
-        let expression = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@case <expr>".to_string())))?;
+        let expression = ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@case <node>".to_string())))?;
 
         ignore_eols(cursor);
 

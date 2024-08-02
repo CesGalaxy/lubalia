@@ -3,7 +3,7 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::tick::VMTick
+    lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, Token}}, node::{ ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
 };
 
 use super::{scope::ScopeStruct, StatementNode, StatementResult};
@@ -12,7 +12,7 @@ use super::{scope::ScopeStruct, StatementNode, StatementResult};
 #[derive(Debug, Clone)]
 pub struct ConditionalStatement {
     /// The condition that will be checked to decide which branch to run
-    pub condition: Box<ASTExpression>,
+    pub condition: Box<ASTNode>,
 
     /// The branch to run if the condition is true
     pub then_branch: ScopeStruct,
@@ -30,7 +30,7 @@ impl Node for ConditionalStatement {
         ignore_eols(cursor);
 
         // Get the condition expression
-        let condition = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("condition@conditional <expr>".to_string())))?;
+        let condition = Box::new(ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("condition@conditional <node>".to_string())))?);
 
         ignore_eols(cursor);
 
@@ -51,11 +51,7 @@ impl Node for ConditionalStatement {
             None
         };
 
-        Ok(Some(Self {
-            condition: Box::new(condition),
-            then_branch: then_branch,
-            else_branch: else_branch
-        }))
+        Ok(Some(Self { condition, then_branch, else_branch }))
     }
 }
 

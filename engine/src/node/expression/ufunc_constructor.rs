@@ -2,7 +2,8 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::{expected_token, ParserError}}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{statement::scope::ScopeStruct, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{
+    data::DataValue, lang::{parser::{cursor::ignore_eols, error::{expected_token, ParserError}}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
 
 use super::{ASTExpression, ExpressionNode};
 
@@ -15,7 +16,7 @@ pub struct UnnamedFunctionConstructor {
     optional_args: Vec<(String, Option<ASTExpression>)>,
 
     /// The body of the function
-    body: ScopeStruct
+    body: Box<ASTNode>,
 }
 
 impl Node for UnnamedFunctionConstructor {
@@ -67,8 +68,8 @@ impl Node for UnnamedFunctionConstructor {
         ignore_eols(cursor);
 
         // The body of the function is a scope
-        let body = ScopeStruct::transcribe(cursor)?
-            .ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(body@ufn <scope>))))?;
+        let body = Box::new(ASTNode::transcribe(cursor)?
+            .ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(body@ufn <node>))))?);
 
         Ok(Some(Self { required_args, optional_args, body }))
     }
