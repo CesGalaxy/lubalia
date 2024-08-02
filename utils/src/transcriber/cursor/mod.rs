@@ -3,7 +3,7 @@ pub mod navigation;
 #[cfg(test)]
 mod tests;
 
-use crate::{checkpoint::Checkpoint, cursor::CursorNavigation};
+use crate::{checkpoint::Checkpoint, cursor::CursorNavigation, loop_through::LoopThrough};
 
 use super::error::TranscriptionException;
 
@@ -52,5 +52,7 @@ impl<'a, Unit> TranscriberCursor<'a, Unit> {
         count
     }
 
-    // TODO: Make ignore with the enum LoopThrough<T> { All, While(T -> bool), Until(T -> bool), WhileEq(T), WhileNot(T), UntilEq(T), UntilNot(T), Count(usize), Forever }
+    pub fn ignore_loop<'b>(&mut self, condition: LoopThrough<'b, Unit>) -> usize where Unit: PartialEq {
+        condition.over(self)
+    }
 }

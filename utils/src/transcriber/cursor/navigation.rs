@@ -38,4 +38,13 @@ impl<'a, Unit> CursorNavigation<'a, Vec<Unit>, Unit> for TranscriberCursor<'a, U
     fn is_overflow(&self) -> bool {
         self.pos >= self.source.len()
     }
+
+    /// Move the cursor n units (negative moves backwards)
+    fn move_by(&mut self, n: isize) {
+        if n < 0 {
+            self.pos = self.pos.saturating_sub(n.abs() as usize);
+        } else {
+            self.pos = (self.pos as isize + n) as usize;
+        }
+    }
 }

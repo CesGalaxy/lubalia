@@ -25,4 +25,7 @@ pub trait CursorNavigation<'a, Source, Unit> {
 
     /// Check if the cursor has passed/reached the end of the source
     fn is_overflow(&self) -> bool;
+
+    /// Move the cursor n units (negative moves backwards)
+    fn move_by(&mut self, n: isize);
 }
