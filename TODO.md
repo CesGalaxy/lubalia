@@ -13,7 +13,8 @@ This data will be sotred in the "program manifest", which will be created during
 
 ## Roadmap
 
-- [ ] Handle EOL between tokens
+- [X] Handle EOL between tokens
+- [ ] Macro for identifying tokens
 - [ ] Design expressions
   - [ ] Binary
   - [ ] Parenthesis

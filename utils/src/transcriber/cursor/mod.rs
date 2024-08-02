@@ -39,4 +39,18 @@ impl<'a, Unit> TranscriberCursor<'a, Unit> {
             Err(TranscriptionException::Error(error))
         }
     }
+
+    /// Ignore all tokens which match the expectation
+    pub fn ignore_all<'b>(&mut self, expectation: &'b Unit) -> usize where Unit: PartialEq {
+        let mut count = 0;
+
+        while self.peek() == Some(expectation) {
+            self.next();
+            count += 1;
+        }
+
+        count
+    }
+
+    // TODO: Make ignore with the enum LoopThrough<T> { All, While(T -> bool), Until(T -> bool), WhileEq(T), WhileNot(T), UntilEq(T), UntilNot(T), Count(usize), Forever }
 }

@@ -2,7 +2,7 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException, intent::TranscriptionIntent}};
 
-use crate::{data::DataValue, lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::tick::VMTick};
 
 use super::{scope::ScopeStruct, StatementNode, StatementResult};
 
@@ -26,10 +26,7 @@ impl Node for SwitchStatement {
         // Then list the cases between braces
         cursor.expect(&Token::Symbol(TokenSymbol::BraceOpen), ParserError::Expected("opening@switch/sym <sym:brace:open> '{'".to_string()))?;
 
-        // TODO: Move this shit to the cursor (x2)
-        while let Some(Token::Symbol(TokenSymbol::EOL)) = cursor.peek() {
-            cursor.next();
-        }
+        ignore_eols(cursor);
 
         let mut cases = vec![];
 
@@ -37,10 +34,7 @@ impl Node for SwitchStatement {
         while let TranscriptionIntent(Ok(Some(case_node))) = cursor.intent(SwitchCase::transcribe) {
             cases.push(case_node);
 
-            // TODO: This can be handled with cursor.expect()
-            while let Some(Token::Symbol(TokenSymbol::EOL)) = cursor.peek() {
-                cursor.next();
-            }
+            ignore_eols(cursor);
         }
 
         // Get the closing brace

@@ -1,4 +1,5 @@
 pub mod error;
+pub mod cursor;
 
 use error::ParserError;
 use lubalia_utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber, TranscriberTickResult};
