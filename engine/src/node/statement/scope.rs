@@ -3,7 +3,9 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
-    lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::{context::Context, tick::VMTick}
+    lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}},
+    node::{ASTNode, Node, NodeParserTickResult},
+    vm::{context::Context, tick::VMTick}
 };
 
 use super::{StatementNode, StatementResult};
@@ -56,9 +58,10 @@ impl StatementNode for ScopeStruct {
     fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
         let mut result = None;
 
-        let using_global_context = tick.context.is_none();
+        let is_global_context = tick.context.is_none();
 
-        tick.context = Some(Box::new(Context::with_parent(std::mem::take(tick.get_context()))));
+        let parent_ctx = tick.get_context().clone();
+        tick.context = Some(Box::new(Context::with_parent(Some(parent_ctx))));
 
         for node in &self.nodes {
             if let Some(value) = node.execute(tick) {
@@ -67,13 +70,12 @@ impl StatementNode for ScopeStruct {
             }
         }
 
-        if let Some(child) = std::mem::take(&mut tick.context) {
-            if let Some(parent) = child.parent {
-                if using_global_context {
-                    tick.vm.global = *parent;
-                } else {
-                    tick.context = Some(parent)
-                }
+        if let Some(child) = &tick.context {
+            tick.context = if is_global_context {
+                tick.vm.global = *child.parent.clone().expect("Matryoshka: global context missing!");
+                None
+            } else {
+                child.parent.clone()
             }
         }
 

@@ -4,7 +4,7 @@ use crate::data::DataValue;
 
 /// A context for running code, contains all variables.
 /// Extends all the data from its parent
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Context{
     pub variables: Vec<(String, DataValue)>,
     pub parent: Option<Box<Context>>
@@ -17,10 +17,10 @@ impl Context {
     }
 
     /// Create a new context with a parent
-    pub fn with_parent(parent: Context) -> Self {
+    pub fn with_parent(parent: Option<Context>) -> Self {
         Context {
             variables: Vec::new(),
-            parent: Some(Box::new(parent))
+            parent: parent.map(Box::new)
         }
     }
 
