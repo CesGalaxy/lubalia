@@ -1,7 +1,7 @@
 let x = 1
 
 let myFunction = fn(name? day = "Monday") {
-    return if name { day } else { myFunction("Unknown person", day) }
+    return if name { name + day } else { myFunction("Unknown person", day) }
 }
 
 switch 16 {

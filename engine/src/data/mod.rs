@@ -5,7 +5,7 @@ pub mod arithmetic;
 pub mod logic;
 
 /// This module contains the comparasion operations for the language data values.
-pub mod comparasion;
+pub mod comparsion;
 pub mod conversion;
 
 use std::fmt;

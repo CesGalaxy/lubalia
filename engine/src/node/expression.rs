@@ -4,7 +4,7 @@ pub mod ufunc_constructor;
 
 use std::fmt;
 
-use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
+use lubalia_utils::transcriber::cursor::TranscriberCursor;
 
 use crate::{data::DataValue, lang::{parser::error::expected_token, token::Token}, vm::tick::VMTick};
 
@@ -30,14 +30,10 @@ pub trait ExpressionNode: Node {
 impl Node for ASTExpression {
     /// Transcribe any kind of expression (if possible)
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
-        //* Expressions shouldn't return an Err if nothing could be transcribed, should them?
-        if cursor.peek_next().is_some_and(Token::is_operator) {
-            binary::BinaryExpression::transcribe(cursor).map(|bexpr| bexpr.map(ASTExpression::Binary))
-        } else {
-            cursor.intent(terminal::TerminalExpression::transcribe)
-                .map(|terminal| terminal.map(|terminal| terminal.map(ASTExpression::Terminal)))
-                .tag(expected_token!(<expr>))
-        }
+        cursor.intent(binary::BinaryExpression::transcribe).map(|bexpr| bexpr.map(|bexpr| bexpr.map(ASTExpression::Binary)))
+            .alt(|| cursor.intent(terminal::TerminalExpression::transcribe)
+                .map(|terminal| terminal.map(|terminal| terminal.map(ASTExpression::Terminal))))
+            .tag(expected_token!(<expr>))
     }
 }
 
