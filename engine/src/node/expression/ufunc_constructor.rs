@@ -10,6 +10,7 @@ use super::ExpressionNode;
 pub struct UnnamedFunctionConstructor {
     /// The arguments of the function
     args: Vec<String>,
+    // TODO: Optional args and default values
 
     /// The body of the function
     body: ScopeStruct

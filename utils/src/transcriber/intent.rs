@@ -49,7 +49,7 @@ impl<'a, Unit> TranscriberCursor<'a, Unit> {
         let result = intent(self);
 
         // If error, rollback the cursor
-        if result.is_err() {
+        if let Err(TranscriptionException::NotFound(_)) = &result {
             self.rollback(checkpoint);
         }
 

@@ -1,6 +1,6 @@
 use std::fmt;
 
-use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException, intent::TranscriptionIntent}};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::tick::VMTick};
 
@@ -35,8 +35,8 @@ impl Node for SwitchStatement {
         let mut cases = vec![];
 
         // Save all cases found inside the switch until a closing brace is found (and ends the switch)
-        while let TranscriptionIntent(Ok(Some(case_node))) = cursor.intent(SwitchCase::transcribe) {
-            cases.push(case_node);
+        while let Some(Token::LangKeyword(TokenLangKeyword::Case)) = cursor.peek() {
+            cases.push(SwitchCase::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("case@switch <case>".to_string())))?);
 
             ignore_eols(cursor);
         }
