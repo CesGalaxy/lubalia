@@ -23,7 +23,7 @@ pub enum DataValue {
     Boolean(bool),
     List(Vec<DataValue>),
     Null,
-    Callable(Vec<String>, ScopeStruct),
+    Callable(Vec<String>, Vec<(String, DataValue)>, ScopeStruct),
 }
 
 impl From<TokenLiteral> for DataValue {
@@ -65,7 +65,9 @@ impl fmt::Display for DataValue {
                 write!(f, "[ {} ]", list_str)
             },
             DataValue::Null => write!(f, "{}", "NULL".bright_red()),
-            DataValue::Callable(args, body) => write!(f, "{}{args:?} {body}", "fn".bright_red().bold()),
+            DataValue::Callable(required_args, optional_args, body) =>
+                // TODO: This should be a lot more detailed
+                write!(f, "{}{required_args:?}{optional_args:?} {body}", "callable".bright_red().bold()),
         }
     }
 }

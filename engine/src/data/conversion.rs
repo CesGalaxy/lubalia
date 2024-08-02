@@ -9,7 +9,7 @@ impl From<DataValue> for f64 {
             DataValue::Boolean(boolean) => if boolean { 1.0 } else { 0.0 },
             DataValue::List(list) => list.len() as f64,
             DataValue::Null => 0.0,
-            DataValue::Callable(_, _) => 0.0
+            DataValue::Callable(_, _, _) => 0.0
         }
     }
 }
@@ -26,7 +26,7 @@ impl From<DataValue> for usize {
             DataValue::List(list) => list.len(),
             DataValue::Boolean(boolean) => if boolean { 1 } else { 0 },
             DataValue::Null => 0,
-            DataValue::Callable(_, _) => 0
+            DataValue::Callable(_, _, _) => 0
         }
     }
 }

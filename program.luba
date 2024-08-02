@@ -1,6 +1,6 @@
 let x = 1
 
-let myFunction = fn(name day) {
+let myFunction = fn(name = "Herobrine" day = "Monday") {
     return "hello"
 }
 
@@ -9,7 +9,7 @@ switch 16 {
         return "no"
     }
     case 16 {
-        return myFunction("César", "Friday")
+        return myFunction("César")
     }
 }
 

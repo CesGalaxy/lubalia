@@ -36,7 +36,7 @@ impl PartialEq for DataValue {
             (DataValue::Boolean(a), DataValue::Char(b)) => (if *a { &'1' } else { &'0' }) == b,
 
             // Function is always false
-            (DataValue::Callable(_, _), _) | (_, DataValue::Callable(_, _)) => false,
+            (DataValue::Callable(_, _, _), _) | (_, DataValue::Callable(_, _, _)) => false,
 
             // Null and List always return false
             (DataValue::List(_), _) | (_, DataValue::List(_)) => false,
@@ -72,8 +72,8 @@ impl PartialOrd for DataValue {
             (DataValue::Number(a), DataValue::List(b)) => Some(a.total_cmp(&(b.len() as f64))),
 
             // Function is always greater
-            (DataValue::Callable(_, _), _) => Some(std::cmp::Ordering::Greater),
-            (_, DataValue::Callable(_, _)) => Some(std::cmp::Ordering::Less),
+            (DataValue::Callable(_, _, _), _) => Some(std::cmp::Ordering::Greater),
+            (_, DataValue::Callable(_, _, _)) => Some(std::cmp::Ordering::Less),
 
             // List - Boolean (use if list is empty)
             (DataValue::List(_), _) => None,

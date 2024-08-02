@@ -9,7 +9,7 @@ impl From<DataValue> for bool {
             DataValue::Boolean(boolean) => boolean,
             DataValue::List(list) => !list.is_empty(),
             DataValue::Null => false,
-            DataValue::Callable(_, _) => true,
+            DataValue::Callable(_, _, _) => true,
         }
     }
 }

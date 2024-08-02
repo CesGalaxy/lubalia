@@ -52,7 +52,11 @@ impl StatementNode for FunctionCallStatement {
             args.push(arg.evaluate(tick));
         }
 
-        if let DataValue::Callable(_argnames, body) = called {
+        if let DataValue::Callable(required_args, _optional_args, body) = called {
+            if args.len() < required_args.len() {
+                panic!("Param {} is required", required_args[args.len()]);
+            }
+
             body.execute(tick)
         } else {
             // TODO: Please, fix this

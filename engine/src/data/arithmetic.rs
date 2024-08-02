@@ -32,7 +32,7 @@ impl From<DataValue> for ArithmeticValue {
             DataValue::List(list) => Self::List(list.into_iter().map(|item| item.into()).collect()),
             DataValue::Null => Self::Null,
             // TODO: I'm not going to allow something as easy as this, I MUST fuck this up
-            DataValue::Callable(_, _) => Self::Null
+            DataValue::Callable(_, _, _) => Self::Null
         }
     }
 }

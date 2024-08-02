@@ -4,13 +4,15 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberC
 
 use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{statement::scope::ScopeStruct, Node, NodeParserTickResult}, vm::tick::VMTick};
 
-use super::ExpressionNode;
+use super::{ASTExpression, ExpressionNode};
 
 #[derive(Debug, Clone)]
 pub struct UnnamedFunctionConstructor {
     /// The arguments of the function
-    args: Vec<String>,
-    // TODO: Optional args and default values
+    required_args: Vec<String>,
+
+    /// The optional arguments of the function (can have default values)
+    optional_args: Vec<(String, Option<ASTExpression>)>,
 
     /// The body of the function
     body: ScopeStruct
@@ -30,13 +32,30 @@ impl Node for UnnamedFunctionConstructor {
 
         ignore_eols(cursor);
 
-        let mut args = vec![];
+        let mut required_args = vec![];
+        let mut optional_args = vec![];
 
         // Get the arguments of the function (for now, no commas are required/allowed)
         while let Some(Token::CustomKeyword(arg)) = cursor.peek() {
             cursor.next();
+            ignore_eols(cursor);
 
-            args.push(arg.clone());
+            if let Some(Token::Symbol(TokenSymbol::Equal)) = cursor.peek() {
+                cursor.next();
+                ignore_eols(cursor);
+
+                let default_value = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("default@ufn <expr>".to_string())))?;
+
+                optional_args.push((arg.clone(), Some(default_value)));
+            } else if let Some(Token::Symbol(TokenSymbol::Question)) = cursor.peek() {
+                cursor.next();
+                ignore_eols(cursor);
+
+                optional_args.push((arg.clone(), None));
+
+            } else {
+                required_args.push(arg.clone());
+            }
 
             ignore_eols(cursor);
         }
@@ -51,18 +70,32 @@ impl Node for UnnamedFunctionConstructor {
         // The body of the function is a scope
         let body = ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("body@ufn <scope>".to_string())))?;
 
-        Ok(Some(Self { args, body }))
+        Ok(Some(Self { required_args, optional_args, body }))
     }
 }
 
 impl ExpressionNode for UnnamedFunctionConstructor {
-    fn evaluate(&self, _tick: &mut VMTick) -> DataValue {
-        DataValue::Callable(self.args.clone(), self.body.clone())
+    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+        let optional_args: Vec<(String, DataValue)> = self.optional_args
+            .iter()
+            .map(|(name, default)| (name.clone(), default.as_ref().map(|expr| expr.evaluate(tick)).unwrap_or_default()))
+            .collect();
+
+        DataValue::Callable(self.required_args.clone(), optional_args.clone(), self.body.clone())
     }
 }
 
 impl fmt::Display for UnnamedFunctionConstructor {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "fn({}) {{\n{}\n}}", self.args.join(", "), self.body)
+        write!(f, "fn({}| {}) {{\n{}\n}}",
+            self.required_args.join(", "),
+            self.optional_args.iter().map(|(name, default)| {
+                match default {
+                    Some(default) => format!("{} = {}", name, default),
+                    None => name.clone()
+                }
+            }).collect::<Vec<String>>().join(", "),
+            self.body
+        )
     }
 }
