@@ -1,7 +1,7 @@
 let x = 1
 
-let myFunction = fn(name = "Herobrine" day = "Monday") {
-    return name
+let myFunction = fn(name? day = "Monday") {
+    return if name { day } else { myFunction("Unknown person", day) }
 }
 
 switch 16 {
@@ -9,7 +9,7 @@ switch 16 {
         return "no"
     }
     case 16 {
-        return myFunction()
+        return myFunction("Herobrine", "Sunday")
     }
 }
 

@@ -6,7 +6,7 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
-use crate::{data::DataValue, lang::token::Token, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::error::expected_token, token::Token}, vm::tick::VMTick};
 
 use super::{Node, NodeParserTickResult};
 
@@ -34,11 +34,9 @@ impl Node for ASTExpression {
         if cursor.peek_next().is_some_and(Token::is_operator) {
             binary::BinaryExpression::transcribe(cursor).map(|bexpr| bexpr.map(ASTExpression::Binary))
         } else {
-            Ok(
-                terminal::TerminalExpression::transcribe(cursor)?
-                    //.unwrap_or(None)
-                    .map(ASTExpression::Terminal)
-            )
+            cursor.intent(terminal::TerminalExpression::transcribe)
+                .map(|terminal| terminal.map(|terminal| terminal.map(ASTExpression::Terminal)))
+                .tag(expected_token!(<expr>))
         }
     }
 }

@@ -14,10 +14,10 @@ This data will be sotred in the "program manifest", which will be created during
 ## Roadmap
 
 - [X] Handle EOL between tokens
-- [ ] Unnamed functions
+- [X] Unnamed functions
   - [X] Constructor
-  - [ ] Call
-- [ ] Macro for identifying tokens
+  - [X] Call
+- [X] Macro for identifying tokens
 - [ ] Design expressions
   - [ ] Binary
   - [ ] Parenthesis

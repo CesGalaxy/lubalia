@@ -2,7 +2,7 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{statement::scope::ScopeStruct, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::{expected_token, ParserError}}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{statement::scope::ScopeStruct, Node, NodeParserTickResult}, vm::tick::VMTick};
 
 use super::{ASTExpression, ExpressionNode};
 
@@ -22,12 +22,12 @@ impl Node for UnnamedFunctionConstructor {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
         // Unnamed functions should start with the keyword `fn`
         if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Fn)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("start@ufn <keyword:fn> 'fn'".to_string())));
+            return Err(TranscriptionException::Error(ParserError::Expected(expected_token!(start@ufn <keyword:fn>))));
         }
 
         // Then, an opening parenthesis should follow
         if cursor.consume() != Some(&Token::Symbol(TokenSymbol::ParenOpen)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("args_start@ufn/sym <sym:paren:open> '('".to_string())));
+            return Err(TranscriptionException::Error(ParserError::Expected(expected_token!(args_start@ufn <sym:paren:open>))));
         }
 
         ignore_eols(cursor);
@@ -44,7 +44,8 @@ impl Node for UnnamedFunctionConstructor {
                 cursor.next();
                 ignore_eols(cursor);
 
-                let default_value = ASTExpression::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("default@ufn <expr>".to_string())))?;
+                let default_value = ASTExpression::transcribe(cursor)?
+                    .ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(default@ufn <expr>))))?;
 
                 optional_args.push((arg.clone(), Some(default_value)));
             } else if let Some(Token::Symbol(TokenSymbol::Question)) = cursor.peek() {
@@ -60,13 +61,14 @@ impl Node for UnnamedFunctionConstructor {
 
         // Then, a closing parenthesis should follow
         if cursor.consume() != Some(&Token::Symbol(TokenSymbol::ParenClose)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("args_end@ufn/sym <sym:paren:close> ')'".to_string())));
+            return Err(TranscriptionException::Error(ParserError::Expected(expected_token!(args_end@ufn <sym:paren:close>))));
         }
 
         ignore_eols(cursor);
 
         // The body of the function is a scope
-        let body = ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("body@ufn <scope>".to_string())))?;
+        let body = ScopeStruct::transcribe(cursor)?
+            .ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(body@ufn <scope>))))?;
 
         Ok(Some(Self { required_args, optional_args, body }))
     }

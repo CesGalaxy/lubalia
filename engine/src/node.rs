@@ -7,7 +7,7 @@ use expression::{ASTExpression, ExpressionNode};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, TranscriberTickResult}};
 use statement::{ASTStatement, StatementNode};
 
-use crate::{lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
+use crate::{lang::{parser::error::{expected_token, ParserError}, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
 
 use super::data::DataValue;
 
@@ -66,7 +66,7 @@ impl Node for ASTNode {
                         //     Some(Err(TranscriptionException::Error(ParserError::Expected("end of line".to_string()))))
                         // })
                         // Is no expression was found neither, no node was found
-                        .tag("<node>".to_string())
+                        .tag(expected_token!(<node>))
             },
             None => Ok(None)
         }

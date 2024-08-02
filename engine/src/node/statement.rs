@@ -11,7 +11,7 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberC
 
 use crate::{
     data::DataValue,
-    lang::{parser::error::ParserError, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
+    lang::{parser::error::{expected_token, ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     vm::tick::VMTick
 };
 
@@ -78,16 +78,16 @@ impl Node for ASTStatement {
                     cursor.next();
                     ASTNode::transcribe(cursor).map(|expr| expr.map(Box::new).map(ASTStatement::Return))
                 },
-                _ => Err(TranscriptionException::Error(ParserError::Expected("LangKeyword $ <stmnt>".to_string())))
+                _ => Err(TranscriptionException::Error(ParserError::Expected(expected_token!(LangKeyword; <stmnt>))))
             },
             Some(Token::CustomKeyword(_)) => if let Some(Token::Symbol(TokenSymbol::ParenOpen)) = cursor.peek_next() {
                 func_call::FunctionCallStatement::transcribe(cursor).map(|call| call.map(ASTStatement::FunctionCall))
             } else {
-                Err(TranscriptionException::NotFound("<stmnt>".to_string()))
+                Err(TranscriptionException::NotFound(expected_token!(<stmnt>)))
             },
             // Scopes are statements too
             Some(Token::Symbol(TokenSymbol::BraceOpen)) => scope::ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope)),
-            _ => Err(TranscriptionException::NotFound("<stmnt>".to_string()))
+            _ => Err(TranscriptionException::NotFound(expected_token!(<stmnt>)))
         }
     }
 }

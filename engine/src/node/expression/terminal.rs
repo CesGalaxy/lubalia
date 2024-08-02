@@ -4,7 +4,7 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberC
 
 use crate::{
     data::DataValue,
-    lang::token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token},
+    lang::{parser::error::expected_token, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     node::{Node, NodeParserTickResult},
     vm::tick::VMTick
 };
@@ -40,11 +40,11 @@ impl Node for TerminalExpression {
                     cursor.back();
                     UnnamedFunctionConstructor::transcribe(cursor).map(|o| o.map(Self::UnnamedFunction))
                 },
-                _ => Err(TranscriptionException::NotFound("LangKeyword $ <expr>".to_string()))
+                _ => Err(TranscriptionException::NotFound(expected_token!(LangKeyword; <expr:terminal>)))
             },
             Some(Token::CustomKeyword(keyword)) => Ok(Some(Self::VarRef(keyword.clone()))),
             Some(Token::Symbol(TokenSymbol::Underscore)) => Ok(Some(Self::LastValue)),
-            _ => Err(TranscriptionException::NotFound("<expr>".to_string()))
+            _ => Err(TranscriptionException::NotFound(expected_token!(<expr:terminal>)))
         }
     }
 }
