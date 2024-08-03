@@ -18,7 +18,6 @@ This data will be sotred in the "program manifest", which will be created during
   - [X] Constructor
   - [X] Call
 - [X] Macro for identifying tokens
-- [ ] Match statement (the same as switch but with node evaluation)
 - [ ] Code comments
 - [ ] Design expressions
   - [ ] Binary

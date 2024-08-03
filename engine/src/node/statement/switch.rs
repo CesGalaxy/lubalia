@@ -77,7 +77,7 @@ impl fmt::Display for SwitchStatement {
 #[derive(Debug, Clone)]
 struct SwitchCase {
     /// The expression to compare
-    expression: ASTNode,
+    case: Option<ASTNode>,
 
     /// The body of the case
     body: ASTNode
@@ -85,10 +85,10 @@ struct SwitchCase {
 
 impl SwitchCase {
     fn case(&self, tick: &mut VMTick, main_value: &DataValue) -> Option<Option<StatementResult>> {
-        let case_value = self.expression.evaluate(tick);
+        let case = self.case.as_ref().map(|node| node.evaluate(tick));
 
         // Return Some if matches, None if doesn't
-        if main_value == &case_value {
+        if case.map(|case_value| main_value == &case_value).unwrap_or(true) {
             Some(self.body.execute(tick).map(StatementResult::Return))
         } else {
             None
@@ -107,20 +107,25 @@ impl Node for SwitchCase {
         ignore_eols(cursor);
 
         // Get the expression to compare
-        let expression = ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(expression@case <node>))))?;
+        let expression = if let Some(Token::LangKeyword(TokenLangKeyword::Default)) = cursor.peek() {
+            cursor.next();
+            None
+        } else {
+            Some(ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(expression@case <node>))))?)
+        };
 
         ignore_eols(cursor);
 
         // Get the body of the case
         let body = ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(body@case <node>))))?;
 
-        Ok(Some(Self { expression, body }))
+        Ok(Some(Self { case: expression, body }))
     }
 }
 
 impl fmt::Display for SwitchCase {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.expression)?;
+        write!(f, "{:?}", self.case)?;
         write!(f, "{}", self.body)
     }
 }

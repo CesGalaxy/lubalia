@@ -16,6 +16,7 @@ pub enum TokenLangKeyword {
     Repeat,
     Switch,
     Case,
+    Default,
 }
 
 impl TokenLangKeyword {
@@ -36,6 +37,7 @@ impl TokenLangKeyword {
             "repeat" => Some(Self::Repeat),
             "switch" => Some(Self::Switch),
             "case" => Some(Self::Case),
+            "default" => Some(Self::Default),
             _ => None,
         }
     }
@@ -57,6 +59,7 @@ impl From<&TokenLangKeyword> for &'static str {
             TokenLangKeyword::Repeat => "repeat",
             TokenLangKeyword::Switch => "switch",
             TokenLangKeyword::Case => "case",
+            TokenLangKeyword::Default => "default",
         }
     }
 }
