@@ -1,6 +1,7 @@
+// You can set vars
 let x = 1
 
-let myFunction = fn(name?, day = "Monday") {
+let myFunction = fn(name?, day = "Monday") { // Comments will be ignored
     return if name { name + day } else { myFunction("Unknown person", day) }
 }
 

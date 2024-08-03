@@ -18,6 +18,7 @@ This data will be sotred in the "program manifest", which will be created during
   - [X] Constructor
   - [X] Call
 - [X] Macro for identifying tokens
+- [ ] Code comments
 - [ ] Design expressions
   - [ ] Binary
   - [ ] Parenthesis

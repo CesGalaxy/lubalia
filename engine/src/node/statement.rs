@@ -11,7 +11,7 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberC
 
 use crate::{
     data::DataValue,
-    lang::{parser::error::{expected_token, ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
+    lang::{parser::error::expected_token, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     vm::tick::VMTick
 };
 
@@ -54,7 +54,6 @@ pub enum ASTStatement {
     Repeat(repeat::Repeat),
     Switch(switch::SwitchStatement),
     FunctionCall(func_call::FunctionCallStatement),
-    // TODO: Are statement-result necessary?
     Return(Box<ASTNode>)
 }
 

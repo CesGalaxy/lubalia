@@ -1,6 +1,6 @@
 use error::TokenizerError;
 use intents::{transcribe_keyword, transcribe_string, transcribe_number};
-use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException, result::{IdentifiedTranscriptionUnit, TranscriptionResult}, transcriber, TranscriberTickResult}};
+use lubalia_utils::{cursor::CursorNavigation, loop_through::LoopThrough, transcriber::{cursor::TranscriberCursor, error::TranscriptionException, result::{IdentifiedTranscriptionUnit, TranscriptionResult}, transcriber, TranscriberTickResult}};
 
 use super::token::{symbol::TokenSymbol, Token};
 
@@ -36,6 +36,23 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
         //         TokenLiteral::Character(cursor.consume().unwrap())
         //     }
         // }))),
+
+        // Comments
+        '/' if cursor.peek() == Some(&'/') => {
+            cursor.ignore_loop(LoopThrough::UntilEq(&'\n'));
+            Ok(None)
+        }
+
+        '/' if cursor.peek() == Some(&'*') => {
+            while let Some(unit) = cursor.consume() {
+                if unit == &'*' && cursor.peek() == Some(&'/') {
+                    cursor.next();
+                    break;
+                }
+            }
+
+            Ok(None)
+        }
 
         // Keywords
         _ if initial_unit.is_ascii_alphabetic() || (initial_unit == &'_' && cursor.peek().is_some_and(|c| char::is_ascii_alphanumeric(c) || c == &'_')) =>
