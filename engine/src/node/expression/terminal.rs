@@ -4,8 +4,8 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberC
 
 use crate::{
     data::DataValue,
-    lang::{parser::error::expected_token, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
-    node::{Node, NodeParserTickResult},
+    lang::{parser::error::{expected_token, ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
+    node::{ASTNode, Node, NodeParserTickResult},
     vm::tick::VMTick
 };
 
@@ -25,6 +25,9 @@ pub enum TerminalExpression {
 
     /// An unnamed function
     UnnamedFunction(UnnamedFunctionConstructor),
+
+    /// Content inside a parenthesis
+    Parenthesis(Box<ASTNode>)
 }
 
 impl Node for TerminalExpression {
@@ -44,6 +47,12 @@ impl Node for TerminalExpression {
             },
             Some(Token::CustomKeyword(keyword)) => Ok(Some(Self::VarRef(keyword.clone()))),
             Some(Token::Symbol(TokenSymbol::Underscore)) => Ok(Some(Self::LastValue)),
+            Some(Token::Symbol(TokenSymbol::ParenOpen)) => {
+                // TODO: Does Result have a way of simplifying this?
+                let node = ASTNode::transcribe(cursor).map(|o| o.map(Box::new).map(Self::Parenthesis));
+                cursor.expect(&Token::Symbol(TokenSymbol::ParenClose), ParserError::Expected(expected_token!(ParenClose; <expr:terminal>)))?;
+                node
+            },
             _ => Err(TranscriptionException::NotFound(expected_token!(<expr:terminal>)))
         }
     }
@@ -56,7 +65,8 @@ impl ExpressionNode for TerminalExpression {
             Self::Literal(literal) => literal.clone(),
             Self::VarRef(varname) => tick.get_context().get(varname.clone()).cloned().unwrap_or_default(),
             Self::LastValue => tick.vm.last_value.clone(),
-            Self::UnnamedFunction(constructor) => constructor.evaluate(tick)
+            Self::UnnamedFunction(constructor) => constructor.evaluate(tick),
+            Self::Parenthesis(node) => node.evaluate(tick)
         }
     }
 }
@@ -67,7 +77,8 @@ impl fmt::Display for TerminalExpression {
             Self::Literal(literal) => write!(f, "{literal}"),
             Self::VarRef(varname) => write!(f, "{varname}"),
             Self::LastValue => write!(f, "_"),
-            Self::UnnamedFunction(ufn) => write!(f, "{ufn}")
+            Self::UnnamedFunction(ufn) => write!(f, "{ufn}"),
+            Self::Parenthesis(node) => write!(f, "({node})")
         }
     }
 }

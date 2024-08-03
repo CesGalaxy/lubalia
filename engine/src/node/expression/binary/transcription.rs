@@ -9,6 +9,8 @@ use super::{operator::BinaryOperator, BinaryExpression};
 
 impl Node for BinaryExpression {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
+        // Use terminal expr due to the infinite loop generated when transcribing a normal expression
+        // TODO: Search first for statement and then terminal? Or use parenthesis (terminal)?
         let lhs = Box::new(ASTExpression::Terminal(TerminalExpression::transcribe(cursor)?
             .ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(lhs@bi <expr>))))?));
 
