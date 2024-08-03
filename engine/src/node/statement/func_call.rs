@@ -84,7 +84,7 @@ impl StatementNode for FunctionCallStatement {
                 }
             }
 
-            result.map(StatementResult::Return)
+            result.map(StatementResult::Usable)
         } else {
             // TODO: Please, fix this
             panic!("Function call to non-function value: {}", called);
