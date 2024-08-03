@@ -5,7 +5,7 @@ let myFunction = fn(name?, day = "Monday") { // Comments will be ignored
     return if name { name + day } else { myFunction("Unknown person", day) }
 }
 
-switch 16 {
+switch 16 /* even this comment is ignored */ {
     case 2 {
         return "no"
     }

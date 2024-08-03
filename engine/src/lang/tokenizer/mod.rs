@@ -38,12 +38,14 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
         // }))),
 
         // Comments
-        '/' if cursor.peek() == Some(&'/') => {
+        '/' if cursor.peek_next() == Some(&'/') => {
             cursor.ignore_loop(LoopThrough::UntilEq(&'\n'));
             Ok(None)
         }
 
-        '/' if cursor.peek() == Some(&'*') => {
+        '/' if cursor.peek_next() == Some(&'*') => {
+            cursor.next();
+
             while let Some(unit) = cursor.consume() {
                 if unit == &'*' && cursor.peek() == Some(&'/') {
                     cursor.next();
