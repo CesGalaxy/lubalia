@@ -6,12 +6,8 @@ let myFunction = fn(name?, day = "Monday") { // Comments will be ignored
 }
 
 switch 16 /* even this comment is ignored */ {
-    case 2 {
-        return ("no")
-    }
-    case 16 {
-        return myFunction("Herobrine", "Sunday")
-    }
+    case 2 "no"
+    case 16 myFunction("Herobrine", "Sunday")
 }
 
 if true {

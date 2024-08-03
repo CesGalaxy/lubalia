@@ -2,9 +2,9 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::{expected_token, ParserError}}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
 
-use super::{scope::ScopeStruct, StatementNode, StatementResult};
+use super::{StatementNode, StatementResult};
 
 #[derive(Debug, Clone)]
 pub struct SwitchStatement {
@@ -80,7 +80,7 @@ struct SwitchCase {
     expression: ASTNode,
 
     /// The body of the case
-    body: ScopeStruct
+    body: ASTNode
 }
 
 impl SwitchCase {
@@ -89,7 +89,7 @@ impl SwitchCase {
 
         // Return Some if matches, None if doesn't
         if main_value == &case_value {
-            Some(self.body.execute(tick))
+            Some(self.body.execute(tick).map(StatementResult::Return))
         } else {
             None
         }
@@ -101,18 +101,18 @@ impl Node for SwitchCase {
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
         // Switch cases should start with the keyword `case`
         if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Case)) {
-            return Err(TranscriptionException::Error(ParserError::Expected("start@case <keyword:case> 'case'".to_string())));
+            return Err(TranscriptionException::Error(ParserError::Expected(expected_token!(start@case <keyword:case>))));
         }
 
         ignore_eols(cursor);
 
         // Get the expression to compare
-        let expression = ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@case <node>".to_string())))?;
+        let expression = ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(expression@case <node>))))?;
 
         ignore_eols(cursor);
 
         // Get the body of the case
-        let body = ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("body@case <scope>".to_string())))?;
+        let body = ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(body@case <node>))))?;
 
         Ok(Some(Self { expression, body }))
     }
