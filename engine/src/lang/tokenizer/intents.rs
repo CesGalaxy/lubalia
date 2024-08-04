@@ -67,8 +67,17 @@ pub fn transcribe_number(cursor: &mut TranscriberCursor<char>) -> Result<Token, 
     }
 
     while let Some(c) = cursor.peek() {
-        if c.is_numeric() || c == &'.' || c == &'_' {
+        if c.is_numeric() {
             literal.push(*c);
+            cursor.next();
+        } else if c == &'.' {
+            if cursor.peek_next().is_some_and(|c| c.is_numeric()) {
+                literal.push(*c);
+                cursor.next();
+            } else {
+                break;
+            }
+        } else if c == &'_' {
             cursor.next();
         } else {
             break;
