@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{collections::HashMap, fmt};
 
 use crate::data::DataValue;
 
@@ -6,18 +6,18 @@ use crate::data::DataValue;
 /// Extends all the data from its parent
 #[derive(Debug, Clone)]
 pub struct Context{
-    pub variables: Vec<(String, DataValue)>,
+    pub variables: HashMap<String, DataValue>,
     pub parent: Option<Box<Context>>
 }
 
 impl Context {
     /// Create a new empty context
-    pub fn new(variables: Vec<(String, DataValue)>) -> Self {
+    pub fn new(variables: HashMap<String, DataValue>) -> Self {
         Context { variables, parent: None }
     }
 
     /// Create a new context with a parent
-    pub fn with_parent(variables: Vec<(String, DataValue)>, parent: Option<Context>) -> Self {
+    pub fn with_parent(variables: HashMap<String, DataValue>, parent: Option<Context>) -> Self {
         Context { variables, parent: parent.map(Box::new) }
     }
 
@@ -28,20 +28,16 @@ impl Context {
         if let Some(variable) = self.get_mut(name.clone()) {
             *variable = value;
         } else {
-            self.variables.push((name, value));
+            self.variables.insert(name, value);
         }
     }
 
     /// Retrieve a mutable reference to a variable from the scope (or parent)
     pub fn get_mut(&mut self, name: String) -> Option<&mut DataValue> {
-        if let Some(local) = self.variables.iter_mut().find(|v| v.0 == name) {
-            Some(&mut local.1)
+        if let Some(local) = self.variables.get_mut(&name){
+            Some(local)
         } else {
-            if let Some(parent) = self.parent.as_mut().map(|scope| scope.get_mut(name)) {
-                parent
-            } else {
-                None
-            }
+            self.parent.as_mut().map(|scope| scope.get_mut(name)).flatten()
         }
     }
 
@@ -51,15 +47,11 @@ impl Context {
     pub fn get(&self, name: String) -> Option<&DataValue> {
         // Check if the variable is in the local scope,
         // otherwise, check the parent scope.
-        if let Some(local) = self.variables.iter().find(|v| v.0 == name).map(|v| &v.1) {
+        if let Some(local) = self.variables.get(&name) {
             Some(local)
         } else {
             // If the variable is not in the parent scope neither, return None (will end up with DataValue::default())
-            if let Some(parent) = &self.parent.as_ref().map(|scope| scope.get(name)) {
-                *parent
-            } else {
-                None
-            }
+            self.parent.as_ref().map(|scope| scope.get(name)).flatten()
         }
     }
 }
@@ -67,7 +59,7 @@ impl Context {
 impl Default for Context {
     /// Geta an empty context
     fn default() -> Self {
-        Context::new(vec![])
+        Context::new(HashMap::new())
     }
 }
 

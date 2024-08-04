@@ -18,14 +18,17 @@ This data will be sotred in the "program manifest", which will be created during
   - [X] Constructor
   - [X] Call
 - [X] Macro for identifying tokens
-- [ ] Code comments
-- [ ] Design expressions
+- [X] Code comments
+- [X] Design expressions
   - [ ] Binary
-  - [ ] Parenthesis
+  - [X] Parenthesis
+- [ ] HashMap memory
 - [ ] Scope identifiers
 - [ ] Callables
+- [ ] Fix switch statement
 - [ ] Improve context
 - [ ] Runtime errors
+- [ ] Manifest
 - [ ] Constant variables
 - [ ] Fixed/mixted var type
 - [ ] Typing

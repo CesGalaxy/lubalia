@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{collections::HashMap, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
@@ -70,7 +70,7 @@ impl StatementNode for FunctionCallStatement {
             let is_global_context = tick.context.is_none();
 
             let parent_ctx = tick.get_context().clone();
-            tick.context = Some(Box::new(Context::with_parent(variables, Some(parent_ctx))));
+            tick.context = Some(Box::new(Context::with_parent(HashMap::from_iter(variables.into_iter()), Some(parent_ctx))));
 
             // TODO: Execute or evaluate?
             let result = body.execute(tick);
