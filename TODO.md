@@ -22,7 +22,7 @@ This data will be sotred in the "program manifest", which will be created during
 - [X] Design expressions
   - [ ] Binary
   - [X] Parenthesis
-- [ ] HashMap memory
+- [X] HashMap memory
 - [ ] Scope identifiers
 - [ ] Callables
 - [ ] Fix switch statement

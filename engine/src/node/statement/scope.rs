@@ -53,15 +53,12 @@ impl Node for ScopeStruct {
 
 impl StatementNode for ScopeStruct {
     // TODO: This code is shit. But works!
-    /// Run the scope (with it's own generated child context),
-    /// it will return a value (NULL if not provided).
+    /// Run the scope (with it's own generated child context)
     fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
         let mut result = None;
 
-        let is_global_context = tick.context.is_none();
-
-        let parent_ctx = tick.get_context().clone();
-        tick.context = Some(Box::new(Context::with_parent(HashMap::new(), Some(parent_ctx))));
+        let parent_ctx = tick.context.clone().map(|c| *c);
+        tick.context = Some(Box::new(Context::with_parent(HashMap::new(), parent_ctx)));
 
         for node in &self.nodes {
             if let Some(value) = node.execute(tick) {
@@ -70,14 +67,7 @@ impl StatementNode for ScopeStruct {
             }
         }
 
-        if let Some(child) = &tick.context {
-            tick.context = if is_global_context {
-                tick.vm.global = *child.parent.clone().expect("Matryoshka: global context missing!");
-                None
-            } else {
-                child.parent.clone()
-            }
-        }
+        tick.context = tick.context.clone().map(|child| child.parent.clone()).flatten();
 
         result.map(StatementResult::Return)
     }

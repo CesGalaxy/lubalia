@@ -65,6 +65,7 @@ impl Node for ASTNode {
                         //     // TODO: Provide expected and position
                         //     Some(Err(TranscriptionException::Error(ParserError::Expected("end of line".to_string()))))
                         // })
+                        // TODO: Callables will be here?
                         // Is no expression was found neither, no node was found
                         .tag(expected_token!(<node>))
             },

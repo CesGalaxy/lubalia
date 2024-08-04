@@ -13,10 +13,6 @@ impl VMTick<'_> {
     /// Gets the current context used ing the VM,
     /// if there's no custom context it returns the global
     pub fn get_context(&mut self) -> &mut Context {
-        if let Some(context) = &mut self.context {
-            context
-        } else {
-            &mut self.vm.global
-        }
+        self.context.as_mut().map(|c| c.as_mut()).unwrap_or(&mut self.vm.global)
     }
 }

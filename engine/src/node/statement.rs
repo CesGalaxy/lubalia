@@ -109,16 +109,7 @@ impl StatementNode for ASTStatement {
 impl ExpressionNode for ASTStatement {
     /// Evaluate the statement and return the result value
     fn evaluate(&self, tick: &mut VMTick) -> DataValue {
-        match self {
-            ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
-            ASTStatement::Scope(scope) => scope.execute(tick),
-            ASTStatement::Conditional(cond) => cond.execute(tick),
-            ASTStatement::Repeat(repeat) => repeat.execute(tick),
-            ASTStatement::Switch(switch) => switch.execute(tick),
-            ASTStatement::FunctionCall(call) => call.execute(tick),
-            ASTStatement::Return(node) => Some(StatementResult::Return(node.evaluate(tick)))
-            // TODO: Handle this with 'From<StatementResult> for DataValue'
-        }.map(|result| result.value()).unwrap_or_default()
+        self.execute(tick).map(|result| result.value()).unwrap_or_default()
     }
 }
 
