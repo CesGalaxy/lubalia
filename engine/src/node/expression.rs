@@ -1,6 +1,7 @@
 pub mod terminal;
 pub mod binary;
 pub mod ufunc_constructor;
+pub mod list;
 
 use std::fmt;
 

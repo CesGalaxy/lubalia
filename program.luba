@@ -1,8 +1,12 @@
 // You can set vars
 let x = 1
 
+let a = ["hello"; 4]
+let b = [2..5]
+let c = ["apples", "coffee", "acid"]
+
 let myFunction = fn(name?, day = "Monday") { // Comments will be ignored
-    return if name { (name + ", today is ") + day } else { myFunction("Unknown person", day) }
+    return if name { [(name + ", today is ") + day, a, b, c] } else { myFunction("Unknown person", day) }
 }
 
 switch 16 /* even this comment is ignored */ {

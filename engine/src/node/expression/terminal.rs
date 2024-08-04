@@ -9,13 +9,16 @@ use crate::{
     vm::tick::VMTick
 };
 
-use super::{ufunc_constructor::UnnamedFunctionConstructor, ExpressionNode};
+use super::{list::LiteralListExpression, ufunc_constructor::UnnamedFunctionConstructor, ExpressionNode};
 
 /// An expression which evaluated result doesn't need manipulation
 #[derive(Debug, Clone)]
 pub enum TerminalExpression {
     /// A value provided in the code
-    Literal(DataValue),
+    StaticLiteral(DataValue),
+
+    /// A list of values provided in the core
+    StaticLiteralList(LiteralListExpression),
 
     /// A reference to a variable (thorugh its name)
     VarRef(String),
@@ -34,11 +37,11 @@ impl Node for TerminalExpression {
     /// Transcribe a terminal expression (literal, variable reference, scope, etc.)
     fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
         match cursor.consume() {
-            Some(Token::Literal(literal)) => Ok(Some(Self::Literal(literal.clone().into()))),
+            Some(Token::Literal(literal)) => Ok(Some(Self::StaticLiteral(literal.clone().into()))),
             Some(Token::LangKeyword(keyword)) => match keyword {
-                TokenLangKeyword::True => Ok(Some(Self::Literal(DataValue::Boolean(true)))),
-                TokenLangKeyword::False => Ok(Some(Self::Literal(DataValue::Boolean(false)))),
-                TokenLangKeyword::Null => Ok(Some(Self::Literal(DataValue::Null))),
+                TokenLangKeyword::True => Ok(Some(Self::StaticLiteral(DataValue::Boolean(true)))),
+                TokenLangKeyword::False => Ok(Some(Self::StaticLiteral(DataValue::Boolean(false)))),
+                TokenLangKeyword::Null => Ok(Some(Self::StaticLiteral(DataValue::Null))),
                 TokenLangKeyword::Fn => {
                     cursor.back();
                     UnnamedFunctionConstructor::transcribe(cursor).map(|o| o.map(Self::UnnamedFunction))
@@ -53,6 +56,10 @@ impl Node for TerminalExpression {
                 cursor.expect(&Token::Symbol(TokenSymbol::ParenClose), ParserError::Expected(expected_token!(ParenClose; <expr:terminal>)))?;
                 node
             },
+            Some(Token::Symbol(TokenSymbol::BracketOpen)) => {
+                cursor.back();
+                LiteralListExpression::transcribe(cursor).map(|o| o.map(Self::StaticLiteralList))
+            },
             _ => Err(TranscriptionException::NotFound(expected_token!(<expr:terminal>)))
         }
     }
@@ -62,7 +69,8 @@ impl ExpressionNode for TerminalExpression {
     /// Evaluate the expression and return its value
     fn evaluate(&self, tick: &mut VMTick) -> DataValue {
         match self {
-            Self::Literal(literal) => literal.clone(),
+            Self::StaticLiteral(literal) => literal.clone(),
+            Self::StaticLiteralList(list) => list.evaluate(tick),
             Self::VarRef(varname) => tick.get_context().get(varname.clone()).cloned().unwrap_or_default(),
             Self::LastValue => tick.vm.last_value.clone(),
             Self::UnnamedFunction(constructor) => constructor.evaluate(tick),
@@ -74,7 +82,8 @@ impl ExpressionNode for TerminalExpression {
 impl fmt::Display for TerminalExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Literal(literal) => write!(f, "{literal}"),
+            Self::StaticLiteral(literal) => write!(f, "{literal}"),
+            Self::StaticLiteralList(list) => write!(f, "{list}"),
             Self::VarRef(varname) => write!(f, "{varname}"),
             Self::LastValue => write!(f, "_"),
             Self::UnnamedFunction(ufn) => write!(f, "{ufn}"),
