@@ -7,7 +7,7 @@ use std::fmt;
 
 use lubalia_utils::transcriber::cursor::TranscriberCursor;
 
-use crate::{data::DataValue, lang::{parser::error::expected_token, token::Token}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{context::ParsingContext, error::expected_token}, token::Token}, vm::tick::VMTick};
 
 use super::{Node, NodeParserTickResult};
 
@@ -30,10 +30,9 @@ pub trait ExpressionNode: Node {
 
 impl Node for ASTExpression {
     /// Transcribe any kind of expression (if possible)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
-        cursor.intent(binary::BinaryExpression::transcribe).map(|bexpr| bexpr.map(|bexpr| bexpr.map(ASTExpression::Binary)))
-            .alt(|| cursor.intent(terminal::TerminalExpression::transcribe)
-                .map(|terminal| terminal.map(|terminal| terminal.map(ASTExpression::Terminal))))
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> {
+        ctx.intent(cursor, binary::BinaryExpression::transcribe).map(ASTExpression::Binary)
+            .alt_with_map(cursor, ctx, terminal::TerminalExpression::transcribe, ASTExpression::Terminal)
             .tag(expected_token!(<expr>))
     }
 }

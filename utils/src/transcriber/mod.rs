@@ -14,12 +14,14 @@ use result::{IdentifiedTranscriptionUnit, Transcription, TranscriptionResult};
 
 use crate::cursor::CursorNavigation;
 
-pub type TranscriberTick<S, R, E> = fn(&mut TranscriberCursor<S>, &S) -> TranscriberTickResult<R, E>;
 pub type TranscriberTickResult<R, E> = Result<Option<R>, TranscriptionException<E>>;
 
 /// Transcribe a vec of iUnits into a vec of oUnits.
 /// Create an iteration over the iUnits for transcribing them to oUnits
-pub fn transcriber<S: Clone, R, E: fmt::Display>(source: Vec<S>, tick: TranscriberTick<S, R, E>) -> TranscriptionResult<S, R, E> {
+pub fn transcriber<S: Clone, R, E: fmt::Display>(
+    source: Vec<S>,
+    mut tick: impl FnMut(&mut TranscriberCursor<S>, &S) -> TranscriberTickResult<R, E>
+) -> TranscriptionResult<S, R, E> {
     let mut cursor = TranscriberCursor::new(&source);
     let mut result = Vec::new();
 

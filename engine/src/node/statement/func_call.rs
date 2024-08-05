@@ -2,7 +2,7 @@ use std::{collections::HashMap, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::{context::Context, tick::VMTick}};
+use crate::{data::DataValue, lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError}, token::{symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::{context::Context, tick::VMTick}};
 
 use super::{StatementNode, StatementResult};
 
@@ -15,15 +15,15 @@ pub struct FunctionCallStatement {
 }
 
 impl Node for FunctionCallStatement {
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
-        if let Ok(Some(called)) = ASTExpression::transcribe(cursor) {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
+        if let Ok(Some(called)) = ASTExpression::transcribe(cursor, ctx) {
             cursor.expect(&Token::Symbol(TokenSymbol::ParenOpen), ParserError::Expected("args_start@call/sym <sym:paren:open> '('".to_string()))?;
 
             ignore_eols(cursor);
 
             let mut args = vec![];
 
-            while let Ok(Some(arg)) = ASTExpression::transcribe(cursor) {
+            while let Ok(Some(arg)) = ASTExpression::transcribe(cursor, ctx) {
                 args.push(arg);
 
                 ignore_eols(cursor);

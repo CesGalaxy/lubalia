@@ -11,7 +11,7 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberC
 
 use crate::{
     data::DataValue,
-    lang::{parser::error::expected_token, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
+    lang::{parser::{context::ParsingContext, error::expected_token}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     vm::tick::VMTick
 };
 
@@ -63,29 +63,29 @@ pub trait StatementNode: Node {
 
 impl Node for ASTStatement {
     /// Transcribe an statement (if possible)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> {
         //? Should this return Err if no statement is found? So node transcription ignores all errors and tries an expr (which will the one that can fail)
         //* This must make sure that the transcribed node is the correct one. In case of error, it will fail.
         match cursor.peek() {
             // Statements are usually defined with an initial keyword
             Some(Token::LangKeyword(keyword)) => match keyword {
-                TokenLangKeyword::Let => variable_declaration::VariableDeclaration::transcribe(cursor).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
-                TokenLangKeyword::If => conditional::ConditionalStatement::transcribe(cursor).map(|cond| cond.map(ASTStatement::Conditional)),
-                TokenLangKeyword::Repeat => repeat::Repeat::transcribe(cursor).map(|repeat| repeat.map(ASTStatement::Repeat)),
-                TokenLangKeyword::Switch => switch::SwitchStatement::transcribe(cursor).map(|switch| switch.map(ASTStatement::Switch)),
+                TokenLangKeyword::Let => variable_declaration::VariableDeclaration::transcribe(cursor, ctx).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
+                TokenLangKeyword::If => conditional::ConditionalStatement::transcribe(cursor, ctx).map(|cond| cond.map(ASTStatement::Conditional)),
+                TokenLangKeyword::Repeat => repeat::Repeat::transcribe(cursor, ctx).map(|repeat| repeat.map(ASTStatement::Repeat)),
+                TokenLangKeyword::Switch => switch::SwitchStatement::transcribe(cursor, ctx).map(|switch| switch.map(ASTStatement::Switch)),
                 TokenLangKeyword::Return => {
                     cursor.next();
-                    ASTNode::transcribe(cursor).map(|expr| expr.map(Box::new).map(ASTStatement::Return))
+                    ASTNode::transcribe(cursor, ctx).map(|expr| expr.map(Box::new).map(ASTStatement::Return))
                 },
                 _ => Err(TranscriptionException::NotFound(expected_token!(LangKeyword; <stmnt>)))
             },
             Some(Token::CustomKeyword(_)) => if let Some(Token::Symbol(TokenSymbol::ParenOpen)) = cursor.peek_next() {
-                func_call::FunctionCallStatement::transcribe(cursor).map(|call| call.map(ASTStatement::FunctionCall))
+                func_call::FunctionCallStatement::transcribe(cursor, ctx).map(|call| call.map(ASTStatement::FunctionCall))
             } else {
                 Err(TranscriptionException::NotFound(expected_token!(<stmnt>)))
             },
             // Scopes are statements too
-            Some(Token::Symbol(TokenSymbol::BraceOpen)) => scope::ScopeStruct::transcribe(cursor).map(|scope| scope.map(Self::Scope)),
+            Some(Token::Symbol(TokenSymbol::BraceOpen)) => scope::ScopeStruct::transcribe(cursor, ctx).map(|scope| scope.map(Self::Scope)),
             _ => Err(TranscriptionException::NotFound(expected_token!(<stmnt>)))
         }
     }

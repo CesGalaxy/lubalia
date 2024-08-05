@@ -7,7 +7,7 @@ use expression::{ASTExpression, ExpressionNode};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, TranscriberTickResult}};
 use statement::{ASTStatement, StatementNode};
 
-use crate::{lang::{parser::error::{expected_token, ParserError}, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
+use crate::{lang::{parser::{context::ParsingContext, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
 
 use super::data::DataValue;
 
@@ -26,7 +26,7 @@ pub enum ASTNode {
 
 pub trait Node: fmt::Display {
     /// Transcribe a node from the source code (tokens)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized;
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized;
 }
 
 impl ASTNode {
@@ -49,25 +49,25 @@ impl ASTNode {
 
 impl Node for ASTNode {
     /// Get a node from the source code (tokens)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> {
         match cursor.peek() {
             Some(token) => match token {
                 // Ignore EOLs (note: the trancriber will automatly move the cursor)
                 Token::Symbol(TokenSymbol::EOL) => Ok(None),
                 // Try (intent) to transcribe a statement
-                _ => cursor.intent(ASTStatement::transcribe).map(|stmnt| stmnt.map(|stmnt| stmnt.map(Self::Statement)))
-                        // if no statement was found, try to transcribe an expression (which won't be a statament-result).
-                        .alt(|| cursor.intent(ASTExpression::transcribe).map(|expr| expr.map(|expr| expr.map(ASTNode::Expression))))
-                        // All nodes must end with a new line
-                        // .check(|_| if let Some(Token::Symbol(TokenSymbol::EOL)) = cursor.consume() {
-                        //     None
-                        // } else {
-                        //     // TODO: Provide expected and position
-                        //     Some(Err(TranscriptionException::Error(ParserError::Expected("end of line".to_string()))))
-                        // })
-                        // TODO: Callables will be here?
-                        // Is no expression was found neither, no node was found
-                        .tag(expected_token!(<node>))
+                _ => ctx.intent(cursor, ASTStatement::transcribe).map(Self::Statement)
+                    // if no statement was found, try to transcribe an expression (which won't be a statament-result).
+                    .alt_with_map(cursor, ctx, ASTExpression::transcribe, ASTNode::Expression)
+                    // All nodes must end with a new line
+                    // .check(|_| if let Some(Token::Symbol(TokenSymbol::EOL)) = cursor.consume() {
+                    //     None
+                    // } else {
+                    //     // TODO: Provide expected and position
+                    //     Some(Err(TranscriptionException::Error(ParserError::Expected("end of line".to_string()))))
+                    // })
+                    // TODO: Callables will be here?
+                    // Is no expression was found neither, no node was found
+                    .tag(expected_token!(<node>))
             },
             None => Ok(None)
         }

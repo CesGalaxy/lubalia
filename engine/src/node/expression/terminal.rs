@@ -4,7 +4,7 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberC
 
 use crate::{
     data::DataValue,
-    lang::{parser::error::{expected_token, ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
+    lang::{parser::{context::ParsingContext, error::{expected_token, ParserError}}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
     node::{ASTNode, Node, NodeParserTickResult},
     vm::tick::VMTick
 };
@@ -35,7 +35,7 @@ pub enum TerminalExpression {
 
 impl Node for TerminalExpression {
     /// Transcribe a terminal expression (literal, variable reference, scope, etc.)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> {
         match cursor.consume() {
             Some(Token::Literal(literal)) => Ok(Some(Self::StaticLiteral(literal.clone().into()))),
             Some(Token::LangKeyword(keyword)) => match keyword {
@@ -44,7 +44,7 @@ impl Node for TerminalExpression {
                 TokenLangKeyword::Null => Ok(Some(Self::StaticLiteral(DataValue::Null))),
                 TokenLangKeyword::Fn => {
                     cursor.back();
-                    UnnamedFunctionConstructor::transcribe(cursor).map(|o| o.map(Self::UnnamedFunction))
+                    UnnamedFunctionConstructor::transcribe(cursor, ctx).map(|o| o.map(Self::UnnamedFunction))
                 },
                 _ => Err(TranscriptionException::NotFound(expected_token!(LangKeyword; <expr:terminal>)))
             },
@@ -52,13 +52,13 @@ impl Node for TerminalExpression {
             Some(Token::Symbol(TokenSymbol::Underscore)) => Ok(Some(Self::LastValue)),
             Some(Token::Symbol(TokenSymbol::ParenOpen)) => {
                 // TODO: Does Result have a way of simplifying this?
-                let node = ASTNode::transcribe(cursor).map(|o| o.map(Box::new).map(Self::Parenthesis));
+                let node = ASTNode::transcribe(cursor, ctx).map(|o| o.map(Box::new).map(Self::Parenthesis));
                 cursor.expect(&Token::Symbol(TokenSymbol::ParenClose), ParserError::Expected(expected_token!(ParenClose; <expr:terminal>)))?;
                 node
             },
             Some(Token::Symbol(TokenSymbol::BracketOpen)) => {
                 cursor.back();
-                LiteralListExpression::transcribe(cursor).map(|o| o.map(Self::StaticLiteralList))
+                LiteralListExpression::transcribe(cursor, ctx).map(|o| o.map(Self::StaticLiteralList))
             },
             _ => Err(TranscriptionException::NotFound(expected_token!(<expr:terminal>)))
         }

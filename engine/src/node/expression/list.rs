@@ -1,6 +1,6 @@
-use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException, intent::TranscriptionIntent}};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{context::{ParsingContext, ParsingIntent}, cursor::ignore_eols, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
 
 use super::ExpressionNode;
 
@@ -20,21 +20,19 @@ pub enum LiteralListExpression {
 }
 
 impl Node for LiteralListExpression {
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // TODO: This function runs twice?
         cursor.expect(&Token::Symbol(TokenSymbol::BracketOpen), ParserError::Expected(expected_token!(<sym:bracket:open>)))?;
 
         ignore_eols(cursor);
 
-        let list = if let TranscriptionIntent(Ok(Some(first))) = cursor.intent(ASTNode::transcribe) {
+        let list = if let ParsingIntent(Ok(Some(first))) = ctx.intent(cursor, ASTNode::transcribe) {
             match cursor.peek() {
                 Some(Token::Symbol(TokenSymbol::Semicolon)) => {
                     cursor.next();
 
-                    let second = ASTNode::transcribe(cursor)?
+                    let second = ASTNode::transcribe(cursor, ctx)?
                         .ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(times@arr_repeat <node>))))?;
-
-                    println!("B {second}");
 
                     Self::Repeat(Box::new(first), Box::new(second))
                 },
@@ -42,7 +40,7 @@ impl Node for LiteralListExpression {
                     cursor.next();
                     cursor.next();
 
-                    let end = ASTNode::transcribe(cursor)?
+                    let end = ASTNode::transcribe(cursor, ctx)?
                         .ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(end@arr_range <node>))))?;
 
                     Self::Range(Box::new(first), Box::new(end))
@@ -54,7 +52,7 @@ impl Node for LiteralListExpression {
                     while let Some(Token::Symbol(TokenSymbol::Comma)) = cursor.peek() {
                         cursor.next();
 
-                        let item = ASTNode::transcribe(cursor)?
+                        let item = ASTNode::transcribe(cursor, ctx)?
                             .ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(item@arr <node>))))?;
 
                         items.push(item);

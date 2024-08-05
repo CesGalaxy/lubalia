@@ -2,7 +2,7 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{cursor::ignore_eols, error::{expected_token, ParserError}}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::{expected_token, ParserError}}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
 
 use super::{StatementNode, StatementResult};
 
@@ -16,14 +16,14 @@ pub struct SwitchStatement {
 }
 
 impl Node for SwitchStatement {
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Switch statements should start with the keyword `if`
         cursor.expect(&Token::LangKeyword(TokenLangKeyword::Switch), ParserError::Expected("start@switch <keyword:switch> 'switch'".to_string()))?;
 
         ignore_eols(cursor);
 
         // Get the expression to evaluate
-        let expression = Box::new(ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@switch <node>".to_string())))?);
+        let expression = Box::new(ASTNode::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("expression@switch <node>".to_string())))?);
 
         ignore_eols(cursor);
 
@@ -36,7 +36,7 @@ impl Node for SwitchStatement {
 
         // Save all cases found inside the switch until a closing brace is found (and ends the switch)
         while let Some(Token::LangKeyword(TokenLangKeyword::Case)) = cursor.peek() {
-            cases.push(SwitchCase::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("case@switch <case>".to_string())))?);
+            cases.push(SwitchCase::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("case@switch <case>".to_string())))?);
 
             ignore_eols(cursor);
         }
@@ -98,7 +98,7 @@ impl SwitchCase {
 
 // Not a node, neither statement, WTF is?
 impl Node for SwitchCase {
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Switch cases should start with the keyword `case`
         if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Case)) {
             return Err(TranscriptionException::Error(ParserError::Expected(expected_token!(start@case <keyword:case>))));
@@ -111,13 +111,13 @@ impl Node for SwitchCase {
             cursor.next();
             None
         } else {
-            Some(ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(expression@case <node>))))?)
+            Some(ASTNode::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(expression@case <node>))))?)
         };
 
         ignore_eols(cursor);
 
         // Get the body of the case
-        let body = ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(body@case <node>))))?;
+        let body = ASTNode::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected(expected_token!(body@case <node>))))?;
 
         Ok(Some(Self { case: expression, body }))
     }

@@ -3,7 +3,7 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, Token}}, node::{ ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
+    lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, Token}}, node::{ ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
 };
 
 use super::{scope::ScopeStruct, StatementNode, StatementResult};
@@ -23,19 +23,19 @@ pub struct ConditionalStatement {
 
 impl Node for ConditionalStatement {
     /// Transcribe a conditional statement from the source code (tokens)
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Conditionals should start with the keyword `if`
         cursor.expect(&Token::LangKeyword(TokenLangKeyword::If), ParserError::Expected("start@conditional <keyword:if> 'if'".to_string()))?;
 
         ignore_eols(cursor);
 
         // Get the condition expression
-        let condition = Box::new(ASTNode::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("condition@conditional <node>".to_string())))?);
+        let condition = Box::new(ASTNode::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("condition@conditional <node>".to_string())))?);
 
         ignore_eols(cursor);
 
         // Get a scope with the branch to run if the condition is true
-        let then_branch = ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("then_branch@conditional <node>".to_string())))?;
+        let then_branch = ScopeStruct::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("then_branch@conditional <node>".to_string())))?;
 
         ignore_eols(cursor);
 
@@ -44,7 +44,7 @@ impl Node for ConditionalStatement {
             // TODO: Automate this in the cursor?
             cursor.next();
             ignore_eols(cursor);
-            Some(ScopeStruct::transcribe(cursor)?.ok_or(TranscriptionException::Error(ParserError::Expected("else_branch@conditional <node>".to_string())))?)
+            Some(ScopeStruct::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("else_branch@conditional <node>".to_string())))?)
         } else {
             // Keep last EOL
             cursor.back();

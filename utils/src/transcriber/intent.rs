@@ -41,7 +41,7 @@ impl<ResultUnit, Error> TranscriptionIntent<ResultUnit, Error> {
 
 impl<'a, Unit> TranscriberCursor<'a, Unit> {
     /// Try to transcribe, after the intent the cursor will be modified only if the transcription was successful
-    pub fn intent<ResultUnit, Error>(&mut self, intent: impl Fn(&mut Self) -> TranscriberTickResult<ResultUnit, Error>) -> TranscriptionIntent<ResultUnit, Error> {
+    pub fn intent<ResultUnit, Error>(&mut self, mut intent: impl FnMut(&mut Self) -> TranscriberTickResult<ResultUnit, Error>) -> TranscriptionIntent<ResultUnit, Error> {
         // Save the status of the cursor before the intent
         let checkpoint = self.checkpoint();
 

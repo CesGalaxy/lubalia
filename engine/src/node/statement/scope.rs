@@ -3,7 +3,7 @@ use std::{collections::HashMap, fmt};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
-    lang::{parser::error::ParserError, token::{symbol::TokenSymbol, Token}},
+    lang::{parser::{context::ParsingContext, error::ParserError}, token::{symbol::TokenSymbol, Token}},
     node::{ASTNode, Node, NodeParserTickResult},
     vm::{context::Context, tick::VMTick}
 };
@@ -23,7 +23,7 @@ pub struct ScopeStruct {
 }
 
 impl Node for ScopeStruct {
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Scopes should start with an opening brace
         cursor.expect(&Token::Symbol(TokenSymbol::BraceOpen), ParserError::Expected("start@scope/sym <sym:brace:open> '{'".to_string()))?;
 
@@ -34,7 +34,7 @@ impl Node for ScopeStruct {
         while Some(&Token::Symbol(TokenSymbol::BraceClose)) != cursor.peek() {
             let initial_position = cursor.pos;
 
-            if let Some(node) = ASTNode::transcribe(cursor)? {
+            if let Some(node) = ASTNode::transcribe(cursor, ctx)? {
                 nodes.push(node);
             }
 

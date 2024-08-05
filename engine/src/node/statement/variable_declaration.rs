@@ -3,7 +3,7 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    lang::{parser::{cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
+    lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
 };
 
 use super::{StatementNode, StatementResult};
@@ -33,7 +33,7 @@ pub struct VariableDeclaration {
 
 impl Node for VariableDeclaration {
     /// Transcribes the declaration of ONE variable
-    fn transcribe(cursor: &mut TranscriberCursor<Token>) -> NodeParserTickResult<Self> where Self: Sized {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Variables should start with the keyword `let`
         cursor.expect(&Token::LangKeyword(TokenLangKeyword::Let), ParserError::Expected("start@var_declaration <keyword:let> 'let'".to_string()))?;
 
@@ -50,7 +50,7 @@ impl Node for VariableDeclaration {
                 cursor.next();
                 ignore_eols(cursor);
                 // TODO: What I was even thinking when I wrote this?
-                ASTNode::transcribe(cursor)?
+                ASTNode::transcribe(cursor, ctx)?
             } else {
                 // Keep last EOL
                 cursor.back();
