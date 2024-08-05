@@ -27,18 +27,18 @@ impl ExpressionNode for BinaryExpression {
             BinaryOperator::Sub => (ArithmeticValue::from(lhs) - ArithmeticValue::from(rhs)).into(),
             BinaryOperator::Mul => (ArithmeticValue::from(lhs) * ArithmeticValue::from(rhs)).into(),
             BinaryOperator::Div => (ArithmeticValue::from(lhs) / ArithmeticValue::from(rhs)).into(),
-            BinaryOperator::Equal => (lhs == rhs).into(),
-            BinaryOperator::NoEqual => (lhs != rhs).into(),
-            BinaryOperator::Greater => (lhs > rhs).into(),
-            BinaryOperator::GreaterOrEqual => (lhs >= rhs).into(),
-            BinaryOperator::Less => (lhs < rhs).into(),
-            BinaryOperator::LessOrEqual => (lhs <= rhs).into(),
-            BinaryOperator::AND => (bool::from(lhs) && bool::from(rhs)).into(),
-            BinaryOperator::OR => (bool::from(lhs) || bool::from(rhs)).into(),
-            BinaryOperator::NAND => (!bool::from(lhs) || !bool::from(rhs)).into(),
-            BinaryOperator::NOR => (!bool::from(lhs) && !bool::from(rhs)).into(),
-            BinaryOperator::XOR => (bool::from(lhs) ^ bool::from(rhs)).into(),
-            BinaryOperator::XNOR => (bool::from(lhs) ^ bool::from(rhs)).not().into()
+            BinaryOperator::Equal => DataValue::Boolean(lhs == rhs),
+            BinaryOperator::NoEqual => DataValue::Boolean(lhs != rhs),
+            BinaryOperator::Greater => DataValue::Boolean(lhs > rhs),
+            BinaryOperator::GreaterOrEqual => DataValue::Boolean(lhs >= rhs),
+            BinaryOperator::Less => DataValue::Boolean(lhs < rhs),
+            BinaryOperator::LessOrEqual => DataValue::Boolean(lhs <= rhs),
+            BinaryOperator::AND => DataValue::Boolean(bool::from(lhs) && bool::from(rhs)),
+            BinaryOperator::OR => DataValue::Boolean(bool::from(lhs) || bool::from(rhs)),
+            BinaryOperator::NAND => DataValue::Boolean(!bool::from(lhs) || !bool::from(rhs)),
+            BinaryOperator::NOR => DataValue::Boolean(!bool::from(lhs) && !bool::from(rhs)),
+            BinaryOperator::XOR => DataValue::Boolean(bool::from(lhs) ^ bool::from(rhs)),
+            BinaryOperator::XNOR => DataValue::Boolean(bool::from(lhs) ^ bool::from(rhs).not())
         }
     }
 }

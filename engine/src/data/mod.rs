@@ -1,12 +1,14 @@
 /// This module contains the arithmetic operations for the language, with their corresponding data values.
 pub mod arithmetic;
 
-/// This module contains the logic operations for the language, with their corresponding data values.
-pub mod logic;
-
 /// This module contains the comparasion operations for the language data values.
 pub mod comparsion;
+
+/// This module contains converters between different (language and machine) data types.
 pub mod conversion;
+
+/// This module contains the typing system.
+pub mod types;
 
 use std::fmt;
 
