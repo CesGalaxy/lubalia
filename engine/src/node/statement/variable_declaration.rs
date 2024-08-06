@@ -3,14 +3,14 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
+    data::types::DataType, lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
 };
 
 use super::{StatementNode, StatementResult};
 
 /// Defined the method variables are stored
 #[derive(Debug, Clone)]
-pub enum VariableType {
+pub enum VariableMutability {
     /// A variable that can be change
     Variable,
 
@@ -20,9 +20,12 @@ pub enum VariableType {
 
 #[derive(Debug, Clone)]
 pub struct VariableDeclaration {
-    /// The type of the variable
+    /// The mutability of the variable
     #[allow(dead_code)]
-    vartype: VariableType,
+    varmut: VariableMutability,
+
+    /// The type of the variable
+    vartype: DataType,
 
     /// The name of the variable
     varname: String,
@@ -45,6 +48,19 @@ impl Node for VariableDeclaration {
 
             ignore_eols(cursor);
 
+            let vartype = if let Some(Token::Symbol(TokenSymbol::Colon)) = cursor.peek() {
+                cursor.next();
+                ignore_eols(cursor);
+
+                let vartype = DataType::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("vartype@var_declaration <type>".to_string())))?;
+
+                ignore_eols(cursor);
+
+                vartype
+            } else {
+                DataType::Any
+            };
+
             // Optionally, the variable can be assigned a value (after an equal sign)
             let value = if let Some(&Token::Symbol(TokenSymbol::Equal)) = cursor.peek() {
                 cursor.next();
@@ -58,7 +74,7 @@ impl Node for VariableDeclaration {
             }.map(Box::new);
 
             // By default, variables are mutable (variable)
-            Ok(Some(VariableDeclaration { vartype: VariableType::Variable, varname, value }))
+            Ok(Some(VariableDeclaration { varmut: VariableMutability::Variable, vartype, varname, value }))
         } else {
             Err(TranscriptionException::Error(ParserError::Expected("varname@var_declaration <keyword:custom>".to_string())))
         }
@@ -82,10 +98,16 @@ impl StatementNode for VariableDeclaration {
 
 impl fmt::Display for VariableDeclaration {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "let {}", self.varname)?;
+        write!(f, "{}", if let VariableMutability::Variable = self.varmut { "var" } else { "const" })?;
+
+        write!(f, " {}", self.varname)?;
+
+        if &self.vartype != &DataType::Any {
+            write!(f, ": {}", self.vartype)?;
+        }
 
         if let Some(value) = &self.value {
-            write!(f, " = {}", value)
+            write!(f, " = {value}")
         } else {
             Ok(())
         }

@@ -15,6 +15,7 @@ impl PartialEq for DataValue {
             (DataValue::Number(a), DataValue::String(b)) => &a.to_string() == b,
             (DataValue::String(a), DataValue::Number(b)) => a == &b.to_string(),
 
+            // TODO: Convert to boolean
             // String - Boolean
             (DataValue::Boolean(a), DataValue::String(b)) => &a.to_string() == b,
             (DataValue::String(a), DataValue::Boolean(b)) => a == &b.to_string(),
