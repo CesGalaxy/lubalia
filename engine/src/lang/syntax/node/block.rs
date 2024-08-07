@@ -7,7 +7,7 @@ use crate::{
     vm::{context::Context, tick::VMTick}
 };
 
-use super::{statement::StatementResult, ASTNode, Node, NodeParserTickResult};
+use super::{statement::{StatementNode, StatementResult}, ASTNode, Node, NodeParserTickResult};
 
 /// A scope that will run a set of nodes in a new context (child of the current one)
 #[derive(Debug, Clone)]
@@ -68,7 +68,7 @@ impl BlockStruct {
 
         tick.context = tick.context.clone().map(|child| child.parent.clone()).flatten();
 
-        result.map(StatementResult::Return)
+        result
     }
 }
 

@@ -97,7 +97,7 @@ impl SwitchCase {
 
         // Return Some if matches, None if doesn't
         if case.map(|case_value| main_value == &case_value).unwrap_or(true) {
-            Some(self.body.execute(tick).map(StatementResult::Return))
+            Some(self.body.execute(tick))
         } else {
             None
         }

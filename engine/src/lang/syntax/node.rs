@@ -7,7 +7,7 @@ use std::fmt;
 
 use expression::{ASTExpression, ExpressionNode};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, TranscriberTickResult}};
-use statement::{ASTStatement, StatementNode};
+use statement::{ASTStatement, StatementNode, StatementResult};
 
 use crate::{data::DataValue, lang::{parser::{context::ParsingContext, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
 
@@ -29,12 +29,12 @@ pub trait Node: fmt::Display {
     fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized;
 }
 
-impl ASTNode {
-    /// Execute the instruction of the node
-    pub fn execute(&self, tick: &mut VMTick) -> Option<DataValue> {
+impl StatementNode for ASTNode {
+    /// Execute the instruction of the node and return any result (wether it's returned or not)
+    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
         match self {
-            Self::Expression(expr) => Some(expr.evaluate(tick)),
-            Self::Statement(statement) => statement.execute(tick).map(|result| result.returned()).flatten()
+            Self::Expression(expr) => Some(StatementResult::Return(expr.evaluate(tick))),
+            Self::Statement(statement) => statement.execute(tick)
         }
     }
 }

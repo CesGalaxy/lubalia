@@ -1,7 +1,7 @@
 use std::fmt;
 
 use lubalia_utils::transcriber::error::TranscriptionError;
-use lubengine::{data::DataValue, lang::{lexer::{lexer, LexerError}, parser::{error::ParserError, parser}, token::Token}, root::ASTRootItem, vm::VM};
+use lubengine::{data::DataValue, lang::{lexer::{lexer, LexerError}, parser::{error::ParserError, parser}, syntax::root::ASTRootItem, token::Token}, vm::VM};
 
 /// Evaluate a source code in the VM
 pub fn evaluate_code(vm: &mut VM, code: String) -> Result<Option<DataValue>, EvaluationError> {
