@@ -3,10 +3,15 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, Token}}, node::{ ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
+    lang::{
+        parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError},
+        syntax::node::{expression::ExpressionNode, block::BlockStruct, ASTNode, Node, NodeParserTickResult},
+        token::{keyword::TokenLangKeyword, Token}
+    },
+    vm::tick::VMTick
 };
 
-use super::{scope::ScopeStruct, StatementNode, StatementResult};
+use super::{StatementNode, StatementResult};
 
 /// A conditional statement that will run a branch based on a condition
 #[derive(Debug, Clone)]
@@ -15,10 +20,10 @@ pub struct ConditionalStatement {
     pub condition: Box<ASTNode>,
 
     /// The branch to run if the condition is true
-    pub then_branch: ScopeStruct,
+    pub then_branch: BlockStruct,
 
     /// The branch to run if the condition is false (or no other condition was met)
-    pub else_branch: Option<ScopeStruct>,
+    pub else_branch: Option<BlockStruct>,
 }
 
 impl Node for ConditionalStatement {
@@ -35,7 +40,7 @@ impl Node for ConditionalStatement {
         ignore_eols(cursor);
 
         // Get a scope with the branch to run if the condition is true
-        let then_branch = ScopeStruct::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("then_branch@conditional <node>".to_string())))?;
+        let then_branch = BlockStruct::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("then_branch@conditional <node>".to_string())))?;
 
         ignore_eols(cursor);
 
@@ -44,7 +49,7 @@ impl Node for ConditionalStatement {
             // TODO: Automate this in the cursor?
             cursor.next();
             ignore_eols(cursor);
-            Some(ScopeStruct::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("else_branch@conditional <node>".to_string())))?)
+            Some(BlockStruct::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("else_branch@conditional <node>".to_string())))?)
         } else {
             // Keep last EOL
             cursor.back();

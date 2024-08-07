@@ -2,7 +2,11 @@ use std::fmt;
 
 use lubalia_utils::transcriber::{cursor::TranscriberCursor, error::TranscriptionException};
 
-use crate::{lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, Token}}, node::{ASTNode, Node, NodeParserTickResult}};
+use crate::lang::{
+    parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError},
+    syntax::node::{expression::ExpressionNode, ASTNode, Node, NodeParserTickResult},
+    token::{keyword::TokenLangKeyword, Token}
+};
 
 use super::{ASTStatement, StatementNode, StatementResult};
 

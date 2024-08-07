@@ -8,12 +8,7 @@ use error::ParserError;
 use lubalia_utils::transcriber::{cursor::TranscriberCursor, result::TranscriptionResult, transcriber, TranscriberTickResult};
 use manifest::ProgramManifest;
 
-use crate::{
-    node::{ASTNode, Node},
-    root::ASTRootItem,
-};
-
-use super::token::{symbol::TokenSymbol, Token};
+use super::{syntax::{node::{ASTNode, Node}, root::ASTRootItem}, token::{symbol::TokenSymbol, Token}};
 
 /// Transcribe a list of tokens into an AST (Abstract Syntax Tree).
 pub fn parser(tokens: Vec<Token>) -> TranscriptionResult<Token, ASTRootItem, ParserError> {

@@ -13,7 +13,7 @@ pub enum ASTRootItem {
 impl fmt::Display for ASTRootItem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ASTRootItem::Node(node) => write!(f, "{}", node)
+            ASTRootItem::Node(node) => write!(f, "> {}", node)
         }
     }
 }

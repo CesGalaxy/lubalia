@@ -1,6 +1,7 @@
 pub mod expression;
 pub mod statement;
-pub mod type_definition;
+pub mod block;
+pub mod meta;
 
 use std::fmt;
 
@@ -8,9 +9,7 @@ use expression::{ASTExpression, ExpressionNode};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, TranscriberTickResult}};
 use statement::{ASTStatement, StatementNode};
 
-use crate::{lang::{parser::{context::ParsingContext, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
-
-use super::data::DataValue;
+use crate::{data::DataValue, lang::{parser::{context::ParsingContext, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
 
 pub type NodeParserTickResult<T> = TranscriberTickResult<T, ParserError>;
 
@@ -38,9 +37,11 @@ impl ASTNode {
             Self::Statement(statement) => statement.execute(tick).map(|result| result.returned()).flatten()
         }
     }
+}
 
+impl ExpressionNode for ASTNode {
     /// Evaluate the node and return the result
-    pub fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
         match self {
             Self::Expression(expr) => expr.evaluate(tick),
             Self::Statement(statement) => statement.execute(tick).map(|result| result.value()).unwrap_or_default()
@@ -59,13 +60,6 @@ impl Node for ASTNode {
                 _ => ctx.intent(cursor, ASTStatement::transcribe).map(Self::Statement)
                     // if no statement was found, try to transcribe an expression (which won't be a statament-result).
                     .alt_with_map(cursor, ctx, ASTExpression::transcribe, ASTNode::Expression)
-                    // All nodes must end with a new line
-                    // .check(|_| if let Some(Token::Symbol(TokenSymbol::EOL)) = cursor.consume() {
-                    //     None
-                    // } else {
-                    //     // TODO: Provide expected and position
-                    //     Some(Err(TranscriptionException::Error(ParserError::Expected("end of line".to_string()))))
-                    // })
                     // TODO: Callables will be here?
                     // Is no expression was found neither, no node was found
                     .tag(expected_token!(<node>))

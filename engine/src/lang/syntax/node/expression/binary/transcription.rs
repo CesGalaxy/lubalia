@@ -1,8 +1,9 @@
 use lubalia_utils::transcriber::{cursor::TranscriberCursor, error::TranscriptionException};
 
-use crate::{
-    lang::{parser::{context::ParsingContext, error::{expected_token, ParserError}}, token::Token},
-    node::{expression::{terminal::TerminalExpression, ASTExpression}, Node, NodeParserTickResult}
+use crate::lang::{
+    parser::{context::ParsingContext, error::{expected_token, ParserError}},
+    syntax::node::{expression::{terminal::TerminalExpression, ASTExpression}, Node, NodeParserTickResult},
+    token::Token
 };
 
 use super::{operator::BinaryOperator, BinaryExpression};

@@ -2,7 +2,15 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::{expected_token, ParserError}}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{
+    data::DataValue,
+    lang::{
+        parser::{context::ParsingContext, cursor::ignore_eols, error::{expected_token, ParserError}},
+        syntax::node::{expression::ExpressionNode, ASTNode, Node, NodeParserTickResult},
+        token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}
+    },
+    vm::tick::VMTick
+};
 
 use super::{StatementNode, StatementResult};
 

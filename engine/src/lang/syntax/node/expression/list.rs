@@ -1,6 +1,14 @@
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{context::{ParsingContext, ParsingIntent}, cursor::ignore_eols, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick};
+use crate::{
+    data::DataValue,
+    lang::{
+        parser::{context::{ParsingContext, ParsingIntent}, cursor::ignore_eols, error::{expected_token, ParserError}},
+        syntax::node::{ASTNode, Node, NodeParserTickResult},
+        token::{symbol::TokenSymbol, Token}
+    },
+    vm::tick::VMTick
+};
 
 use super::ExpressionNode;
 

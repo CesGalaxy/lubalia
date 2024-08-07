@@ -4,15 +4,14 @@ use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCu
 
 use crate::{
     lang::{parser::{context::ParsingContext, error::ParserError}, token::{symbol::TokenSymbol, Token}},
-    node::{ASTNode, Node, NodeParserTickResult},
     vm::{context::Context, tick::VMTick}
 };
 
-use super::{StatementNode, StatementResult};
+use super::{statement::StatementResult, ASTNode, Node, NodeParserTickResult};
 
 /// A scope that will run a set of nodes in a new context (child of the current one)
 #[derive(Debug, Clone)]
-pub struct ScopeStruct {
+pub struct BlockStruct {
     /// The nodes to execute inside the scope
     nodes: Vec<ASTNode>,
 
@@ -22,9 +21,9 @@ pub struct ScopeStruct {
     name: String
 }
 
-impl Node for ScopeStruct {
+impl Node for BlockStruct {
     fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
-        // Scopes should start with an opening brace
+        // Blocks should start with an opening brace
         cursor.expect(&Token::Symbol(TokenSymbol::BraceOpen), ParserError::Expected("start@scope/sym <sym:brace:open> '{'".to_string()))?;
 
         let mut nodes = vec![];
@@ -44,17 +43,17 @@ impl Node for ScopeStruct {
             }
         }
 
-        // Scopes should end with a closing brace
+        // Blocks should end with a closing brace
         cursor.expect(&Token::Symbol(TokenSymbol::BraceClose), ParserError::Expected("end@scope/sym <sym:brace:close> '}'".to_string()))?;
 
-        Ok(Some(ScopeStruct { nodes, name: String::new() }))
+        Ok(Some(BlockStruct { nodes, name: String::new() }))
     }
 }
 
-impl StatementNode for ScopeStruct {
+impl BlockStruct {
     // TODO: This code is shit. But works!
-    /// Run the scope (with it's own generated child context)
-    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
+    /// Run the block (with it's own generated child context)
+    pub fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
         let mut result = None;
 
         let parent_ctx = tick.context.clone().map(|c| *c);
@@ -73,7 +72,7 @@ impl StatementNode for ScopeStruct {
     }
 }
 
-impl fmt::Display for ScopeStruct {
+impl fmt::Display for BlockStruct {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{{\n")?;
 

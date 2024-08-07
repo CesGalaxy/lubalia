@@ -1,8 +1,13 @@
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::types::DataType, lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::{expected_token, ParserError}}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}};
-
-use super::{Node, NodeParserTickResult};
+use crate::{
+    data::types::DataType,
+    lang::{
+        parser::{context::ParsingContext, cursor::ignore_eols, error::{expected_token, ParserError}},
+        syntax::node::{Node, NodeParserTickResult},
+        token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}
+    }
+};
 
 impl DataType {
     pub fn transcribe_terminal(cursor: &mut TranscriberCursor<Token>, _ctx: &mut ParsingContext) -> NodeParserTickResult<Self> {

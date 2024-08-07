@@ -4,7 +4,7 @@ pub mod tick;
 use context::Context;
 use tick::VMTick;
 
-use crate::{data::DataValue, node::ASTNode, root::ASTRootItem};
+use crate::{data::DataValue, lang::syntax::{node::ASTNode, root::ASTRootItem}};
 
 /// A virtual machine that executes a program in bytecode
 #[derive(Debug)]

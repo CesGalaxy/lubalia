@@ -1,6 +1,6 @@
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{lang::{parser::error::expected_token, token::{symbol::TokenSymbol, Token}}, node::NodeParserTickResult};
+use crate::lang::{parser::error::expected_token, syntax::node::NodeParserTickResult, token::{symbol::TokenSymbol, Token}};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum BinaryOperator {

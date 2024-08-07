@@ -3,7 +3,13 @@ use std::fmt;
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    data::types::DataType, lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}}, node::{ASTNode, Node, NodeParserTickResult}, vm::tick::VMTick
+    data::types::DataType,
+    lang::{
+        parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError},
+        syntax::node::{expression::ExpressionNode, ASTNode, Node, NodeParserTickResult},
+        token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}
+    },
+    vm::tick::VMTick
 };
 
 use super::{StatementNode, StatementResult};

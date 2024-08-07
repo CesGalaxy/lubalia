@@ -10,3 +10,4 @@ pub mod tokenizer;
 
 /// The token module contains the definition of tokens.
 pub mod token;
+pub mod syntax;

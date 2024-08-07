@@ -1,5 +1,4 @@
 pub mod variable_declaration;
-pub mod scope;
 pub mod conditional;
 pub mod repeat;
 pub mod switch;
@@ -15,7 +14,7 @@ use crate::{
     vm::tick::VMTick
 };
 
-use super::{expression::ExpressionNode, ASTNode, Node, NodeParserTickResult};
+use super::{block::BlockStruct, expression::ExpressionNode, ASTNode, Node, NodeParserTickResult};
 
 /// Wether the statement returned a value for using it or the result is just a side effect
 #[derive(Debug, Clone)]
@@ -49,7 +48,7 @@ impl StatementResult {
 #[derive(Debug, Clone)]
 pub enum ASTStatement {
     VariableDeclaration(variable_declaration::VariableDeclaration),
-    Scope(scope::ScopeStruct),
+    Block(BlockStruct),
     Conditional(conditional::ConditionalStatement),
     Repeat(repeat::Repeat),
     Switch(switch::SwitchStatement),
@@ -85,7 +84,7 @@ impl Node for ASTStatement {
                 Err(TranscriptionException::NotFound(expected_token!(<stmnt>)))
             },
             // Scopes are statements too
-            Some(Token::Symbol(TokenSymbol::BraceOpen)) => scope::ScopeStruct::transcribe(cursor, ctx).map(|scope| scope.map(Self::Scope)),
+            Some(Token::Symbol(TokenSymbol::BraceOpen)) => BlockStruct::transcribe(cursor, ctx).map(|scope| scope.map(Self::Block)),
             _ => Err(TranscriptionException::NotFound(expected_token!(<stmnt>)))
         }
     }
@@ -96,7 +95,7 @@ impl StatementNode for ASTStatement {
     fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
         match self {
             ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
-            ASTStatement::Scope(scope) => scope.execute(tick),
+            ASTStatement::Block(block) => block.execute(tick),
             ASTStatement::Conditional(cond) => cond.execute(tick),
             ASTStatement::Repeat(repeat) => repeat.execute(tick),
             ASTStatement::Switch(switch) => switch.execute(tick),
@@ -117,7 +116,7 @@ impl fmt::Display for ASTStatement {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ASTStatement::VariableDeclaration(vd) => write!(f, "{vd}"),
-            ASTStatement::Scope(scope) => write!(f, "{scope}"),
+            ASTStatement::Block(scope) => write!(f, "{scope}"),
             ASTStatement::Conditional(cond) => write!(f, "{cond}"),
             ASTStatement::Repeat(repeat) => write!(f, "{repeat}"),
             ASTStatement::Switch(switch) => write!(f, "{switch}"),

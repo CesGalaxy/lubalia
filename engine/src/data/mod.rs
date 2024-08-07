@@ -14,7 +14,7 @@ use std::fmt;
 
 use colored::Colorize;
 
-use crate::{lang::token::literal::TokenLiteral, node::ASTNode};
+use crate::lang::{syntax::node::ASTNode, token::literal::TokenLiteral};
 
 /// Represents a posible data value which the language can work with.
 #[derive(Debug, Clone)]

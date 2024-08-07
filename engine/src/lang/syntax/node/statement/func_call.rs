@@ -2,7 +2,15 @@ use std::{collections::HashMap, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{data::DataValue, lang::{parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError}, token::{symbol::TokenSymbol, Token}}, node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult}, vm::{context::Context, tick::VMTick}};
+use crate::{
+    data::DataValue,
+    lang::{
+        parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError},
+        syntax::node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult},
+        token::{symbol::TokenSymbol, Token}
+    },
+    vm::{context::Context, tick::VMTick}
+};
 
 use super::{StatementNode, StatementResult};
 
