@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
@@ -9,7 +9,7 @@ use crate::{
         syntax::node::{ASTNode, Node, NodeParserTickResult},
         token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}
     },
-    vm::tick::VMTick
+    vm::{scope::Scope, VM}
 };
 
 use super::{list::LiteralListExpression, ufunc_constructor::UnnamedFunctionConstructor, ExpressionNode};
@@ -70,14 +70,14 @@ impl Node for TerminalExpression {
 
 impl ExpressionNode for TerminalExpression {
     /// Evaluate the expression and return its value
-    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
         match self {
             Self::StaticLiteral(literal) => literal.clone(),
-            Self::StaticLiteralList(list) => list.evaluate(tick),
-            Self::VarRef(varname) => tick.get_context().get(varname.clone()).cloned().unwrap_or_default(),
-            Self::LastValue => tick.vm.last_value.clone(),
-            Self::UnnamedFunction(constructor) => constructor.evaluate(tick),
-            Self::Parenthesis(node) => node.evaluate(tick)
+            Self::StaticLiteralList(list) => list.evaluate(vm, scope),
+            Self::VarRef(varname) => scope.borrow().get(varname).cloned().unwrap_or_default(),
+            Self::LastValue => vm.last_value.clone(),
+            Self::UnnamedFunction(constructor) => constructor.evaluate(vm, scope),
+            Self::Parenthesis(node) => node.evaluate(vm, scope)
         }
     }
 }

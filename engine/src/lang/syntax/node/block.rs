@@ -1,10 +1,10 @@
-use std::{collections::HashMap, fmt};
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
 use crate::{
     lang::{parser::{context::ParsingContext, error::ParserError}, token::{symbol::TokenSymbol, Token}},
-    vm::{context::Context, tick::VMTick}
+    vm::{scope::Scope, VM}
 };
 
 use super::{statement::{StatementNode, StatementResult}, ASTNode, Node, NodeParserTickResult};
@@ -52,23 +52,18 @@ impl Node for BlockStruct {
 
 impl BlockStruct {
     // TODO: This code is shit. But works!
-    /// Run the block (with it's own generated child context)
-    pub fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
-        let mut result = None;
-
-        let parent_ctx = tick.context.clone().map(|c| *c);
-        tick.context = Some(Box::new(Context::with_parent(HashMap::new(), parent_ctx)));
+    /// Run the block (with its own generated child context)
+    pub fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
+        let child = Scope::with_parent(scope.borrow());
+        let child = RefCell::new(child);
 
         for node in &self.nodes {
-            if let Some(value) = node.execute(tick) {
-                result = Some(value);
-                break;
+            if let Some(value) = node.execute(vm, &child) {
+                return Some(value);
             }
         }
 
-        tick.context = tick.context.clone().map(|child| child.parent.clone()).flatten();
-
-        result
+        None
     }
 }
 

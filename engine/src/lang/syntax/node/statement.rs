@@ -4,14 +4,14 @@ pub mod repeat;
 pub mod switch;
 pub mod func_call;
 
-use std::fmt;
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
     data::DataValue,
     lang::{parser::{context::ParsingContext, error::expected_token}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
-    vm::tick::VMTick
+    vm::{scope::Scope, VM}
 };
 
 use super::{block::BlockStruct, expression::ExpressionNode, ASTNode, Node, NodeParserTickResult};
@@ -57,7 +57,7 @@ pub enum ASTStatement {
 }
 
 pub trait StatementNode: Node {
-    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult>;
+    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult>;
 }
 
 impl Node for ASTStatement {
@@ -92,23 +92,23 @@ impl Node for ASTStatement {
 
 impl StatementNode for ASTStatement {
     /// Execute an statement and return a value if any is provided
-    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
+    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
         match self {
-            ASTStatement::VariableDeclaration(vd) => vd.execute(tick),
-            ASTStatement::Block(block) => block.execute(tick),
-            ASTStatement::Conditional(cond) => cond.execute(tick),
-            ASTStatement::Repeat(repeat) => repeat.execute(tick),
-            ASTStatement::Switch(switch) => switch.execute(tick),
-            ASTStatement::FunctionCall(call) => call.execute(tick),
-            ASTStatement::Return(node) => Some(StatementResult::Return(node.evaluate(tick)))
+            ASTStatement::VariableDeclaration(vd) => vd.execute(vm, scope),
+            ASTStatement::Block(block) => block.execute(vm, scope),
+            ASTStatement::Conditional(cond) => cond.execute(vm, scope),
+            ASTStatement::Repeat(repeat) => repeat.execute(vm, scope),
+            ASTStatement::Switch(switch) => switch.execute(vm, scope),
+            ASTStatement::FunctionCall(call) => call.execute(vm, scope),
+            ASTStatement::Return(node) => Some(StatementResult::Return(node.evaluate(vm, scope)))
         }
     }
 }
 
 impl ExpressionNode for ASTStatement {
     /// Evaluate the statement and return the result value
-    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
-        self.execute(tick).map(|result| result.value()).unwrap_or_default()
+    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
+        self.execute(vm, scope).map(|result| result.value()).unwrap_or_default()
     }
 }
 

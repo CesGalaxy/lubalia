@@ -1,12 +1,12 @@
-use std::fmt;
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::transcriber::{cursor::TranscriberCursor, error::TranscriptionException};
 
-use crate::lang::{
+use crate::{lang::{
     parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError},
     syntax::node::{expression::ExpressionNode, ASTNode, Node, NodeParserTickResult},
     token::{keyword::TokenLangKeyword, Token}
-};
+}, vm::{scope::Scope, VM}};
 
 use super::{ASTStatement, StatementNode, StatementResult};
 
@@ -37,12 +37,12 @@ impl Node for Repeat {
 }
 
 impl StatementNode for Repeat {
-    fn execute(&self, tick: &mut crate::vm::tick::VMTick) -> Option<StatementResult> {
-        let times: usize = self.times.evaluate(tick).into();
+    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
+        let times: usize = self.times.evaluate(vm, scope).into();
 
         // TODO: Provide current count to the iteration
         for _ in 0..times {
-            if let Some(StatementResult::Return(value)) = self.iteration.execute(tick) {
+            if let Some(StatementResult::Return(value)) = self.iteration.execute(vm, scope) {
                 return Some(StatementResult::Return(value));
             }
         }

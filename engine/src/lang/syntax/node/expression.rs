@@ -3,11 +3,11 @@ pub mod binary;
 pub mod ufunc_constructor;
 pub mod list;
 
-use std::fmt;
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::transcriber::cursor::TranscriberCursor;
 
-use crate::{data::DataValue, lang::{parser::{context::ParsingContext, error::expected_token}, token::Token}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{context::ParsingContext, error::expected_token}, token::Token}, vm::{scope::Scope, VM}};
 
 use super::{Node, NodeParserTickResult};
 
@@ -25,7 +25,7 @@ pub enum ASTExpression {
 pub trait ExpressionNode: Node {
     // TODO: Return an Option (for optional returns in statements)
     /// Evaluate the expression and return the result value
-    fn evaluate(&self, tick: &mut VMTick) -> DataValue;
+    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue;
 }
 
 impl Node for ASTExpression {
@@ -39,14 +39,14 @@ impl Node for ASTExpression {
 
 impl ExpressionNode for ASTExpression {
     /// Evaluate the expression and return the result value
-    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
         let result = match self {
-            ASTExpression::Terminal(expr) => expr.evaluate(tick),
-            ASTExpression::Binary(expr) => expr.evaluate(tick)
+            ASTExpression::Terminal(expr) => expr.evaluate(vm, scope),
+            ASTExpression::Binary(expr) => expr.evaluate(vm, scope)
         };
 
         // Save the result of the last evaluated expression for the `_` variable
-        tick.vm.last_value = result.clone();
+        vm.last_value = result.clone();
 
         result
     }

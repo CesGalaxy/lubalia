@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt};
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
@@ -9,7 +9,7 @@ use crate::{
         syntax::node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult},
         token::{symbol::TokenSymbol, Token}
     },
-    vm::{context::Context, tick::VMTick}
+    vm::{scope::Scope, VM}
 };
 
 use super::{StatementNode, StatementResult};
@@ -52,13 +52,13 @@ impl Node for FunctionCallStatement {
 }
 
 impl StatementNode for FunctionCallStatement {
-    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
-        let called = self.called.evaluate(tick);
+    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
+        let called = self.called.evaluate(vm, scope);
 
         let mut args = vec![];
 
         for arg in &self.args {
-            args.push(arg.evaluate(tick));
+            args.push(arg.evaluate(vm, scope));
         }
 
         if let DataValue::Callable(required_args, optional_args, body) = called {
@@ -75,24 +75,11 @@ impl StatementNode for FunctionCallStatement {
                 i += 1;
             }
 
-            let is_global_context = tick.context.is_none();
+            let child = Scope::with_parent(scope.borrow());
 
-            let parent_ctx = tick.get_context().clone();
-            tick.context = Some(Box::new(Context::with_parent(HashMap::from_iter(variables.into_iter()), Some(parent_ctx))));
+            let child = RefCell::new(child);
 
-            // TODO: Execute or evaluate?
-            let result = body.execute(tick);
-
-            if let Some(child) = &tick.context {
-                tick.context = if is_global_context {
-                    tick.vm.global = *child.parent.clone().expect("Matryoshka: global context missing!");
-                    None
-                } else {
-                    child.parent.clone()
-                }
-            }
-
-            result
+            body.execute(vm, &child)
         } else {
             // TODO: Please, fix this
             panic!("Function call to non-function value: {}", called);

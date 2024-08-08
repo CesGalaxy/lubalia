@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
@@ -9,7 +9,7 @@ use crate::{
         syntax::node::{expression::ExpressionNode, ASTNode, Node, NodeParserTickResult},
         token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}
     },
-    vm::tick::VMTick
+    vm::{scope::Scope, VM}
 };
 
 use super::{StatementNode, StatementResult};
@@ -57,11 +57,11 @@ impl Node for SwitchStatement {
 }
 
 impl StatementNode for SwitchStatement {
-    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
-        let main_value = self.expression.evaluate(tick);
+    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
+        let main_value = self.expression.evaluate(vm, scope);
 
         for case in &self.cases {
-            if let Some(result) = case.case(tick, &main_value) {
+            if let Some(result) = case.case(vm, scope, &main_value) {
                 return result;
             }
         }
@@ -92,12 +92,12 @@ struct SwitchCase {
 }
 
 impl SwitchCase {
-    fn case(&self, tick: &mut VMTick, main_value: &DataValue) -> Option<Option<StatementResult>> {
-        let case = self.case.as_ref().map(|node| node.evaluate(tick));
+    fn case(&self, vm: &mut VM, scope: &RefCell<Scope>, main_value: &DataValue) -> Option<Option<StatementResult>> {
+        let case = self.case.as_ref().map(|node| node.evaluate(vm, scope));
 
         // Return Some if matches, None if doesn't
         if case.map(|case_value| main_value == &case_value).unwrap_or(true) {
-            Some(self.body.execute(tick))
+            Some(self.body.execute(vm, scope))
         } else {
             None
         }

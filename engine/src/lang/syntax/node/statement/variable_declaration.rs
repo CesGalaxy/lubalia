@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
@@ -9,7 +9,7 @@ use crate::{
         syntax::node::{expression::ExpressionNode, ASTNode, Node, NodeParserTickResult},
         token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}
     },
-    vm::tick::VMTick
+    vm::{scope::Scope, VM}
 };
 
 use super::{StatementNode, StatementResult};
@@ -90,12 +90,12 @@ impl Node for VariableDeclaration {
 impl StatementNode for VariableDeclaration {
     /// Creates a new variable for the current context and assigns a value to it.
     /// Returns the value of the variable.
-    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
+    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
         // Evaluate the expression containing it's value
-        let value = self.value.clone().map(|node| node.evaluate(tick)).unwrap_or_default();
+        let value = self.value.clone().map(|node| node.evaluate(vm, scope)).unwrap_or_default();
 
         // Create a new variable in the context with it's data
-        tick.get_context().create(self.varname.clone(), value.clone());
+        scope.borrow_mut().create(self.varname.clone(), value.clone());
 
         // [SemiExpression] Return (if any) the value returned by the first node of the scope that returned a value
         Some(StatementResult::Usable(value))

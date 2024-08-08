@@ -1,11 +1,11 @@
 mod operator;
 mod transcription;
 
-use std::{fmt, ops::Not};
+use std::{cell::RefCell, fmt, ops::Not};
 
 use operator::BinaryOperator;
 
-use crate::{data::{arithmetic::ArithmeticValue, DataValue}, vm::tick::VMTick};
+use crate::{data::{arithmetic::ArithmeticValue, DataValue}, vm::{scope::Scope, VM}};
 
 use super::{ASTExpression, ExpressionNode};
 
@@ -18,9 +18,9 @@ pub struct BinaryExpression {
 }
 
 impl ExpressionNode for BinaryExpression {
-    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
-        let lhs = self.lhs.evaluate(tick);
-        let rhs = self.rhs.evaluate(tick);
+    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
+        let lhs = self.lhs.evaluate(vm, scope);
+        let rhs = self.rhs.evaluate(vm, scope);
 
         match self.operator {
             BinaryOperator::Add => (ArithmeticValue::from(lhs) + ArithmeticValue::from(rhs)).into(),

@@ -1,20 +1,37 @@
-use lubalia_utils::{loop_through::LoopThrough, transcriber::cursor::TranscriberCursor};
+use std::fmt;
 
-use crate::lang::{parser::context::ParsingContext, token::Token};
+use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
-use super::node::{Node, NodeParserTickResult};
+use crate::lang::{parser::context::ParsingContext, token::{symbol::TokenSymbol, Token}};
 
-pub struct NodeList<T: Node> {
-    _nodes: Vec<T>,
+use super::node::{ASTNode, Node, NodeParserTickResult};
+
+pub struct NodeList<T: Node>(Vec<T>);
+
+impl Node for NodeList<ASTNode> {
+    fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> {
+        let mut nodes = Vec::new();
+
+        while let Some(node) = ASTNode::transcribe(cursor, ctx)? {
+            nodes.push(node);
+
+            if cursor.peek() == Some(&Token::Symbol(TokenSymbol::Semicolon)) {
+                cursor.next();
+            } else {
+                break;
+            }
+        }
+
+        Ok(Some(Self(nodes)))
+    }
 }
 
-impl<T: Node> NodeList<T> {
-    pub fn transcribe_list(
-        _cursor: &mut TranscriberCursor<Token>,
-        _ctx: &mut ParsingContext,
-        _transcriber: impl Fn(&mut TranscriberCursor<Token>, &mut ParsingContext) -> NodeParserTickResult<T>,
-        _loop_condition: LoopThrough<Token>
-    ) -> NodeParserTickResult<Self> {
-        todo!()
+impl fmt::Display for NodeList<ASTNode> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        for node in &self.0 {
+            write!(f, "\t{}", node)?;
+        }
+
+        Ok(())
     }
 }

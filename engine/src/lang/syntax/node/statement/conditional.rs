@@ -1,14 +1,14 @@
-use std::fmt;
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
     lang::{
         parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError},
-        syntax::node::{expression::ExpressionNode, block::BlockStruct, ASTNode, Node, NodeParserTickResult},
+        syntax::node::{block::BlockStruct, expression::ExpressionNode, ASTNode, Node, NodeParserTickResult},
         token::{keyword::TokenLangKeyword, Token}
     },
-    vm::tick::VMTick
+    vm::{scope::Scope, VM},
 };
 
 use super::{StatementNode, StatementResult};
@@ -62,11 +62,11 @@ impl Node for ConditionalStatement {
 
 impl StatementNode for ConditionalStatement {
     /// Run the conditional statement (with the corresponding branch) and return a value
-    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
-        if self.condition.evaluate(tick).into() {
-            self.then_branch.execute(tick)
+    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
+        if self.condition.evaluate(vm, scope).into() {
+            self.then_branch.execute(vm, scope)
         } else if let Some(else_branch) = &self.else_branch {
-            else_branch.execute(tick)
+            else_branch.execute(vm, scope)
         } else {
             None
         }

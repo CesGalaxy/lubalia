@@ -3,13 +3,13 @@ pub mod statement;
 pub mod block;
 pub mod meta;
 
-use std::fmt;
+use std::{cell::RefCell, fmt};
 
 use expression::{ASTExpression, ExpressionNode};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, TranscriberTickResult}};
 use statement::{ASTStatement, StatementNode, StatementResult};
 
-use crate::{data::DataValue, lang::{parser::{context::ParsingContext, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, vm::tick::VMTick};
+use crate::{data::DataValue, lang::{parser::{context::ParsingContext, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, vm::{scope::Scope, VM}};
 
 pub type NodeParserTickResult<T> = TranscriberTickResult<T, ParserError>;
 
@@ -31,20 +31,20 @@ pub trait Node: fmt::Display {
 
 impl StatementNode for ASTNode {
     /// Execute the instruction of the node and return any result (wether it's returned or not)
-    fn execute(&self, tick: &mut VMTick) -> Option<StatementResult> {
+    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
         match self {
-            Self::Expression(expr) => Some(StatementResult::Return(expr.evaluate(tick))),
-            Self::Statement(statement) => statement.execute(tick)
+            Self::Expression(expr) => Some(StatementResult::Return(expr.evaluate(vm, scope))),
+            Self::Statement(statement) => statement.execute(vm, scope)
         }
     }
 }
 
 impl ExpressionNode for ASTNode {
     /// Evaluate the node and return the result
-    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
         match self {
-            Self::Expression(expr) => expr.evaluate(tick),
-            Self::Statement(statement) => statement.execute(tick).map(|result| result.value()).unwrap_or_default()
+            Self::Expression(expr) => expr.evaluate(vm, scope),
+            Self::Statement(statement) => statement.execute(vm, scope).map(|result| result.value()).unwrap_or_default()
         }
     }
 }

@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{cell::RefCell, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
@@ -9,7 +9,7 @@ use crate::{
         syntax::node::{ASTNode, Node, NodeParserTickResult},
         token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}
     },
-    vm::tick::VMTick
+    vm::{scope::Scope, VM}
 };
 
 use super::{ASTExpression, ExpressionNode};
@@ -88,10 +88,10 @@ impl Node for UnnamedFunctionConstructor {
 }
 
 impl ExpressionNode for UnnamedFunctionConstructor {
-    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
         let optional_args: Vec<(String, DataValue)> = self.optional_args
             .iter()
-            .map(|(name, default)| (name.clone(), default.as_ref().map(|expr| expr.evaluate(tick)).unwrap_or_default()))
+            .map(|(name, default)| (name.clone(), default.as_ref().map(|expr| expr.evaluate(vm, scope)).unwrap_or_default()))
             .collect();
 
         DataValue::Callable(self.required_args.clone(), optional_args.clone(), self.body.clone())

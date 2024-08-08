@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
@@ -7,7 +9,7 @@ use crate::{
         syntax::node::{ASTNode, Node, NodeParserTickResult},
         token::{symbol::TokenSymbol, Token}
     },
-    vm::tick::VMTick
+    vm::{scope::Scope, VM}
 };
 
 use super::ExpressionNode;
@@ -82,11 +84,11 @@ impl Node for LiteralListExpression {
 }
 
 impl ExpressionNode for LiteralListExpression {
-    fn evaluate(&self, tick: &mut VMTick) -> DataValue {
+    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
         match self {
             LiteralListExpression::Repeat(item, times) => {
-                let item = item.evaluate(tick);
-                let times = times.evaluate(tick);
+                let item = item.evaluate(vm, scope);
+                let times = times.evaluate(vm, scope);
 
                 let mut list = Vec::new();
 
@@ -97,8 +99,8 @@ impl ExpressionNode for LiteralListExpression {
                 DataValue::List(list)
             },
             LiteralListExpression::Range(start, end) => {
-                let start = usize::from(start.evaluate(tick));
-                let end = usize::from(end.evaluate(tick));
+                let start = usize::from(start.evaluate(vm, scope));
+                let end = usize::from(end.evaluate(vm, scope));
 
                 let mut list = Vec::new();
 
@@ -112,7 +114,7 @@ impl ExpressionNode for LiteralListExpression {
                 let mut list = Vec::new();
 
                 for item in items {
-                    list.push(item.evaluate(tick));
+                    list.push(item.evaluate(vm, scope));
                 }
 
                 DataValue::List(list)
