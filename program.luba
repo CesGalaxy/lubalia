@@ -6,7 +6,8 @@ let b = [2..5]
 let c = ["apples", "coffee", "acid"]
 
 let myFunction = fn(name?, day = "Monday") { // Comments will be ignored
-    return if name { [(name + ", today is ") + day, a, b, c] } else { myFunction("Unknown person", day) }
+    //return if name { [(name + ", today is ") + day, a, b, c] } else { myFunction("Unknown person", day) }
+    return [(name + ", today is ") + day, a, b, c]
 }
 
 switch 16 /* even this comment is ignored */ {

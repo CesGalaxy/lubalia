@@ -27,43 +27,41 @@ impl<'a> Scope<'a> {
     /// If there is one with the same name in the parent scope, it won't be overwritten,
     /// but inaccessable from the current scope, as it will shadow the parent's variable.
     pub fn create(&mut self, name: String, value: DataValue) {
-        if let Some(variable) = self.get_mut(&name) {
-            *variable = value;
+        if let Some(_variable) = self.get(&name) {
+            self.variables.remove(&name);
+            self.variables.insert(name, value);
         } else {
             self.variables.insert(name, value);
         }
     }
 
-    // Retrieve a recefrence to a variable from the scope,
-    // if there is no variable with the given name, it will look in the parent scope.
-    // If the variable is not found neither, it will return None.
+    /// Retrieve a recefrence to a variable from the scope,
+    /// if there is no variable with the given name, it will look in the parent scope.
+    /// If the variable is not found neither, it will return None.
     pub fn get(&self, name: &String) -> Option<&DataValue> {
         // Buscamos en el scope actual
         if let Some(value) = self.variables.get(name) {
             return Some(value);
         }
 
-        None
-
         // Si no encontramos, buscamos en el scope padre
-        //self.parent.as_ref().map(|parent| parent.borrow().get(name)).flatten()
+        self.parent.as_ref().map(|parent| parent.get(name)).flatten()
     }
 
     // Retrieve a mutable reference to a variable from the scope (or parent)
-    fn get_mut(&mut self, name: &str) -> Option<&mut DataValue> {
-        // Buscamos en el scope actual
-        if let Some(value) = self.variables.get_mut(name) {
-            return Some(value);
-        }
+    // fn get_mut(&mut self, name: &str) -> Option<&mut DataValue> {
+    //     // Buscamos en el scope actual
+    //     if let Some(value) = self.variables.get_mut(name) {
+    //         return Some(value);
+    //     }
 
-        // Si no encontramos, buscamos en el scope padre
-        if let Some(_parent) = &mut self.parent {
-            //parent.borrow_mut().get_mut(name)
-            None
-        } else {
-            None
-        }
-    }
+    //     // Si no encontramos, buscamos en el scope padre
+    //     if let Some(parent) = &mut self.parent {
+    //         parent.get_mut(name)
+    //     } else {
+    //         None
+    //     }
+    // }
 }
 
 impl Default for Scope<'_> {
