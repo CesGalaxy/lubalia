@@ -35,12 +35,11 @@ impl VM {
             // Execute all the nodes until a value is returned
             let ASTRootItem::Node(node) = astri;
 
+            // If the node returned a value, return it
             if let Some(value) = self.tick(node, &scope) {
                 return Some(value);
             }
         }
-
-        //println!("Evaluation finished! Scope: {scope}");
 
         None
     }

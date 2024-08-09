@@ -54,3 +54,4 @@ This data will be sotred in the "program manifest", which will be created during
 - [ ] Reference variables in strings
 - [ ] Actors
 - [ ] Custom types
+- [ ] Make the engine "no_std"

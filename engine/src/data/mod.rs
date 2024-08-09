@@ -41,6 +41,7 @@ impl From<TokenLiteral> for DataValue {
 }
 
 impl Default for DataValue {
+    /// Returns the default value for a data value, which is `NULL`.
     fn default() -> Self {
         DataValue::Null
     }

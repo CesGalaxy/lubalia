@@ -11,6 +11,7 @@ use statement::{ASTStatement, StatementNode, StatementResult};
 
 use crate::{data::DataValue, lang::{parser::{context::ParsingContext, error::{expected_token, ParserError}}, token::{symbol::TokenSymbol, Token}}, vm::{scope::Scope, VM}};
 
+/// The result of trying to transcribe (parse) a node
 pub type NodeParserTickResult<T> = TranscriberTickResult<T, ParserError>;
 
 /// An instruction for the VM

@@ -4,6 +4,7 @@ use crate::lang::token::{keyword::TokenLangKeyword, literal::TokenLiteral, Token
 
 use super::error::TokenizerError;
 
+/// Transcribe an string literal (between double quotes).
 pub fn transcribe_string(cursor: &mut TranscriberCursor<char>) -> Result<Option<Token>, TranscriptionException<TokenizerError>> {
     let opening = cursor.consume().ok_or(TokenizerError::UnexpectedEnd).map_err(TranscriptionException::Error)?;
 
@@ -28,6 +29,7 @@ pub fn transcribe_string(cursor: &mut TranscriberCursor<char>) -> Result<Option<
     Ok(Some(Token::Literal(TokenLiteral::String(buffer))))
 }
 
+/// Transcribe a built-in or custom keyword.
 pub fn transcribe_keyword(cursor: &mut TranscriberCursor<char>) -> Result<Token, TranscriptionException<TokenizerError>> {
     let mut keyword = String::new();
 
@@ -55,6 +57,7 @@ pub fn transcribe_keyword(cursor: &mut TranscriberCursor<char>) -> Result<Token,
     }
 }
 
+/// Transcribe a number literal.
 pub fn transcribe_number(cursor: &mut TranscriberCursor<char>) -> Result<Token, TranscriptionException<TokenizerError>> {
     let mut literal = String::new();
 

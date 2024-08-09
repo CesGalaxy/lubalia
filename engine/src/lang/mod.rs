@@ -10,4 +10,6 @@ pub mod tokenizer;
 
 /// The token module contains the definition of tokens.
 pub mod token;
+
+/// The syntax module contains the definitions of all the AST and their execution.
 pub mod syntax;

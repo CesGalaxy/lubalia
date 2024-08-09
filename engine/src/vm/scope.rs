@@ -6,7 +6,10 @@ use crate::data::DataValue;
 /// Extends all the data from its parent
 #[derive(Debug)]
 pub struct Scope<'a> {
+    /// All the variables stored in the current scope
     pub variables: HashMap<String, DataValue>,
+
+    /// The parent scope of the actual one, this will be used to look for variables that are not in the current scope
     pub parent: Option<Ref<'a, Self>>
 }
 
