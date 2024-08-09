@@ -1,4 +1,4 @@
-use std::{cell::RefCell, fmt};
+use std::{cell::RefCell, collections::HashMap, fmt};
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
@@ -75,8 +75,8 @@ impl StatementNode for FunctionCallStatement {
                 i += 1;
             }
 
-            let child = Scope::with_parent(scope.borrow());
-
+            let mut child = Scope::with_parent(scope.borrow());
+            child.variables = HashMap::from_iter(variables);
             let child = RefCell::new(child);
 
             body.execute(vm, &child)
