@@ -1,6 +1,10 @@
 use std::fmt;
 
-use super::node::ASTNode;
+use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, TranscriberTickResult}};
+
+use crate::lang::{parser::{context::ParsingContext, error::ParserError}, token::{symbol::TokenSymbol, Token}};
+
+use super::node::{ASTNode, Node};
 
 /// A script can contain multiple items,
 /// in the case of nodes, they will be executed.
@@ -8,6 +12,16 @@ use super::node::ASTNode;
 pub enum ASTRootItem {
     /// A node that will be executed by the VM
     Node(ASTNode)
+}
+
+impl ASTRootItem {
+    /// Create a new root item from a node
+    pub fn parse(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> TranscriberTickResult<Self, ParserError> {
+        match cursor.peek() {
+            Some(Token::Symbol(TokenSymbol::EOF)) => Ok(None),
+            _ => ASTNode::transcribe(cursor, ctx).map(|astn| astn.map(ASTRootItem::Node))
+        }
+    }
 }
 
 impl fmt::Display for ASTRootItem {
