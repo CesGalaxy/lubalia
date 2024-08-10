@@ -30,7 +30,7 @@ impl Node for ConditionalStatement {
     /// Transcribe a conditional statement from the source code (tokens)
     fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Conditionals should start with the keyword `if`
-        cursor.expect(&Token::LangKeyword(TokenLangKeyword::If), ParserError::Expected("start@conditional <keyword:if> 'if'".to_string()))?;
+        cursor.expect(&Token::Keyword(TokenLangKeyword::If), ParserError::Expected("start@conditional <keyword:if> 'if'".to_string()))?;
 
         ignore_eols(cursor);
 
@@ -45,7 +45,7 @@ impl Node for ConditionalStatement {
         ignore_eols(cursor);
 
         // Optionally, if the statement continues with the `else` keyword, get the else branch
-        let else_branch = if cursor.peek() == Some(&Token::LangKeyword(TokenLangKeyword::Else)) {
+        let else_branch = if cursor.peek() == Some(&Token::Keyword(TokenLangKeyword::Else)) {
             // TODO: Automate this in the cursor?
             cursor.next();
             ignore_eols(cursor);

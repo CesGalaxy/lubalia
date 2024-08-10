@@ -22,7 +22,7 @@ pub struct Repeat {
 impl Node for Repeat {
     fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Repeat loops should start with the keyword `repeat`
-        cursor.expect(&Token::LangKeyword(TokenLangKeyword::Repeat), ParserError::Expected("start@repeat <keyword:repeat> 'repeat'".to_string()))?;
+        cursor.expect(&Token::Keyword(TokenLangKeyword::Repeat), ParserError::Expected("start@repeat <keyword:repeat> 'repeat'".to_string()))?;
 
         ignore_eols(cursor);
 

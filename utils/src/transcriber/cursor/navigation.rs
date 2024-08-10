@@ -19,6 +19,15 @@ impl<'a, Unit> CursorNavigation<'a, Vec<Unit>, Unit> for TranscriberCursor<'a, U
         self.pos -= 1;
     }
 
+    /// Move the cursor n units (negative moves backwards)
+    fn move_by(&mut self, n: isize) {
+        if n < 0 {
+            self.pos = self.pos.saturating_sub(n.abs() as usize);
+        } else {
+            self.pos = (self.pos as isize + n) as usize;
+        }
+    }
+
     /// Get the unit at the cursor position
     fn peek(&self) -> Option<&'a Unit> {
         self.source.get(self.pos)
@@ -34,17 +43,19 @@ impl<'a, Unit> CursorNavigation<'a, Vec<Unit>, Unit> for TranscriberCursor<'a, U
         self.source.get(self.pos - 1)
     }
 
+    /// Peek at the n-th unit (negative moves backwards)
+    fn peek_by(&self, n: isize) -> Option<&'a Unit> {
+        let pos = if n < 0 {
+            self.pos.saturating_sub(n.abs() as usize)
+        } else {
+            (self.pos as isize + n) as usize
+        };
+
+        self.source.get(pos)
+    }
+
     /// Check if the cursor is outside the source (cursor position >= source length)
     fn is_overflow(&self) -> bool {
         self.pos >= self.source.len()
-    }
-
-    /// Move the cursor n units (negative moves backwards)
-    fn move_by(&mut self, n: isize) {
-        if n < 0 {
-            self.pos = self.pos.saturating_sub(n.abs() as usize);
-        } else {
-            self.pos = (self.pos as isize + n) as usize;
-        }
     }
 }

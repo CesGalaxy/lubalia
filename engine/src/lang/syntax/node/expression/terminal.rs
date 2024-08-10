@@ -41,7 +41,7 @@ impl Node for TerminalExpression {
     fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> {
         match cursor.consume() {
             Some(Token::Literal(literal)) => Ok(Some(Self::StaticLiteral(literal.clone().into()))),
-            Some(Token::LangKeyword(keyword)) => match keyword {
+            Some(Token::Keyword(keyword)) => match keyword {
                 TokenLangKeyword::True => Ok(Some(Self::StaticLiteral(DataValue::Boolean(true)))),
                 TokenLangKeyword::False => Ok(Some(Self::StaticLiteral(DataValue::Boolean(false)))),
                 TokenLangKeyword::Null => Ok(Some(Self::StaticLiteral(DataValue::Null))),
@@ -51,7 +51,7 @@ impl Node for TerminalExpression {
                 },
                 _ => Err(TranscriptionException::NotFound(expected_token!(LangKeyword; <expr:terminal>)))
             },
-            Some(Token::CustomKeyword(keyword)) => Ok(Some(Self::VarRef(keyword.clone()))),
+            Some(Token::Identifier(keyword)) => Ok(Some(Self::VarRef(keyword.clone()))),
             Some(Token::Symbol(TokenSymbol::Underscore)) => Ok(Some(Self::LastValue)),
             Some(Token::Symbol(TokenSymbol::ParenOpen)) => {
                 // TODO: Does Result have a way of simplifying this?

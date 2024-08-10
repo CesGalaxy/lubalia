@@ -67,7 +67,7 @@ impl Node for ASTStatement {
         //* This must make sure that the transcribed node is the correct one. In case of error, it will fail.
         match cursor.peek() {
             // Statements are usually defined with an initial keyword
-            Some(Token::LangKeyword(keyword)) => match keyword {
+            Some(Token::Keyword(keyword)) => match keyword {
                 TokenLangKeyword::Let => variable_declaration::VariableDeclaration::transcribe(cursor, ctx).map(|vd| vd.map(ASTStatement::VariableDeclaration)),
                 TokenLangKeyword::If => conditional::ConditionalStatement::transcribe(cursor, ctx).map(|cond| cond.map(ASTStatement::Conditional)),
                 TokenLangKeyword::Repeat => repeat::Repeat::transcribe(cursor, ctx).map(|repeat| repeat.map(ASTStatement::Repeat)),
@@ -78,7 +78,7 @@ impl Node for ASTStatement {
                 },
                 _ => Err(TranscriptionException::NotFound(expected_token!(LangKeyword; <stmnt>)))
             },
-            Some(Token::CustomKeyword(_)) => if let Some(Token::Symbol(TokenSymbol::ParenOpen)) = cursor.peek_next() {
+            Some(Token::Identifier(_)) => if let Some(Token::Symbol(TokenSymbol::ParenOpen)) = cursor.peek_next() {
                 func_call::FunctionCallStatement::transcribe(cursor, ctx).map(|call| call.map(ASTStatement::FunctionCall))
             } else {
                 Err(TranscriptionException::NotFound(expected_token!(<stmnt>)))

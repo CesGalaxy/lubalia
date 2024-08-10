@@ -30,7 +30,7 @@ pub fn transcribe_string(cursor: &mut TranscriberCursor<char>) -> Result<Option<
 }
 
 /// Transcribe a built-in or custom keyword.
-pub fn transcribe_keyword(cursor: &mut TranscriberCursor<char>) -> Result<Token, TranscriptionException<TokenizerError>> {
+pub fn transcribe_keyword(cursor: &mut TranscriberCursor<char>) -> Result<Option<Token>, TranscriptionException<TokenizerError>> {
     let mut keyword = String::new();
 
     let initial_char = cursor.consume().ok_or(TokenizerError::UnexpectedEnd).map_err(TranscriptionException::Error)?;
@@ -51,14 +51,14 @@ pub fn transcribe_keyword(cursor: &mut TranscriberCursor<char>) -> Result<Token,
     }
 
     if let Some(keyword) = TokenLangKeyword::from_string(&keyword) {
-        Ok(Token::LangKeyword(keyword))
+        Ok(Some(Token::Keyword(keyword)))
     } else {
-        Ok(Token::CustomKeyword(keyword))
+        Ok(Some(Token::Identifier(keyword)))
     }
 }
 
 /// Transcribe a number literal.
-pub fn transcribe_number(cursor: &mut TranscriberCursor<char>) -> Result<Token, TranscriptionException<TokenizerError>> {
+pub fn transcribe_number(cursor: &mut TranscriberCursor<char>) -> Result<Option<Token>, TranscriptionException<TokenizerError>> {
     let mut literal = String::new();
 
     let initial_char = cursor.consume().ok_or(TokenizerError::UnexpectedEnd).map_err(TranscriptionException::Error)?;
@@ -87,5 +87,46 @@ pub fn transcribe_number(cursor: &mut TranscriberCursor<char>) -> Result<Token, 
         }
     }
 
-    literal.parse().map_err(|_| TranscriptionException::Error(TokenizerError::ErrorParsingNumber(literal))).map(TokenLiteral::Number).map(Token::Literal)
+    literal.parse().map_err(|_| TranscriptionException::Error(TokenizerError::ErrorParsingNumber(literal))).map(TokenLiteral::Number).map(Token::Literal).map(Some)
+}
+
+/// Transcribes a tag (ex: #name)
+pub fn transcribe_tag(cursor: &mut TranscriberCursor<char>) -> Result<Option<Token>, TranscriptionException<TokenizerError>> {
+    let initial_char = cursor.consume().ok_or(TokenizerError::UnexpectedEnd).map_err(TranscriptionException::Error)?;
+
+    if initial_char != &'#'
+    {
+        return Err(TranscriptionException::Error(TokenizerError::UnexpectedSymbol(*initial_char, Some("tag:initial '#'"))));
+    }
+
+    let mut tag = String::new();
+
+    while let Some(c) = cursor.peek() {
+        if c.is_ascii_alphanumeric() || c == &'_' {
+            tag.push(*c);
+            cursor.next();
+        } else {
+            break;
+        }
+    }
+
+    Ok(Some(Token::Tag(tag)))
+}
+
+/// Transcribes a char (ex 'a')
+pub fn transcribe_char(cursor: &mut TranscriberCursor<char>) -> Result<Option<Token>, TranscriptionException<TokenizerError>> {
+    let initial_char = cursor.consume().ok_or(TokenizerError::UnexpectedEnd).map_err(TranscriptionException::Error)?;
+
+    if initial_char != &'\''
+    {
+        return Err(TranscriptionException::Error(TokenizerError::UnexpectedSymbol(*initial_char, Some("char:initial /'/"))));
+    }
+
+    let character = cursor.consume().ok_or(TokenizerError::UnexpectedEnd).map_err(TranscriptionException::Error)?;
+
+    if cursor.consume() != Some(&'\'') {
+        return Err(TranscriptionException::Error(TokenizerError::UnexpectedEnd));
+    }
+
+    Ok(Some(Token::Literal(TokenLiteral::Character(*character))))
 }

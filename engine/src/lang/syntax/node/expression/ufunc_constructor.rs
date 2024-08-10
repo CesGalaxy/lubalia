@@ -29,7 +29,7 @@ pub struct UnnamedFunctionConstructor {
 impl Node for UnnamedFunctionConstructor {
     fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Unnamed functions should start with the keyword `fn`
-        if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Fn)) {
+        if cursor.consume() != Some(&Token::Keyword(TokenLangKeyword::Fn)) {
             return Err(TranscriptionException::Error(ParserError::Expected(expected_token!(start@ufn <keyword:fn>))));
         }
 
@@ -44,7 +44,7 @@ impl Node for UnnamedFunctionConstructor {
         let mut optional_args = vec![];
 
         // Get the arguments of the function (for now, no commas are required/allowed)
-        while let Some(Token::CustomKeyword(arg)) = cursor.peek() {
+        while let Some(Token::Identifier(arg)) = cursor.peek() {
             cursor.next();
             ignore_eols(cursor);
 

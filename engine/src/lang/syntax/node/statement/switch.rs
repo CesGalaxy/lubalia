@@ -26,7 +26,7 @@ pub struct SwitchStatement {
 impl Node for SwitchStatement {
     fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Switch statements should start with the keyword `if`
-        cursor.expect(&Token::LangKeyword(TokenLangKeyword::Switch), ParserError::Expected("start@switch <keyword:switch> 'switch'".to_string()))?;
+        cursor.expect(&Token::Keyword(TokenLangKeyword::Switch), ParserError::Expected("start@switch <keyword:switch> 'switch'".to_string()))?;
 
         ignore_eols(cursor);
 
@@ -43,7 +43,7 @@ impl Node for SwitchStatement {
         let mut cases = vec![];
 
         // Save all cases found inside the switch until a closing brace is found (and ends the switch)
-        while let Some(Token::LangKeyword(TokenLangKeyword::Case)) = cursor.peek() {
+        while let Some(Token::Keyword(TokenLangKeyword::Case)) = cursor.peek() {
             cases.push(SwitchCase::transcribe(cursor, ctx)?.ok_or(TranscriptionException::Error(ParserError::Expected("case@switch <case>".to_string())))?);
 
             ignore_eols(cursor);
@@ -108,14 +108,14 @@ impl SwitchCase {
 impl Node for SwitchCase {
     fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // Switch cases should start with the keyword `case`
-        if cursor.consume() != Some(&Token::LangKeyword(TokenLangKeyword::Case)) {
+        if cursor.consume() != Some(&Token::Keyword(TokenLangKeyword::Case)) {
             return Err(TranscriptionException::Error(ParserError::Expected(expected_token!(start@case <keyword:case>))));
         }
 
         ignore_eols(cursor);
 
         // Get the expression to compare
-        let expression = if let Some(Token::LangKeyword(TokenLangKeyword::Default)) = cursor.peek() {
+        let expression = if let Some(Token::Keyword(TokenLangKeyword::Default)) = cursor.peek() {
             cursor.next();
             None
         } else {

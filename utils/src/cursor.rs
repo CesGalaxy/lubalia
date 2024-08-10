@@ -8,6 +8,9 @@ pub trait CursorNavigation<'a, Source, Unit> {
     /// Move the cursor to the previous unit
     fn back(&mut self);
 
+    /// Move the cursor n units (negative moves backwards)
+    fn move_by(&mut self, n: isize);
+
     /// Get the current unit (if cursor hasn't reached the end)
     fn peek(&self) -> Option<&'a Unit>;
 
@@ -17,6 +20,14 @@ pub trait CursorNavigation<'a, Source, Unit> {
     /// Get the previous unit (if cursor hasn't reached the start)
     fn peek_prev(&self) -> Option<&'a Unit>;
 
+    /// Peek at the n-th unit (negative moves backwards)
+    fn peek_by(&self, n: isize) -> Option<&'a Unit>;
+
+    // Peek at the n-th unit
+    fn peek_at(&self, n: usize) -> Option<&'a Unit> {
+        self.peek_by(n as isize)
+    }
+
     /// Get the current unit and move the cursor forward to the next unit
     fn consume(&mut self) -> Option<&'a Unit> {
         self.next();
@@ -25,7 +36,4 @@ pub trait CursorNavigation<'a, Source, Unit> {
 
     /// Check if the cursor has passed/reached the end of the source
     fn is_overflow(&self) -> bool;
-
-    /// Move the cursor n units (negative moves backwards)
-    fn move_by(&mut self, n: isize);
 }

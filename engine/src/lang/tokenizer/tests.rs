@@ -11,22 +11,22 @@ fn test_tokenization() {
     assert_eq!(transcription.units().len(), 19, "the transcription should have 19 units");
 
     assert_eq!(transcription.units(), vec![
-        &Token::LangKeyword(TokenLangKeyword::Let),
-        &Token::CustomKeyword("a".to_string()),
+        &Token::Keyword(TokenLangKeyword::Let),
+        &Token::Identifier("a".to_string()),
         &Token::Symbol(TokenSymbol::Equal),
         &Token::Literal(TokenLiteral::Number(10.0)),
         &Token::Symbol(TokenSymbol::Semicolon),
         &Token::Symbol(TokenSymbol::EOL),
 
-        &Token::LangKeyword(TokenLangKeyword::Let),
-        &Token::CustomKeyword("b".to_string()),
+        &Token::Keyword(TokenLangKeyword::Let),
+        &Token::Identifier("b".to_string()),
         &Token::Symbol(TokenSymbol::Equal),
         &Token::Literal(TokenLiteral::Number(20.0)),
         &Token::Symbol(TokenSymbol::Semicolon),
         &Token::Symbol(TokenSymbol::EOL),
 
-        &Token::LangKeyword(TokenLangKeyword::Let),
-        &Token::CustomKeyword("c".to_string()),
+        &Token::Keyword(TokenLangKeyword::Let),
+        &Token::Identifier("c".to_string()),
         &Token::Symbol(TokenSymbol::Equal),
         &Token::Literal(TokenLiteral::String("Hello, World!".to_string())),
         &Token::Symbol(TokenSymbol::Semicolon),

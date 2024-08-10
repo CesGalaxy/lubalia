@@ -10,9 +10,6 @@ pub enum TokenLiteral {
 
     /// A single character
     Character(char),
-
-    /// A way of identificating things
-    Identifier(String),
 }
 
 impl std::fmt::Display for TokenLiteral {
@@ -21,7 +18,6 @@ impl std::fmt::Display for TokenLiteral {
             Self::String(value) => write!(f, "[str:{}]", value.yellow().bold()),
             Self::Number(value) => write!(f, "[num:{}]", value.to_string().cyan().bold()),
             Self::Character(value) => write!(f, "[char:{}]", value.to_string().green().bold()),
-            Self::Identifier(value) => write!(f, "[id:{}]", value.blue().bold()),
         }
     }
 }

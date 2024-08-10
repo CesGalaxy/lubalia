@@ -12,10 +12,10 @@ use crate::{
 impl DataType {
     pub fn transcribe_terminal(cursor: &mut TranscriberCursor<Token>, _ctx: &mut ParsingContext) -> NodeParserTickResult<Self> {
         let base_type = match cursor.consume() {
-            Some(Token::LangKeyword(TokenLangKeyword::Null)) => Ok(Some(DataType::Null)),
-            Some(Token::LangKeyword(TokenLangKeyword::True)) => Ok(Some(DataType::True)),
-            Some(Token::LangKeyword(TokenLangKeyword::False)) => Ok(Some(DataType::False)),
-            Some(Token::CustomKeyword(keyword)) => match keyword.as_str() {
+            Some(Token::Keyword(TokenLangKeyword::Null)) => Ok(Some(DataType::Null)),
+            Some(Token::Keyword(TokenLangKeyword::True)) => Ok(Some(DataType::True)),
+            Some(Token::Keyword(TokenLangKeyword::False)) => Ok(Some(DataType::False)),
+            Some(Token::Identifier(keyword)) => match keyword.as_str() {
                 "num" => Ok(Some(DataType::Number)),
                 "str" => Ok(Some(DataType::String)),
                 "char" => Ok(Some(DataType::Char)),

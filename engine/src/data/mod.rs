@@ -34,8 +34,6 @@ impl From<TokenLiteral> for DataValue {
             TokenLiteral::Number(number) => DataValue::Number(number),
             TokenLiteral::String(string) => DataValue::String(string),
             TokenLiteral::Character(character) => DataValue::Char(character),
-            // TODO: This shouldn't even be a literal
-            TokenLiteral::Identifier(_) => DataValue::Null,
         }
     }
 }

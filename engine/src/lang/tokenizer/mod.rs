@@ -1,5 +1,5 @@
 use error::TokenizerError;
-use intents::{transcribe_keyword, transcribe_string, transcribe_number};
+use intents::{transcribe_char, transcribe_keyword, transcribe_number, transcribe_string, transcribe_tag};
 use lubalia_utils::{cursor::CursorNavigation, loop_through::LoopThrough, transcriber::{cursor::TranscriberCursor, error::TranscriptionException, result::{IdentifiedTranscriptionUnit, TranscriptionResult}, transcriber, TranscriberTickResult}};
 
 use super::token::{symbol::TokenSymbol, Token};
@@ -29,20 +29,13 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
     match initial_unit {
         ' ' | '\t' | '\r' => Ok(None),
 
-        '"' => transcribe_string(cursor),
-
-        // '\'' => Ok(Some(Token::Literal({
-        //     if let Some('\'') = cursor.peek_next() {
-        //         TokenLiteral::Character(cursor.consume().unwrap())
-        //     }
-        // }))),
-
         // Comments
         '/' if cursor.peek_next() == Some(&'/') => {
             cursor.ignore_loop(LoopThrough::UntilEq(&'\n'));
             Ok(None)
         }
 
+        // Inline comments
         '/' if cursor.peek_next() == Some(&'*') => {
             cursor.next();
 
@@ -56,12 +49,21 @@ fn tokenizer_tick(cursor: &mut TranscriberCursor<char>, initial_unit: &char) -> 
             Ok(None)
         }
 
+        // Strings
+        '"' => transcribe_string(cursor),
+
+        // Tags
+        '#' => transcribe_tag(cursor),
+
+        // Characters
+        '\'' => transcribe_char(cursor),
+
         // Keywords
         _ if initial_unit.is_ascii_alphabetic() || (initial_unit == &'_' && cursor.peek().is_some_and(|c| char::is_ascii_alphanumeric(c) || c == &'_')) =>
-            transcribe_keyword(cursor).map(Some),
+            transcribe_keyword(cursor),
 
         // Numbers
-        _ if initial_unit.is_numeric() => transcribe_number(cursor).map(Some),
+        _ if initial_unit.is_numeric() => transcribe_number(cursor),
 
         // Symbols (or Error if neither)
         _ => if let Some(symbol) = TokenSymbol::from_char(*initial_unit) {
