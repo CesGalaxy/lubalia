@@ -15,21 +15,21 @@ use crate::{
 use super::ExpressionNode;
 
 #[derive(Debug, Clone)]
-pub enum LiteralListExpression {
-    /// Make the list from a given item repeated a given number of times
+pub enum LiteralArray {
+    /// Make the array from a given item repeated a given number of times
     Repeat(Box<ASTNode>, Box<ASTNode>),
 
-    /// Make the list from a given range of numbers
+    /// Make the array from a given range of numbers
     Range(Box<ASTNode>, Box<ASTNode>),
 
     /// A normal list
-    Array(Vec<ASTNode>),
+    List(Vec<ASTNode>),
 
     /// An empty list
     Empty
 }
 
-impl Node for LiteralListExpression {
+impl Node for LiteralArray {
     fn transcribe(cursor: &mut TranscriberCursor<Token>, ctx: &mut ParsingContext) -> NodeParserTickResult<Self> where Self: Sized {
         // TODO: This function runs twice?
         cursor.expect(&Token::Symbol(TokenSymbol::BracketOpen), ParserError::Expected(expected_token!(<sym:bracket:open>)))?;
@@ -68,7 +68,7 @@ impl Node for LiteralListExpression {
                         items.push(item);
                     }
 
-                    Self::Array(items)
+                    Self::List(items)
                 }
             }
         } else {
@@ -83,10 +83,10 @@ impl Node for LiteralListExpression {
     }
 }
 
-impl ExpressionNode for LiteralListExpression {
+impl ExpressionNode for LiteralArray {
     fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
         match self {
-            LiteralListExpression::Repeat(item, times) => {
+            LiteralArray::Repeat(item, times) => {
                 let item = item.evaluate(vm, scope);
                 let times = times.evaluate(vm, scope);
 
@@ -98,7 +98,7 @@ impl ExpressionNode for LiteralListExpression {
 
                 DataValue::List(list)
             },
-            LiteralListExpression::Range(start, end) => {
+            LiteralArray::Range(start, end) => {
                 let start = usize::from(start.evaluate(vm, scope));
                 let end = usize::from(end.evaluate(vm, scope));
 
@@ -110,7 +110,7 @@ impl ExpressionNode for LiteralListExpression {
 
                 DataValue::List(list)
             },
-            LiteralListExpression::Array(items) => {
+            LiteralArray::List(items) => {
                 let mut list = Vec::new();
 
                 for item in items {
@@ -119,17 +119,17 @@ impl ExpressionNode for LiteralListExpression {
 
                 DataValue::List(list)
             },
-            LiteralListExpression::Empty => DataValue::List(Vec::new())
+            LiteralArray::Empty => DataValue::List(Vec::new())
         }
     }
 }
 
-impl std::fmt::Display for LiteralListExpression {
+impl std::fmt::Display for LiteralArray {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LiteralListExpression::Repeat(item, times) => write!(f, "[Repeat {times} times: {item}]"),
-            LiteralListExpression::Range(start, end) => write!(f, "[Range from {start} until {end}]"),
-            LiteralListExpression::Array(items) => {
+            LiteralArray::Repeat(item, times) => write!(f, "[Repeat {times} times: {item}]"),
+            LiteralArray::Range(start, end) => write!(f, "[Range from {start} until {end}]"),
+            LiteralArray::List(items) => {
                 let mut list_str = String::new();
 
                 for item in items {
@@ -144,7 +144,7 @@ impl std::fmt::Display for LiteralListExpression {
 
                 write!(f, "[ {} ]", list_str)
             },
-            LiteralListExpression::Empty => write!(f, "[]")
+            LiteralArray::Empty => write!(f, "[]")
         }
     }
 }

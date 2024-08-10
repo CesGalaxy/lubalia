@@ -22,8 +22,8 @@ impl<'a> Scope<'a> {
     }
 
     /// Provide a new scope with a parent
-    pub fn with_parent(parent: Ref<'a, Scope<'a>>) -> Self {
-        let mut scope = Scope::new(HashMap::new());
+    pub fn with_parent(variables: HashMap<String, Variable>, parent: Ref<'a, Scope<'a>>) -> Self {
+        let mut scope = Scope::new(variables);
         scope.parent = Some(parent);
         scope
     }

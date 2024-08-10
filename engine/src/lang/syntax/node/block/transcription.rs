@@ -1,6 +1,6 @@
 use lubalia_utils::{cursor::CursorNavigation, transcriber::cursor::TranscriberCursor};
 
-use crate::lang::{parser::{context::ParsingContext, error::ParserError}, syntax::node::{ASTNode, Node, NodeParserTickResult}, token::{symbol::TokenSymbol, Token}};
+use crate::lang::{parser::{context::ParsingContext, error::ParserError}, syntax::node::{statement::ASTStatement, ASTNode, Node, NodeParserTickResult}, token::{symbol::TokenSymbol, Token}};
 
 use super::{meta::BlockMetadata, BlockStruct};
 
@@ -10,6 +10,7 @@ impl Node for BlockStruct {
         cursor.expect(&Token::Symbol(TokenSymbol::BraceOpen), ParserError::Expected("start@scope/sym <sym:brace:open> '{'".to_string()))?;
 
         let mut nodes = vec![];
+        let mut meta = BlockMetadata::default();
 
         // Save all nodes found inside the scope until a closing brace is found (and ends the scope)
         // FIXME: When None it will loop forever
@@ -17,6 +18,13 @@ impl Node for BlockStruct {
             let initial_position = cursor.pos;
 
             if let Some(node) = ASTNode::transcribe(cursor, ctx)? {
+                match node {
+                    ASTNode::Statement(ASTStatement::VariableDeclaration(_)) => {
+                        meta.variables += 1;
+                    },
+                    _ => {}
+                }
+
                 nodes.push(node);
             }
 
@@ -28,8 +36,6 @@ impl Node for BlockStruct {
 
         // Blocks should end with a closing brace
         cursor.expect(&Token::Symbol(TokenSymbol::BraceClose), ParserError::Expected("end@scope/sym <sym:brace:close> '}'".to_string()))?;
-
-        let meta = BlockMetadata { variables: 0 };
 
         Ok(Some(BlockStruct { nodes, name: String::new(), meta }))
     }

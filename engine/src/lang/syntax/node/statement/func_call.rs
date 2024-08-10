@@ -80,8 +80,7 @@ impl StatementNode for FunctionCallStatement {
                 i += 1;
             }
 
-            let mut child = Scope::with_parent(scope.borrow());
-            child.variables = HashMap::from_iter(variables);
+            let child = Scope::with_parent(HashMap::from_iter(variables), scope.borrow());
             let child = RefCell::new(child);
 
             body.execute(vm, &child)

@@ -12,7 +12,7 @@ use crate::{
     vm::{scope::Scope, VM}
 };
 
-use super::{list::LiteralListExpression, ufunc_constructor::UnnamedFunctionConstructor, ExpressionNode};
+use super::{array::LiteralArray, ufunc_constructor::UnnamedFunctionConstructor, ExpressionNode};
 
 /// An expression which evaluated result doesn't need manipulation
 #[derive(Debug, Clone)]
@@ -21,7 +21,7 @@ pub enum TerminalExpression {
     StaticLiteral(DataValue),
 
     /// A list of values provided in the core
-    StaticLiteralList(LiteralListExpression),
+    StaticLiteralList(LiteralArray),
 
     /// A reference to a variable (thorugh its name)
     VarRef(String),
@@ -61,7 +61,7 @@ impl Node for TerminalExpression {
             },
             Some(Token::Symbol(TokenSymbol::BracketOpen)) => {
                 cursor.back();
-                LiteralListExpression::transcribe(cursor, ctx).map(|o| o.map(Self::StaticLiteralList))
+                LiteralArray::transcribe(cursor, ctx).map(|o| o.map(Self::StaticLiteralList))
             },
             _ => Err(TranscriptionException::NotFound(expected_token!(<expr:terminal>)))
         }

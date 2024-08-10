@@ -1,7 +1,7 @@
 pub mod meta;
 pub mod transcription;
 
-use std::{cell::RefCell, fmt};
+use std::{cell::RefCell, collections::HashMap, fmt};
 
 use meta::BlockMetadata;
 
@@ -20,7 +20,7 @@ pub struct BlockStruct {
     #[allow(dead_code)]
     name: String,
 
-    #[allow(dead_code)]
+    /// Metadata about the block and the instructions it contains
     meta: BlockMetadata
 }
 
@@ -28,7 +28,7 @@ impl BlockStruct {
     // TODO: This code is shit. But works!
     /// Run the block (with its own generated child context)
     pub fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
-        let child = Scope::with_parent(scope.borrow());
+        let child = Scope::with_parent(HashMap::with_capacity(self.meta.variables) , scope.borrow());
         let child = RefCell::new(child);
 
         for node in &self.nodes {
