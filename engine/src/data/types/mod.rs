@@ -33,6 +33,18 @@ pub enum ListType {
     Unique(DataType, Option<usize>)
 }
 
+impl Default for DataType {
+    fn default() -> Self {
+        DataType::Any
+    }
+}
+
+impl Default for ListType {
+    fn default() -> Self {
+        ListType::Any(None)
+    }
+}
+
 impl DataType {
     pub fn matched(&self, value: &DataValue) -> bool {
         match self {
@@ -106,12 +118,6 @@ impl DataType {
             DataType::Any => true,
             DataType::Never => false
         }
-    }
-}
-
-impl Default for DataType {
-    fn default() -> Self {
-        DataType::Any
     }
 }
 

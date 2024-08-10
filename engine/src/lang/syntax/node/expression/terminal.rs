@@ -74,7 +74,7 @@ impl ExpressionNode for TerminalExpression {
         match self {
             Self::StaticLiteral(literal) => literal.clone(),
             Self::StaticLiteralList(list) => list.evaluate(vm, scope),
-            Self::VarRef(varname) => scope.borrow().get(varname).cloned().unwrap_or_default(),
+            Self::VarRef(varname) => scope.borrow().get(varname).cloned().unwrap_or_default().0,
             Self::LastValue => vm.last_value.clone(),
             Self::UnnamedFunction(constructor) => constructor.evaluate(vm, scope),
             Self::Parenthesis(node) => node.evaluate(vm, scope)

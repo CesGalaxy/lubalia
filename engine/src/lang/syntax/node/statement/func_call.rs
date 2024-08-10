@@ -3,7 +3,7 @@ use std::{cell::RefCell, collections::HashMap, fmt};
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
 use crate::{
-    data::DataValue,
+    data::{types::DataType, DataValue},
     lang::{
         parser::{context::ParsingContext, cursor::ignore_eols, error::ParserError},
         syntax::node::{expression::{ASTExpression, ExpressionNode}, Node, NodeParserTickResult},
@@ -66,12 +66,17 @@ impl StatementNode for FunctionCallStatement {
                 panic!("Param {} is required", required_args[args.len()]);
             }
 
-            let mut variables: Vec<(String, DataValue)> = required_args.iter().cloned().zip(args.clone()).collect();
+            let mut variables: Vec<(String, (DataValue, DataType))> = required_args
+                .iter()
+                .cloned()
+                .zip(args.clone())
+                .map(|(name, value)| (name, (value, DataType::default())))
+                .collect();
 
             let mut i = 0;
 
             for (name, default) in optional_args {
-                variables.push((name, args.get(i).map(|v| v.clone()).unwrap_or(default)));
+                variables.push((name, (args.get(i).map(|v| v.clone()).unwrap_or(default), DataType::default())));
                 i += 1;
             }
 
@@ -83,7 +88,6 @@ impl StatementNode for FunctionCallStatement {
         } else {
             // TODO: Please, fix this
             panic!("Function call to non-function value: {}", called);
-            //Some(StatementResult::Usable(called))
         }
     }
 }

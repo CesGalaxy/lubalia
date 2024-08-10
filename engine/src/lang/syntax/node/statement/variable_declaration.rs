@@ -95,7 +95,7 @@ impl StatementNode for VariableDeclaration {
         let value = self.value.clone().map(|node| node.evaluate(vm, scope)).unwrap_or_default();
 
         // Create a new variable in the context with it's data
-        scope.borrow_mut().create(self.varname.clone(), value.clone());
+        scope.borrow_mut().create(self.varname.clone(), (value.clone(), self.vartype.clone()));
 
         // [SemiExpression] Return (if any) the value returned by the first node of the scope that returned a value
         Some(StatementResult::Usable(value))

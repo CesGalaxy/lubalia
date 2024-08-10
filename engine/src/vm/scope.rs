@@ -1,13 +1,15 @@
 use std::{cell::Ref, collections::HashMap, fmt};
 
-use crate::data::DataValue;
+use crate::data::{types::DataType, DataValue};
+
+pub type Variable = (DataValue, DataType);
 
 /// A context for running code, contains all variables.
 /// Extends all the data from its parent
 #[derive(Debug)]
 pub struct Scope<'a> {
     /// All the variables stored in the current scope
-    pub variables: HashMap<String, DataValue>,
+    pub variables: HashMap<String, Variable>,
 
     /// The parent scope of the actual one, this will be used to look for variables that are not in the current scope
     pub parent: Option<Ref<'a, Self>>
@@ -15,7 +17,7 @@ pub struct Scope<'a> {
 
 impl<'a> Scope<'a> {
     /// Create a new empty context
-    pub fn new(variables: HashMap<String, DataValue>) -> Self {
+    pub fn new(variables: HashMap<String, Variable>) -> Self {
         Scope { variables, parent: None }
     }
 
@@ -29,7 +31,7 @@ impl<'a> Scope<'a> {
     /// Add a new variable to the current scope (or overwrite it if it already exists).
     /// If there is one with the same name in the parent scope, it won't be overwritten,
     /// but inaccessable from the current scope, as it will shadow the parent's variable.
-    pub fn create(&mut self, name: String, value: DataValue) {
+    pub fn create(&mut self, name: String, value: Variable) {
         if let Some(_variable) = self.get(&name) {
             self.variables.remove(&name);
             self.variables.insert(name, value);
@@ -41,30 +43,28 @@ impl<'a> Scope<'a> {
     /// Retrieve a recefrence to a variable from the scope,
     /// if there is no variable with the given name, it will look in the parent scope.
     /// If the variable is not found neither, it will return None.
-    pub fn get(&self, name: &String) -> Option<&DataValue> {
+    pub fn get(&self, name: &String) -> Option<&Variable> {
         // Buscamos en el scope actual
         if let Some(value) = self.variables.get(name) {
             return Some(value);
         }
 
-        // Si no encontramos, buscamos en el scope padre
+        // Try to search at the parent scope, otherwise return None
         self.parent.as_ref().map(|parent| parent.get(name)).flatten()
     }
 
     // Retrieve a mutable reference to a variable from the scope (or parent)
-    // fn get_mut(&mut self, name: &str) -> Option<&mut DataValue> {
-    //     // Buscamos en el scope actual
-    //     if let Some(value) = self.variables.get_mut(name) {
-    //         return Some(value);
-    //     }
+    #[allow(dead_code)]
+    fn get_mut(&mut self, name: &String) -> Option<&mut Variable> {
+        //Buscamos en el scope actual
+        if let Some(value) = self.variables.get_mut(name) {
+            return Some(value);
+        }
 
-    //     // Si no encontramos, buscamos en el scope padre
-    //     if let Some(parent) = &mut self.parent {
-    //         parent.get_mut(name)
-    //     } else {
-    //         None
-    //     }
-    // }
+        todo!("get_mut() can't be called for the parent yet");
+        // TODO: idk what to do here
+        // self.parent.as_mut().map(|parent| parent.get_mut(name)).flatten()
+    }
 }
 
 impl Default for Scope<'_> {
@@ -79,7 +79,7 @@ impl fmt::Display for Scope<'_> {
         write!(f, "Context ================================\n")?;
 
         for (name, value) in &self.variables {
-            write!(f, "\t{name:16} = {}\n", value)?;
+            write!(f, "\t{name:16}: {} = {}\n", value.1, value.0)?;
         }
 
         if let Some(parent) = &self.parent {
