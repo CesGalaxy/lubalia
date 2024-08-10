@@ -38,5 +38,19 @@
         <p>Made with ❤️</p>
         <p>&copy; 2024</p>
     </footer>
+    <!-- <script type="module" src="../pkg/lubascript.js"></script> -->
+    <script type="module">
+        import init, { luval } from "../pkg/lubascript.js";
+
+        init().then(run);
+
+        function run() {
+            const ex = "return 12 + 2"
+
+            let result = luval(ex);
+
+            console.log(result);
+        }
+    </script>
 </body>
 </html>
