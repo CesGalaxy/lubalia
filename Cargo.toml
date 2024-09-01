@@ -11,7 +11,7 @@ clap = { workspace = true }
 lubengine = { path = "engine" }
 
 [workspace]
-members = [ "compiler","debug", "engine", "js", "lang", "utils", "vm"]
+members = [ "compiler","debug", "engine", "lang", "utils", "vm"]
 
 [workspace.dependencies]
 colored = "2.1.0"
