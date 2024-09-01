@@ -1,14 +1,18 @@
-use lubalia_utils::transcriber::TranscriberTickResult;
+use lubalia_utils::{cursor::CursorNavigation, transcriber::TranscriberTickResult};
 
-use crate::parser::{error::ParserError, ParserCursor};
+use crate::{parser::{error::ParserError, ParserCursor}, token::Token};
 
 #[derive(Debug, Clone)]
 pub enum ASTRootItem {
+    Const,
     Node,
 }
 
 impl ASTRootItem {
     pub fn parse(cursor: &mut ParserCursor) -> TranscriberTickResult<ASTRootItem, ParserError> {
-        unimplemented!()
+        match cursor.peek() {
+            Some(_) => todo!(),
+            None => unreachable!(),
+        }
     }
 }

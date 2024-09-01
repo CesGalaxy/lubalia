@@ -20,7 +20,7 @@ pub fn tokenizer(code: String) -> TranscriptionResult<char, Token, TokenizerErro
     let mut transcription = transcriber(code.chars().collect(), tokenizer_tick)?;
 
     transcription.result.push(IdentifiedTranscriptionUnit::new(Token::Symbol(TokenSymbol::EOL), Some(code_len), None));
-    transcription.result.push(IdentifiedTranscriptionUnit::new(Token::Symbol(TokenSymbol::EOF), Some(code_len), None));
+    transcription.result.push(IdentifiedTranscriptionUnit::new(Token::EOF, Some(code_len), None));
 
     Ok(transcription)
 }

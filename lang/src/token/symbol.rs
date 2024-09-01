@@ -25,14 +25,12 @@ pub enum TokenSymbol {
     Colon,
     Semicolon,
     EOL,
-    EOF,
 }
 
 impl std::fmt::Display for TokenSymbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "['{}']", match self {
             Self::EOL => "EOL".magenta(),
-            Self::EOF => "EOF".magenta(),
             Self::Semicolon => ";".magenta(),
             _ => <&'static str>::from(self).bright_green().bold()
         })
@@ -65,7 +63,6 @@ impl From<&TokenSymbol> for &'static str {
             TokenSymbol::Colon => ":",
             TokenSymbol::Semicolon => ";",
             TokenSymbol::EOL => "\n",
-            TokenSymbol::EOF => "",
         }
     }
 }

@@ -23,6 +23,9 @@ pub enum Token {
 
     /// For naming things
     Tag(String),
+
+    // End of file
+    EOF,
 }
 
 impl std::fmt::Display for Token {
@@ -33,9 +36,9 @@ impl std::fmt::Display for Token {
             Self::Literal(value) => write!(f, "|l:{value}|"),
             Self::Symbol(symbol::TokenSymbol::Semicolon) => write!(f, "|{}|", "SEMICOLON".magenta()),
             Self::Symbol(symbol::TokenSymbol::EOL) => write!(f, "|{}|", "EOL".magenta()),
-            Self::Symbol(symbol::TokenSymbol::EOF) => write!(f, "|{}|", "END"),
             Self::Symbol(value) => write!(f, "|s:{value}|"),
             Self::Tag(value) => write!(f, "|t:{}|", value.blue().bold()),
+            Self::EOF => write!(f, "|{}|", "END"),
         }
     }
 }
