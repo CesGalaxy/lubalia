@@ -1,6 +1,6 @@
 use lubalia_utils::transcriber::{cursor::TranscriberCursor, error::TranscriptionException};
 
-use crate::lang::{syntax::node::NodeParserTickResult, token::Token};
+use crate::{syntax::node::NodeParserTickResult, token::Token};
 
 use super::manifest::ProgramManifest;
 

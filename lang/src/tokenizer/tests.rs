@@ -1,4 +1,4 @@
-use crate::lang::token::{keyword::TokenLangKeyword, literal::TokenLiteral};
+use crate::token::{keyword::TokenLangKeyword, literal::TokenLiteral};
 
 use super::*;
 

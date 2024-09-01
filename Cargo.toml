@@ -12,8 +12,8 @@ lubengine = { path = "engine" }
 lubalia_utils = { path = "utils" }
 
 [workspace]
-members = ["debug", "engine", "js", "utils"]
+members = ["debug", "engine", "js", "lang", "utils", "vm"]
 
 [workspace.dependencies]
 colored = "2.1.0"
-clap = { version = "4.5.11", features = ["derive"]}
+clap = { version = "4.5.11", features = ["derive"] }

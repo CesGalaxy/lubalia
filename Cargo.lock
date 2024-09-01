@@ -1463,6 +1463,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "lubalang"
+version = "0.1.0"
+dependencies = [
+ "colored",
+ "lubalia_utils",
+]
+
+[[package]]
 name = "lubalia"
 version = "0.0.1"
 dependencies = [
@@ -1495,6 +1503,7 @@ version = "0.1.0"
 dependencies = [
  "colored",
  "lubalia_utils",
+ "luvam",
 ]
 
 [[package]]
@@ -1504,6 +1513,13 @@ dependencies = [
  "clap",
  "colored",
  "iced",
+]
+
+[[package]]
+name = "luvam"
+version = "0.1.0"
+dependencies = [
+ "lubalang",
 ]
 
 [[package]]

@@ -20,7 +20,7 @@ macro_rules! expected_token {
         $($segment:ident@$block:ident)|* <$($token_type:ident):+> $($extra:expr)?
     ) => {{
         use colored::Colorize;
-        use crate::lang::token::keyword::TokenLangKeyword;
+        use crate::token::keyword::TokenLangKeyword;
 
         let components: Vec<String> = vec![$(
             format!("{}{}{}", stringify!($segment).yellow(), stringify!(@), stringify!($block).yellow())

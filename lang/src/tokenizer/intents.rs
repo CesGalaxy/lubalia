@@ -1,6 +1,6 @@
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::lang::token::{keyword::TokenLangKeyword, literal::TokenLiteral, Token};
+use crate::token::{keyword::TokenLangKeyword, literal::TokenLiteral, Token};
 
 use super::error::TokenizerError;
 

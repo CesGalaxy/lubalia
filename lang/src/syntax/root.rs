@@ -2,7 +2,7 @@ use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, TranscriberTickResult}};
 
-use crate::lang::{parser::{context::ParsingContext, error::ParserError}, token::{symbol::TokenSymbol, Token}};
+use crate::{parser::{context::ParsingContext, error::ParserError}, token::{symbol::TokenSymbol, Token}};
 
 use super::node::{ASTNode, Node};
 

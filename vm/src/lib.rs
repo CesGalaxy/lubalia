@@ -4,11 +4,9 @@ use std::{cell::RefCell, fmt::Debug};
 
 use scope::Scope;
 
-use crate::{data::DataValue, lang::syntax::{node::{statement::StatementNode, ASTNode}, root::ASTRootItem}};
-
 /// A virtual machine that executes a program in bytecode
 #[derive(Debug)]
-pub struct VM {
+pub struct LUVAM {
     /// The global scope (context) of the VM
     pub global: Scope<'static>,
 

@@ -4,44 +4,40 @@ pub mod repeat;
 pub mod switch;
 pub mod func_call;
 
-use std::{cell::RefCell, fmt};
+use std::fmt;
 
 use lubalia_utils::{cursor::CursorNavigation, transcriber::{cursor::TranscriberCursor, error::TranscriptionException}};
 
-use crate::{
-    data::DataValue,
-    lang::{parser::{context::ParsingContext, error::expected_token}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}},
-    vm::{scope::Scope, VM}
-};
+use crate::{parser::{context::ParsingContext, error::expected_token}, token::{keyword::TokenLangKeyword, symbol::TokenSymbol, Token}};
 
 use super::{block::BlockStruct, expression::ExpressionNode, ASTNode, Node, NodeParserTickResult};
 
 /// Wether the statement returned a value for using it or the result is just a side effect
 #[derive(Debug, Clone)]
 pub enum StatementResult {
-    /// Something was returned by the program
-    Return(DataValue),
+    // Something was returned by the program
+    //Return(DataValue),
 
-    /// The statement result, it's not returned
-    Usable(DataValue)
+    // The statement result, it's not returned
+    //Usable(DataValue)
 }
 
 impl StatementResult {
-    /// Get the value of the statement result
-    pub fn value(&self) -> DataValue {
-        match self {
-            StatementResult::Return(value) => value.clone(),
-            StatementResult::Usable(value) => value.clone()
-        }
-    }
+    // /// Get the value of the statement result
+    // pub fn value(&self) -> DataValue {
+    //     match self {
+    //         StatementResult::Return(value) => value.clone(),
+    //         StatementResult::Usable(value) => value.clone()
+    //     }
+    // }
 
-    /// Get the returned value (if any)
-    pub fn returned(&self) -> Option<DataValue> {
-        match self {
-            StatementResult::Return(value) => Some(value.clone()),
-            StatementResult::Usable(_) => None
-        }
-    }
+    // /// Get the returned value (if any)
+    // pub fn returned(&self) -> Option<DataValue> {
+    //     match self {
+    //         StatementResult::Return(value) => Some(value.clone()),
+    //         StatementResult::Usable(_) => None
+    //     }
+    // }
 }
 
 /// An instruction the VM executes without returning a value
@@ -57,7 +53,7 @@ pub enum ASTStatement {
 }
 
 pub trait StatementNode: Node {
-    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult>;
+    // fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult>;
 }
 
 impl Node for ASTStatement {
@@ -91,25 +87,25 @@ impl Node for ASTStatement {
 }
 
 impl StatementNode for ASTStatement {
-    /// Execute an statement and return a value if any is provided
-    fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
-        match self {
-            ASTStatement::VariableDeclaration(vd) => vd.execute(vm, scope),
-            ASTStatement::Block(block) => block.execute(vm, scope),
-            ASTStatement::Conditional(cond) => cond.execute(vm, scope),
-            ASTStatement::Repeat(repeat) => repeat.execute(vm, scope),
-            ASTStatement::Switch(switch) => switch.execute(vm, scope),
-            ASTStatement::FunctionCall(call) => call.execute(vm, scope),
-            ASTStatement::Return(node) => Some(StatementResult::Return(node.evaluate(vm, scope)))
-        }
-    }
+    // /// Execute an statement and return a value if any is provided
+    // fn execute(&self, vm: &mut VM, scope: &RefCell<Scope>) -> Option<StatementResult> {
+    //     match self {
+    //         ASTStatement::VariableDeclaration(vd) => vd.execute(vm, scope),
+    //         ASTStatement::Block(block) => block.execute(vm, scope),
+    //         ASTStatement::Conditional(cond) => cond.execute(vm, scope),
+    //         ASTStatement::Repeat(repeat) => repeat.execute(vm, scope),
+    //         ASTStatement::Switch(switch) => switch.execute(vm, scope),
+    //         ASTStatement::FunctionCall(call) => call.execute(vm, scope),
+    //         ASTStatement::Return(node) => Some(StatementResult::Return(node.evaluate(vm, scope)))
+    //     }
+    // }
 }
 
 impl ExpressionNode for ASTStatement {
-    /// Evaluate the statement and return the result value
-    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
-        self.execute(vm, scope).map(|result| result.value()).unwrap_or_default()
-    }
+    // /// Evaluate the statement and return the result value
+    // fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
+    //     self.execute(vm, scope).map(|result| result.value()).unwrap_or_default()
+    // }
 }
 
 impl fmt::Display for ASTStatement {

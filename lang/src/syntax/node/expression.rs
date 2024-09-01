@@ -3,11 +3,11 @@ pub mod binary;
 pub mod ufunc_constructor;
 pub mod array;
 
-use std::{cell::RefCell, fmt};
+use std::fmt;
 
 use lubalia_utils::transcriber::cursor::TranscriberCursor;
 
-use crate::{data::DataValue, lang::{parser::{context::ParsingContext, error::expected_token}, token::Token}, vm::{scope::Scope, VM}};
+use crate::{parser::{context::ParsingContext, error::expected_token}, token::Token};
 
 use super::{Node, NodeParserTickResult};
 
@@ -23,9 +23,9 @@ pub enum ASTExpression {
 }
 
 pub trait ExpressionNode: Node {
-    // TODO: Return an Option (for optional returns in statements)
-    /// Evaluate the expression and return the result value
-    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue;
+    // // TODO: Return an Option (for optional returns in statements)
+    // /// Evaluate the expression and return the result value
+    // fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue;
 }
 
 impl Node for ASTExpression {
@@ -38,18 +38,18 @@ impl Node for ASTExpression {
 }
 
 impl ExpressionNode for ASTExpression {
-    /// Evaluate the expression and return the result value
-    fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
-        let result = match self {
-            ASTExpression::Terminal(expr) => expr.evaluate(vm, scope),
-            ASTExpression::Binary(expr) => expr.evaluate(vm, scope)
-        };
+    // /// Evaluate the expression and return the result value
+    // fn evaluate(&self, vm: &mut VM, scope: &RefCell<Scope>) -> DataValue {
+    //     let result = match self {
+    //         ASTExpression::Terminal(expr) => expr.evaluate(vm, scope),
+    //         ASTExpression::Binary(expr) => expr.evaluate(vm, scope)
+    //     };
 
-        // Save the result of the last evaluated expression for the `_` variable
-        vm.last_value = result.clone();
+    //     // Save the result of the last evaluated expression for the `_` variable
+    //     vm.last_value = result.clone();
 
-        result
-    }
+    //     result
+    // }
 }
 
 impl fmt::Display for ASTExpression {
