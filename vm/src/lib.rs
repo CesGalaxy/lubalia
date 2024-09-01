@@ -4,16 +4,20 @@ use instruction::Instruction;
 pub mod instruction;
 pub mod data;
 
-pub struct LUVAM<const Collections: usize> {
+pub struct LUVAM<const CAPACITY: usize> {
+    /// The accumulator of the VM
     accumulator: DataValue,
-    collections: [Vec<DataValue>; Collections],
+
+    /// The stack of the VM
+    stack: [DataValue; CAPACITY],
 }
 
 impl LUVAM {
-    pub fn new(reserved: [usize; Collections]) -> Self {
+    pub fn new(stack_size: usize) -> Self {
         Self {
             accumulator: DataValue::Int(0),
-            collections: reserved.iter().map(|&size| Vec::with_capacity(size)).collect(),
+            // TODO: Is this even secure?
+            stack: Vec::with_capacity(stack_size),
         }
     }
 

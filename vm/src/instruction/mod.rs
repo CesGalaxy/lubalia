@@ -1,17 +1,11 @@
 use crate::LUVAM;
 
 pub enum Instruction {
-    ColInit(usize),
-    ColClear(usize),
-    ColPush(usize),
-    ColPop(usize),
-    ColMoveLast(usize),
-    ColDestroy(usize),
-    ColGet(usize, usize),
-    ColUpdate(usize, usize),
-    ColRemove(usize, usize),
-    ColMove(usize, usize),
-    ColSwap(usize, usize),
+    Push,
+    Pop,
+    Get(usize),
+    Set(usize),
+    Swap(usize, usize),
 
     Add(usize, usize),
     Sub(usize, usize),
@@ -21,7 +15,38 @@ pub enum Instruction {
 }
 
 impl Instruction {
-    pub fn run(vm: &mut LUVAM) {
-        todo!()
+    pub fn run(&self, vm: &mut LUVAM) {
+        match self {
+            Instruction::Push => {
+                vm.stack.push(vm.accumulator);
+            },
+            Instruction::Pop => {
+                vm.accumulator = vm.stack.pop().unwrap();
+            },
+            Instruction::Get(index) => {
+                vm.accumulator = vm.stack[*index];
+            },
+            Instruction::Set(index) => {
+                vm.stack[*index] = vm.accumulator;
+            },
+            Instruction::Swap(index1, index2) => {
+                vm.stack.swap(*index1, *index2);
+            },
+            Instruction::Add(index1, index2) => {
+                vm.accumulator = vm.stack[*index1] + vm.stack[*index2];
+            },
+            Instruction::Sub(index1, index2) => {
+                vm.accumulator = vm.stack[*index1] - vm.stack[*index2];
+            },
+            Instruction::Mul(index1, index2) => {
+                vm.accumulator = vm.stack[*index1] * vm.stack[*index2];
+            },
+            Instruction::Div(index1, index2) => {
+                vm.accumulator = vm.stack[*index1] / vm.stack[*index2];
+            },
+            Instruction::Quo(index1, index2) => {
+                vm.accumulator = vm.stack[*index1] % vm.stack[*index2];
+            },
+        }
     }
 }
