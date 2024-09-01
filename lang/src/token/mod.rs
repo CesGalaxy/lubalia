@@ -1,6 +1,7 @@
 pub mod symbol;
 pub mod literal;
 pub mod keyword;
+pub mod identifier;
 
 use colored::Colorize;
 
