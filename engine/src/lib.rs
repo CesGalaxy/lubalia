@@ -1,4 +1,5 @@
 use lubalang::{lexer::lexer, parser::parser};
+use lubalia_compiler::compile;
 
 pub fn eval(source_code: String) {
     let lexer_result = lexer(source_code);
@@ -8,8 +9,14 @@ pub fn eval(source_code: String) {
             let parser_result = parser(tokens);
 
             match parser_result {
-                Ok(ast) => {
+                Ok(parsed_tokens) => {
+                    let ast = parsed_tokens.units().into_iter().cloned().collect();
+
                     println!("AST: {:?}", ast);
+
+                    let program = compile(ast);
+
+                    println!("Program: {:?}", program);
                 },
                 Err(e) => {
                     println!("Error: {:?}", e);

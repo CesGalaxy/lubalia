@@ -508,10 +508,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "compiler"
-version = "0.1.0"
-
-[[package]]
 name = "concurrent-queue"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1474,6 +1470,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "lubalia_compiler"
+version = "0.1.0"
+dependencies = [
+ "lubalang",
+ "luvam",
+]
+
+[[package]]
 name = "lubalia_utils"
 version = "0.1.0"
 dependencies = [
@@ -1486,6 +1490,7 @@ version = "0.1.0"
 dependencies = [
  "colored",
  "lubalang",
+ "lubalia_compiler",
  "lubalia_utils",
  "luvam",
 ]

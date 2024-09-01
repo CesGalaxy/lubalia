@@ -1,5 +1,6 @@
 use crate::LUVAM;
 
+#[derive(Debug)]
 pub enum Instruction {
     Get(usize),
     Set(usize),

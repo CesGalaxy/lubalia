@@ -1,6 +1,8 @@
 [package]
-name = "compiler"
+name = "lubalia_compiler"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+lubalang = { path = "../lang" }
+luvam = { path = "../vm" }

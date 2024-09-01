@@ -45,7 +45,7 @@
                 "args": [ "build", "--bin=lubalia", "--package=lubalia" ],
                 "filter": { "name": "lubalia", "kind": "bin" }
             },
-            "args": [ "program.luba" ],
+            "args": [ "indev.luba" ],
             "cwd": "${workspaceFolder}"
         },
         {

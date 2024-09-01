@@ -8,3 +8,4 @@ colored =  { workspace = true }
 lubalia_utils = { path = "../utils" }
 luvam = { path = "../vm" }
 lubalang = { path = "../lang" }
+lubalia_compiler = { path = "../compiler" }

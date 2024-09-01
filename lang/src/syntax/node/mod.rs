@@ -2,6 +2,8 @@ use lubalia_utils::transcriber::TranscriberTickResult;
 
 use crate::parser::{ParserCursor, error::ParserError};
 
+pub mod const_declaration;
+
 pub enum Node {
 
 }
