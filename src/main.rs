@@ -1,7 +1,4 @@
-use eval::evaluate_code;
-use lubengine::vm::VM;
-
-pub mod eval;
+use lubengine::eval;
 
 fn main() {
     println!("Welcome to Lubalia!");
@@ -22,17 +19,19 @@ fn main() {
 fn test_file(file_name: &str) {
     let file = std::fs::read_to_string(file_name);
 
-    if let Ok(code) = file {
-        let mut vm = VM::new();
+    if let Ok(source_code) = file {
+        eval(source_code);
 
-        let result = evaluate_code(&mut vm, code);
+        // let mut vm = VM::new();
 
-        // TODO: Shall I move the Display implementations into the main bin?
-        match result {
-            Ok(Some(value)) => println!("OK -> {}", value),
-            Ok(None) => println!("OK -> No result"),
-            Err(e) => println!("ERROR -> {}", e),
-        }
+        // let result = evaluate_code(&mut vm, code);
+
+        // // TODO: Shall I move the Display implementations into the main bin?
+        // match result {
+        //     Ok(Some(value)) => println!("OK -> {}", value),
+        //     Ok(None) => println!("OK -> No result"),
+        //     Err(e) => println!("ERROR -> {}", e),
+        // }
     } else {
         println!("Error reading file: {:?}", file.err());
     }
