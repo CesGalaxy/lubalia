@@ -1,7 +1,9 @@
-use crate::LUVAM;
+use crate::{data::DataValue, LUVAM};
 
 #[derive(Debug)]
 pub enum Instruction {
+    Load(DataValue),
+
     Get(usize),
     Set(usize),
     Swap(usize, usize),
@@ -14,21 +16,24 @@ pub enum Instruction {
 }
 
 impl Instruction {
-    pub fn run<const CAPACITY: usize>(&self, vm: &mut LUVAM<CAPACITY>) {
+    pub fn run<const CAPACITY: usize>(self, vm: &mut LUVAM<CAPACITY>) {
         match self {
+            Instruction::Load(value) => {
+                vm.accumulator = value;
+            },
             Instruction::Get(index) => {
-                vm.accumulator = vm.stack[*index].clone();
+                vm.accumulator = vm.stack[index].clone();
             },
             Instruction::Set(index) => {
-                vm.stack[*index] = vm.accumulator.clone();
+                vm.stack[index] = vm.accumulator.clone();
             },
             Instruction::Swap(index1, index2) => {
-                let temp = vm.stack[*index1].clone();
-                vm.stack[*index1] = vm.stack[*index2].clone();
-                vm.stack[*index2] = temp;
+                let temp = vm.stack[index1].clone();
+                vm.stack[index1] = vm.stack[index2].clone();
+                vm.stack[index2] = temp;
             },
             Instruction::Add(index1, index2) => {
-                vm.accumulator = &vm.stack[*index1] + &vm.stack[*index2];
+                vm.accumulator = &vm.stack[index1] + &vm.stack[index2];
             },
             // Instruction::Sub(index1, index2) => {
             //     vm.accumulator = vm.stack[*index1] - vm.stack[*index2];
