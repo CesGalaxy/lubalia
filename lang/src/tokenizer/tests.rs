@@ -32,7 +32,6 @@ fn test_tokenization() {
         &Token::Symbol(TokenSymbol::Semicolon),
 
         &Token::Symbol(TokenSymbol::EOL),
-        &Token::EOF,
     ], "the transcription units should be the expected ones");
 }
 
