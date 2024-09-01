@@ -12,12 +12,13 @@ pub struct LUVAM<const CAPACITY: usize> {
     stack: [DataValue; CAPACITY],
 }
 
-impl LUVAM {
-    pub fn new(stack_size: usize) -> Self {
+const STACK_DEFAULT_VALUE: DataValue = DataValue::Int(0);
+
+impl<const CAPACITY: usize> LUVAM<CAPACITY> {
+    pub fn new() -> Self {
         Self {
             accumulator: DataValue::Int(0),
-            // TODO: Is this even secure?
-            stack: Vec::with_capacity(stack_size),
+            stack: [STACK_DEFAULT_VALUE; CAPACITY],
         }
     }
 
@@ -25,5 +26,25 @@ impl LUVAM {
         for instruction in instructions {
             instruction.run(self);
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_vm() {
+        let mut vm = LUVAM::<2>::new();
+
+        vm.accumulator = DataValue::Int(2);
+
+        vm.eval(vec![
+            Instruction::Set(0),
+            Instruction::Set(1),
+            Instruction::Add(0, 1),
+        ]);
+
+        assert_eq!(vm.accumulator, DataValue::Int(4));
     }
 }
