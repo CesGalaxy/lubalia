@@ -1,49 +1,25 @@
-pub mod scope;
+use data::DataValue;
+use instruction::Instruction;
 
-use std::{cell::RefCell, fmt::Debug};
+pub mod instruction;
+pub mod data;
 
-use scope::Scope;
-
-/// A virtual machine that executes a program in bytecode
-#[derive(Debug)]
-pub struct LUVAM {
-    /// The global scope (context) of the VM
-    pub global: Scope<'static>,
-
-    /// The last value returned by an expression (_)
-    pub last_value: DataValue,
+pub struct LUVAM<const Collections: usize> {
+    accumulator: DataValue,
+    collections: [Vec<DataValue>; Collections],
 }
 
-impl VM {
-    /// Create a new VM with a program
-    pub fn new() -> Self {
-        VM {
-            global: Scope::default(),
-            last_value: DataValue::default()
+impl LUVAM {
+    pub fn new(reserved: [usize; Collections]) -> Self {
+        Self {
+            accumulator: DataValue::Int(0),
+            collections: reserved.iter().map(|&size| Vec::with_capacity(size)).collect(),
         }
     }
 
-    /// Start running the emulation
-    pub fn evaluate(&mut self, program: Vec<ASTRootItem>) -> Option<DataValue> {
-        let scope = Scope::default();
-        let scope = RefCell::new(scope);
-
-        // Loop through all the nodes in the program
-        for astri in program {
-            // Execute all the nodes until a value is returned
-            let ASTRootItem::Node(node) = astri;
-
-            // If the node returned a value, return it
-            if let Some(value) = self.tick(node, &scope) {
-                return Some(value);
-            }
+    pub fn eval(&mut self, instructions: Vec<Instruction>) {
+        for instruction in instructions {
+            instruction.run(self);
         }
-
-        None
-    }
-
-    /// Each tick corresponds to the execution of a single instruction/node.
-    pub fn tick(&mut self, node: ASTNode, scope: &RefCell<Scope>) -> Option<DataValue> {
-        node.execute(self, scope).map(|result| result.returned()).flatten()
     }
 }
