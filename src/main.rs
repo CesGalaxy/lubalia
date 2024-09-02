@@ -1,3 +1,7 @@
+// LRE -> Lubalia Runtime Environment
+
+pub mod vfs;
+
 use lubengine::eval;
 
 fn main() {

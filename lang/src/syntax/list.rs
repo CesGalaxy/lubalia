@@ -27,3 +27,9 @@ impl<T: NodeFactory> NodeFactory for NodeList<T> {
         Ok(Some(NodeList { items }))
     }
 }
+
+impl <T: NodeFactory> Into<Vec<T>> for NodeList<T> {
+    fn into(self) -> Vec<T> {
+        self.items
+    }
+}

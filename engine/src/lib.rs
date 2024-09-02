@@ -1,3 +1,5 @@
+pub mod vfs;
+
 use lubalang::{lexer::lexer, parser::parser};
 use lubalia_compiler::compile;
 
@@ -9,9 +11,7 @@ pub fn eval(source_code: String) {
             let parser_result = parser(tokens);
 
             match parser_result {
-                Ok(parsed_tokens) => {
-                    let ast = parsed_tokens.units().into_iter().cloned().collect();
-
+                Ok(ast) => {
                     println!("AST: {:?}", ast);
 
                     let program = compile(ast);
