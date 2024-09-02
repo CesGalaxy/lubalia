@@ -12,7 +12,7 @@ impl StatementList {
         let mut items = Vec::new();
 
         if cursor.peek().is_some() {
-            if let Ok(Some(statement)) = StatementNode::parse(cursor) {
+            if let Ok(statement) = StatementNode::parse(cursor) {
                 items.push(statement);
             }
 
@@ -21,7 +21,7 @@ impl StatementList {
             while cursor.peek().is_some_and(|token| token == &Token::Symbol(TokenSymbol::EOL) || token == &Token::Symbol(TokenSymbol::EOL)) {
                 ignore_eols(cursor);
 
-                if let Ok(Some(statement)) = StatementNode::parse(cursor) {
+                if let Ok(statement) = StatementNode::parse(cursor) {
                     items.push(statement);
                 }
             }

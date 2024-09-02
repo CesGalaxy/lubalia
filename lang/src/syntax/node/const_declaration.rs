@@ -10,9 +10,9 @@ pub struct ConstDeclaration {
 
 impl NodeFactory for ConstDeclaration {
     fn parse(_cursor: &mut ParserCursor) -> NodeParsingResult<Self> {
-        Ok(Some(Self {
+        Ok(Self {
             name: "a".to_string(),
             value: 10,
-        }))
+        })
     }
 }
