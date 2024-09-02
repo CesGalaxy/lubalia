@@ -1,6 +1,6 @@
 use lubalang::{lexer::lexer, parser::parser, syntax::statement::list::StatementList};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Module {
     pub name: String,
     pub items: StatementList,

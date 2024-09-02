@@ -4,7 +4,7 @@ use crate::{parser::{cursor::{ignore_eols, ignore_eols_but_last}, ParserCursor},
 
 use super::StatementNode;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct StatementList(pub Vec<StatementNode>);
 
 impl StatementList {

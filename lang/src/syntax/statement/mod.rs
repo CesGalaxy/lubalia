@@ -4,7 +4,7 @@ use crate::parser::ParserCursor;
 
 use super::{expr::ExpressionNode, node::{const_declaration::ConstDeclaration, return_value::ReturnValue, var_declaration::VarDeclaration, NodeParsingResult}};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum StatementNode {
     ConstDeclaration(ConstDeclaration),
     VariableDeclaration(VarDeclaration),
