@@ -31,7 +31,17 @@ impl<'a, Unit> Checkpoint<usize> for TranscriberCursor<'a, Unit> {
 
 impl<'a, Unit> TranscriberCursor<'a, Unit> {
     /// Checks if the cursor is at an expected token, if it is, it will be consumed and returned.
-    pub fn expect<'b, Error>(&mut self, expectation: &'b Unit, error: Error) -> Result<&'b Unit, TranscriptionException<Error>> where Unit: PartialEq {
+    pub fn expect<'b, Error>(&mut self, expectation: &'b Unit, error: Error) -> Result<&'b Unit, Error> where Unit: PartialEq {
+        if self.peek() == Some(expectation) {
+            self.next();
+            Ok(expectation)
+        } else {
+            Err(error)
+        }
+    }
+
+    /// Checks if the cursor is at an expected token, if it is, it will be consumed and returned.
+    pub fn expect_using_transcriber<'b, Error>(&mut self, expectation: &'b Unit, error: Error) -> Result<&'b Unit, TranscriptionException<Error>> where Unit: PartialEq {
         if self.peek() == Some(expectation) {
             self.next();
             Ok(expectation)
