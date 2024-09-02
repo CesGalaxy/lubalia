@@ -1,3 +1,5 @@
+use super::statement::list::StatementList;
+
 pub struct Block {
-    pub items: Vec<BlockItem>,
+    pub items: StatementList,
 }

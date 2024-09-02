@@ -1,20 +1,20 @@
-use lubalang::{lexer::lexer, parser::parser, syntax::node::Node};
+use lubalang::{lexer::lexer, parser::parser, syntax::statement::list::StatementList};
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Module {
     pub name: String,
-    pub items: Vec<Node>,
+    pub items: StatementList,
 }
 
 impl Module {
-    pub fn new(name: String, items: Vec<Node>) -> Module {
+    pub fn new(name: String, items: StatementList) -> Module {
         Module {
             name,
             items,
         }
     }
 
-    pub fn read(source_code: String) -> Option<Vec<Node>> {
+    pub fn read(source_code: String) -> Option<StatementList> {
         if let Ok(tokens) = lexer(source_code) {
             if let Ok(ast) = parser(tokens) {
                 return Some(ast);

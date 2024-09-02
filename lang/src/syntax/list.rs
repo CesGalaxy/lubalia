@@ -1,35 +1,23 @@
 use lubalia_utils::cursor::CursorNavigation;
 
-use crate::{parser::ParserCursor, token::{symbol::TokenSymbol, Token}};
+use crate::{parser::ParserCursor, token::Token};
 
-use super::node::{NodeFactory, NodeParsingResult};
+pub fn parse_all<T>(
+    cursor: &mut ParserCursor,
+    parse: fn(&mut ParserCursor) -> Option<T>,
+    divider: fn(&Token) -> bool,
+) -> Vec<T> {
+    let mut items = Vec::new();
 
-pub struct NodeList<T: NodeFactory> {
-    pub items: Vec<T>,
-}
+    if let Some(node) = parse(cursor) {
+        items.push(node);
+    }
 
-impl<T: NodeFactory> NodeFactory for NodeList<T> {
-    fn parse(cursor: &mut ParserCursor) -> NodeParsingResult<Self> where Self: Sized {
-        let mut items = Vec::new();
-
-        if let Ok(Some(node)) = T::parse(cursor) {
+    while cursor.peek().is_some_and(divider) {
+        if let Some(node) = parse(cursor) {
             items.push(node);
         }
-
-        while cursor.peek().is_some_and(|token| token == &Token::Symbol(TokenSymbol::EOL) || token == &Token::Symbol(TokenSymbol::Semicolon)) {
-            cursor.next();
-
-            if let Ok(Some(node)) = T::parse(cursor) {
-                items.push(node);
-            }
-        }
-
-        Ok(Some(NodeList { items }))
     }
-}
 
-impl <T: NodeFactory> Into<Vec<T>> for NodeList<T> {
-    fn into(self) -> Vec<T> {
-        self.items
-    }
+    items
 }

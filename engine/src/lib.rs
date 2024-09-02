@@ -7,6 +7,8 @@ use vfs::{VFSError, VirtualFileSystem};
 pub fn run(vfs: &dyn VirtualFileSystem, entry: String) -> Result<(), VFSError> {
     let module = vfs.get_module(entry)?;
 
+    println!("Module: {:?}", module);
+
     let program = compile(module.items);
 
     println!("Program: {:?}", program);

@@ -2,7 +2,7 @@
 
 pub mod vfs;
 
-use lubengine::eval;
+use lubengine::run;
 use vfs::LREVFS;
 
 fn main() {
@@ -14,21 +14,17 @@ fn main() {
 
     let args: Vec<_> = std::env::args().collect();
 
-    let file = args.get(1).expect("No file provided!");
+    let file = args.get(1).expect("No file provided!").clone();
 
     // Read test file
     test_file(file);
 }
 
 /// Get a file from storage, parse it and run it in the VM
-fn test_file(file_name: &str) {
-    let file = std::fs::read_to_string(file_name);
+fn test_file(file_name: String) {
+    let vfs = LREVFS::new();
 
-    if let Ok(source_code) = file {
-        eval(source_code);
+    let result = run(&vfs, file_name);
 
-        let vfs = LREVFS::new();
-    } else {
-        println!("Error reading file: {:?}", file.err());
-    }
+    println!("{:?}", result);
 }

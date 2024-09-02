@@ -1,12 +1,12 @@
 pub mod save_value;
 pub mod scope;
 
-use lubalang::syntax::node::Node;
+use lubalang::syntax::statement::list::StatementList;
 use luvam::instruction::Instruction;
 use save_value::compile_save_value;
 use scope::Scope;
 
-pub fn compile(ast: Vec<Node>) -> Vec<Instruction> {
+pub fn compile(ast: StatementList) -> Vec<Instruction> {
     let mut program = Vec::new();
 
     let mut global = Scope::new(0);
