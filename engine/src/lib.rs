@@ -20,21 +20,20 @@ pub fn eval(source_code: String) {
     let lexer_result = lexer(source_code);
 
     match lexer_result {
-        Ok(tokens) => {
-            let parser_result = parser(tokens);
+        Ok(tokens) => match parser(tokens) {
+            Ok(Some(ast)) => {
+                println!("AST: {:?}", ast);
 
-            match parser_result {
-                Ok(ast) => {
-                    println!("AST: {:?}", ast);
+                let program = compile(ast);
 
-                    let program = compile(ast);
-
-                    println!("Program: {:?}", program);
-                },
-                Err(e) => {
-                    println!("Error: {:?}", e);
-                }
+                println!("Program: {:?}", program);
             }
+            Ok(None) => {
+                println!("No StatementList found");
+            },
+            Err(e) => {
+                println!("Error: {:?}", e);
+            },
         },
         Err(e) => {
             println!("Error: {:?}", e);

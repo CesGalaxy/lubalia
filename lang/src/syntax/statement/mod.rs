@@ -2,7 +2,7 @@ pub mod list;
 
 use lubalia_utils::cursor::CursorNavigation;
 
-use crate::parser::ParserCursor;
+use crate::{parser::ParserCursor, token::{keyword::TokenLangKeyword, Token}};
 
 use super::{expr::ExpressionNode, node::{const_declaration::ConstDeclaration, return_value::ReturnValue, var_declaration::VarDeclaration, NodeParsingResult}};
 
@@ -15,9 +15,10 @@ pub enum StatementNode {
 }
 
 impl StatementNode {
-    pub fn parse(cursor: &mut ParserCursor) -> NodeParsingResult<Self> {
+    pub fn parse(cursor: &mut ParserCursor) -> NodeParsingResult<Self>  {
         match cursor.peek() {
-            _ => ExpressionNode::parse(cursor).map(Self::Expression),
+            Some(Token::Keyword(TokenLangKeyword::Let)) => Ok(VarDeclaration::parse(cursor)?.map(Self::VariableDeclaration)),
+            _ => Ok(ExpressionNode::parse(cursor)?.map(Self::Expression)),
         }
     }
 }

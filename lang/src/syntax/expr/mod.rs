@@ -35,19 +35,19 @@ impl ExpressionNode {
             // Reference to a variable
             Some(Token::Identifier(ident)) => {
                 cursor.consume();
-                Ok(Self::VarRef(ident.clone()))
+                Ok(Some(Self::VarRef(ident.clone())))
             },
 
             // A literal value
-            Some(Token::Literal(_)) | Some(Token::Keyword(_)) => LiteralExpression::parse(cursor).map(Self::Literal),
+            Some(Token::Literal(_)) | Some(Token::Keyword(_)) => LiteralExpression::parse(cursor).map(|x| x.map(Self::Literal)),
 
             // Reference to the last value computed
             Some(Token::Symbol(TokenSymbol::Underscore)) => {
                 cursor.consume();
-                Ok(Self::LastValue)
+                Ok(Some(Self::LastValue))
             },
 
-            _ => Err(ParserError::Expected("expr:t")),
+            _ => Ok(None),
         }
     }
 }

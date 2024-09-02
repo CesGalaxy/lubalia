@@ -16,7 +16,7 @@ impl Module {
 
     pub fn read(source_code: String) -> Option<StatementList> {
         if let Ok(tokens) = lexer(source_code) {
-            if let Ok(ast) = parser(tokens) {
+            if let Ok(Some(ast)) = parser(tokens) {
                 return Some(ast);
             }
         }

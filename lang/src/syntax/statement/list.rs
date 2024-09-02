@@ -1,6 +1,6 @@
 use lubalia_utils::cursor::CursorNavigation;
 
-use crate::{parser::{cursor::{ignore_eols, ignore_eols_but_last}, ParserCursor}, token::{symbol::TokenSymbol, Token}};
+use crate::{parser::{cursor::{ignore_eols, ignore_eols_but_last}, ParserCursor}, syntax::node::NodeParsingResult, token::{symbol::TokenSymbol, Token}};
 
 use super::StatementNode;
 
@@ -8,11 +8,11 @@ use super::StatementNode;
 pub struct StatementList(pub Vec<StatementNode>);
 
 impl StatementList {
-    pub fn parse(cursor: &mut ParserCursor) -> Self {
+    pub fn parse(cursor: &mut ParserCursor) -> NodeParsingResult<Self> {
         let mut items = Vec::new();
 
         if cursor.peek().is_some() {
-            if let Ok(statement) = StatementNode::parse(cursor) {
+            if let Some(statement) = StatementNode::parse(cursor)? {
                 items.push(statement);
             }
 
@@ -21,12 +21,12 @@ impl StatementList {
             while cursor.peek().is_some_and(|token| token == &Token::Symbol(TokenSymbol::EOL) || token == &Token::Symbol(TokenSymbol::EOL)) {
                 ignore_eols(cursor);
 
-                if let Ok(statement) = StatementNode::parse(cursor) {
+                if let Some(statement) = StatementNode::parse(cursor)? {
                     items.push(statement);
                 }
             }
         }
 
-        Self(items)
+        Ok(Some(Self(items)))
     }
 }

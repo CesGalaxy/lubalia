@@ -12,10 +12,10 @@ pub enum LiteralExpression {
 impl LiteralExpression {
     pub fn parse(cursor: &mut ParserCursor) -> NodeParsingResult<Self> {
         match cursor.consume() {
-            Some(Token::Literal(TokenLiteral::Number(n))) => Ok(Self::Number(*n)),
-            Some(Token::Literal(TokenLiteral::String(s))) => Ok(Self::String(s.clone())),
-            Some(Token::Keyword(TokenLangKeyword::True)) => Ok(Self::Boolean(true)),
-            Some(Token::Keyword(TokenLangKeyword::False)) => Ok(Self::Boolean(false)),
+            Some(Token::Literal(TokenLiteral::Number(n))) => Ok(Some(Self::Number(*n))),
+            Some(Token::Literal(TokenLiteral::String(s))) => Ok(Some(Self::String(s.clone()))),
+            Some(Token::Keyword(TokenLangKeyword::True)) => Ok(Some(Self::Boolean(true))),
+            Some(Token::Keyword(TokenLangKeyword::False)) => Ok(Some(Self::Boolean(false))),
             None => Err(ParserError::UnexpectedEnd),
             _ => Err(ParserError::Expected("expr:lit")),
         }
