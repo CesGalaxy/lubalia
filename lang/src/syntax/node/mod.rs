@@ -4,7 +4,7 @@ use crate::parser::{ParserCursor, error::ParserError};
 
 pub mod const_declaration;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Node {
     ConstDeclaration(ConstDeclarationNode),
 }

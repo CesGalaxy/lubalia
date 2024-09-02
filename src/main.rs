@@ -3,6 +3,7 @@
 pub mod vfs;
 
 use lubengine::eval;
+use vfs::LREVFS;
 
 fn main() {
     println!("Welcome to Lubalia!");
@@ -26,16 +27,7 @@ fn test_file(file_name: &str) {
     if let Ok(source_code) = file {
         eval(source_code);
 
-        // let mut vm = VM::new();
-
-        // let result = evaluate_code(&mut vm, code);
-
-        // // TODO: Shall I move the Display implementations into the main bin?
-        // match result {
-        //     Ok(Some(value)) => println!("OK -> {}", value),
-        //     Ok(None) => println!("OK -> No result"),
-        //     Err(e) => println!("ERROR -> {}", e),
-        // }
+        let vfs = LREVFS::new();
     } else {
         println!("Error reading file: {:?}", file.err());
     }

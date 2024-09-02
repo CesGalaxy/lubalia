@@ -1,5 +1,6 @@
 use lubalang::{lexer::lexer, parser::parser, syntax::node::Node};
 
+#[derive(Debug, Clone)]
 pub struct Module {
     pub name: String,
     pub items: Vec<Node>,
@@ -13,10 +14,13 @@ impl Module {
         }
     }
 
-    pub fn parse(source_code: String) -> Vec<Node> {
-        let tokens = lexer(source_code).unwrap();
-        let ast = parser(tokens).unwrap();
+    pub fn read(source_code: String) -> Option<Vec<Node>> {
+        if let Ok(tokens) = lexer(source_code) {
+            if let Ok(ast) = parser(tokens) {
+                return Some(ast);
+            }
+        }
 
-        ast
+        None
     }
 }
